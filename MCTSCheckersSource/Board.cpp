@@ -98,3 +98,47 @@ void Board::PrintBoard()
     std::cout << "  -----------------\n";
     std::cout << "   A B C D E F G H\n";
 }
+
+void Board::PrintBitboard(UINT bitboard)
+{
+    std::cout << "   A B C D E F G H\n";
+    std::cout << "  -----------------\n";
+
+    for (int row = 0; row < 8; row++) {
+        std::cout << 8 - row << "| ";
+
+        for (int col = 0; col < 8; col++) {
+            // Only dark squares are used
+            bool isDarkSquare = (row + col) % 2 != 0;
+
+            if (!isDarkSquare) {
+                std::cout << "  ";  // Light square - always empty
+                continue;
+            }
+
+            // Calculate bit position for dark squares
+            int darkSquareNumber = (row * 4) + (col / 2);  // Which dark square (0-31)
+            UINT mask = 1U << (31 - darkSquareNumber);     // Corresponding bit in the bitboard
+
+            // Check if bit is set in the bitboard
+            char piece = (bitboard & mask) ? '1' : '0';
+
+            std::cout << piece << ' ';
+        }
+
+        std::cout << "|" << 8 - row;
+
+        // Print the hex value for this row's dark squares
+        if (row % 2 == 0) {
+            int startBit = 28 - (row * 4);
+            UINT rowBits = (bitboard >> startBit) & 0xF;
+            std::cout << "  0x" << std::hex << rowBits;
+        }
+
+        std::cout << '\n';
+    }
+
+    std::cout << "  -----------------\n";
+    std::cout << "   A B C D E F G H\n";
+    std::cout << "Full value: 0x" << std::hex << std::uppercase << bitboard << std::dec << '\n';
+}
