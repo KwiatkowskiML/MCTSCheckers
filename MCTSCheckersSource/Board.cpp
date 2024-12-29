@@ -25,16 +25,16 @@ UINT Board::GetWhiteMovers()
 	UINT movers = (emptyFields << BASE_DIAGONAL_SHIFT) & _whitePieces;
 	
 	// Get the white pieces that can move in the right down direction
-	movers |= ((emptyFields & MOVES_LEFT_UP_AVAILABLE) << LEFT_UP_SHIFT) & _whitePieces;
+	movers |= ((emptyFields & MOVES_UP_LEFT_AVAILABLE) << LEFT_UP_SHIFT) & _whitePieces;
 
 	// Get the white pieces that can move in the left down direction
-	movers |= ((emptyFields & MOVES_RIGHT_UP_AVAILABLE) << RIGHT_UP_SHIFT) & _whitePieces;
+	movers |= ((emptyFields & MOVES_UP_RIGHT_AVAILABLE) << RIGHT_UP_SHIFT) & _whitePieces;
 
 	// Get the white kings that can move in the upper diagonal direction (right up or left up)
 	if (whiteKings)
 	{
 		movers |= (emptyFields >> BASE_DIAGONAL_SHIFT) & whiteKings;
-		movers |= ((emptyFields & MOVES_RIGHT_DOWN_AVAILABLE) >> RIGHT_DOWN_SHIFT) & whiteKings;
+		movers |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> RIGHT_DOWN_SHIFT) & whiteKings;
 		movers |= ((emptyFields & MOVES_DOWN_LEFT_AVAILABLE) >> LEFT_DOWN_SHIFT) & whiteKings;
 	}
 
@@ -96,7 +96,7 @@ void Board::PrintBoard()
     }
 
     std::cout << "  -----------------\n";
-    std::cout << "   A B C D E F G H\n";
+    std::cout << "   A B C D E F G H\n\n";
 }
 
 void Board::PrintBitboard(UINT bitboard)
@@ -128,17 +128,14 @@ void Board::PrintBitboard(UINT bitboard)
 
         std::cout << "|" << 8 - row;
 
-        // Print the hex value for this row's dark squares
-        if (row % 2 == 0) {
-            int startBit = 28 - (row * 4);
-            UINT rowBits = (bitboard >> startBit) & 0xF;
-            std::cout << "  0x" << std::hex << rowBits;
-        }
+        int startBit = 28 - (row * 4);
+        UINT rowBits = (bitboard >> startBit) & 0xF;
+        std::cout << "  " << std::hex << rowBits;
 
         std::cout << '\n';
     }
 
     std::cout << "  -----------------\n";
     std::cout << "   A B C D E F G H\n";
-    std::cout << "Full value: 0x" << std::hex << std::uppercase << bitboard << std::dec << '\n';
+    printf("Full values: 0x%08X\n\n", bitboard);
 }

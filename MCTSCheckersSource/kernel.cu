@@ -46,10 +46,7 @@ int main()
 
 	UINT whiteMovers = board.GetWhiteMovers();
 
-
-	Board::PrintBitboard(white);
 	Board::PrintBitboard(whiteMovers);
-
 
     return 0;
 }
