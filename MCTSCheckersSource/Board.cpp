@@ -11,6 +11,14 @@ UINT Board::GetBlackMovers()
 	return 0;
 }
 
+void Board::GetBlackAvailableMoves(std::queue<Board>& availableMoves)
+{
+    UINT blackMovers = 0;
+    UINT blackJumpers = 0;
+
+
+}
+
 UINT Board::GetWhiteJumpers()
 {
     const UINT emptyFields = ~(_whitePawns | _blackPawns);
@@ -86,7 +94,11 @@ void Board::AddMoveWhite(std::queue<Board>& availableMoves, UINT src, UINT dst)
     UINT newWhitePawns = _whitePawns & ~src;
     newWhitePawns |= dst;
 
-    availableMoves.push(Board(newWhitePawns, _blackPawns, _kings));
+    UINT newKings = _kings;
+    if (dst & WHITE_CROWNING)
+        newKings |= dst;
+
+    availableMoves.push(Board(newWhitePawns, _blackPawns, newKings));
 }
 
 void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
@@ -136,17 +148,9 @@ void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
                 }
             }
 
-            // TODO: consider kings move generation
+            // TODO: kings move generation
         }
     }
-}
-
-void Board::GetBlackAvailableMoves(std::queue<Board>& availableMoves)
-{
-	UINT blackMovers = 0;
-	UINT blackJumpers = 0;
-
-
 }
 
 void Board::PrintBoard()

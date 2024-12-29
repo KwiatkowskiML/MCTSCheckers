@@ -38,8 +38,8 @@ int main()
     //    return 1;
     //}
 
-	UINT white = 0xFFF00000;
-	UINT black = 0x00000FFF; // TODO: look into 0x00030FFF
+	UINT white = 0xFFF000068;
+	UINT black = 0x00000000; // TODO: look into 0x00030FFF
 	UINT kings = 0x00000000;
 
 	UINT white2 = 0x00600000;
