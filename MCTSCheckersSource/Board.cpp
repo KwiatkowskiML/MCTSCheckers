@@ -89,27 +89,22 @@ UINT Board::GetWhiteMovers()
 	return movers;
 }
 
-void Board::AddWhitePawnMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
+void Board::AddWhiteMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
 {
+	// Adding the move to the board
     UINT newWhitePawns = _whitePawns & ~src;
     newWhitePawns |= dst;
-
     UINT newKings = _kings;
-    if (dst & WHITE_CROWNING)
+
+    if (src & _kings)
+    {
+        newKings = _kings & ~src;
+        newKings |= dst;
+    }
+    else if (dst & WHITE_CROWNING)
         newKings |= dst;
 
     availableMoves.push(Board(newWhitePawns, _blackPawns, newKings));
-}
-
-void Board::AddWhiteKingMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
-{
-    UINT newWhitePawns = _whitePawns & ~src;
-    newWhitePawns |= dst;
-
-	UINT newKings = _kings & ~src;
-	newKings |= dst;
-
-	availableMoves.push(Board(newWhitePawns, _blackPawns, newKings));
 }
 
 void Board::GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT position)
@@ -138,7 +133,7 @@ void Board::GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT 
 			break;
 
         iteration++;
-		AddWhiteKingMove(availableMoves, position, newPosition);
+		AddWhiteMove(availableMoves, position, newPosition);
 	}
 
     newPosition = position;
@@ -161,7 +156,7 @@ void Board::GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT 
         if (!(newPosition & empty_fields))
             break;
         iteration++;
-        AddWhiteKingMove(availableMoves, position, newPosition);
+        AddWhiteMove(availableMoves, position, newPosition);
     }
 
 	newPosition = position;
@@ -184,7 +179,7 @@ void Board::GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT 
         if (!(newPosition & empty_fields))
             break;
         iteration++;
-        AddWhiteKingMove(availableMoves, position, newPosition);
+        AddWhiteMove(availableMoves, position, newPosition);
     }
 
     newPosition = position;
@@ -207,7 +202,7 @@ void Board::GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT 
         if (!(newPosition & empty_fields))
             break;
         iteration++;
-        AddWhiteKingMove(availableMoves, position, newPosition);
+        AddWhiteMove(availableMoves, position, newPosition);
     }
 }
 
@@ -244,7 +239,7 @@ void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
                 // Generate moves in the base diagonal direction
                 if ((mover >> BASE_DIAGONAL_SHIFT) & empty_fields)
                 {
-                    AddWhitePawnMove(availableMoves, mover, mover >> BASE_DIAGONAL_SHIFT);
+                    AddWhiteMove(availableMoves, mover, mover >> BASE_DIAGONAL_SHIFT);
                 }
 
                 if (mover & MOVES_DOWN_LEFT_AVAILABLE)
@@ -252,7 +247,7 @@ void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
                     // Generate moves in the down left direction
                     if ((mover >> DOWN_LEFT_SHIFT) & empty_fields)
                     {
-                        AddWhitePawnMove(availableMoves, mover, mover >> DOWN_LEFT_SHIFT);
+                        AddWhiteMove(availableMoves, mover, mover >> DOWN_LEFT_SHIFT);
                     }
                 }
 
@@ -261,7 +256,7 @@ void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
                     // Generate moves in the down right direction
                     if ((mover >> DOWN_RIGHT_SHIFT) & empty_fields)
                     {
-                        AddWhitePawnMove(availableMoves, mover, mover >> DOWN_RIGHT_SHIFT);
+                        AddWhiteMove(availableMoves, mover, mover >> DOWN_RIGHT_SHIFT);
                     }
                 }
             }            
