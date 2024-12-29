@@ -45,7 +45,7 @@ int main()
     board.PrintBoard();
 
 	UINT whiteMovers = board.GetWhiteMovers();
-	//Board::PrintBitboard(whiteMovers);
+	Board::PrintBitboard(whiteMovers);
 
 	UINT whiteJumpers = board.GetWhiteJumpers();
 	Board::PrintBitboard(whiteJumpers);

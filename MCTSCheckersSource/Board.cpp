@@ -26,12 +26,6 @@ UINT Board::GetWhiteJumpers()
 	{
 		// Get the white pawns that can capture black pawn in the base diagonal direction
 		jumpers |= ((captBlackPawns & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & _whitePawns;
-		//PrintBitboard(captBlackPawns);
-  //      printf("before values: 0x%08X\n", captBlackPawns & MOVES_UP_LEFT_AVAILABLE);
-		//PrintBitboard(captBlackPawns & MOVES_UP_LEFT_AVAILABLE);
-  //      printf("after values: 0x%08X\n", (captBlackPawns & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT);
-		//PrintBitboard((captBlackPawns & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT);
-		//PrintBitboard(1 << 16);
 		jumpers |= ((captBlackPawns & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _whitePawns;
 	}
 
