@@ -39,20 +39,24 @@ int main()
     //}
 
 	UINT white = 0xFFF00000;
-	UINT black = 0x00080FFF; // TODO: look into 0x00030FFF
+	UINT black = 0x00000FFF; // TODO: look into 0x00030FFF
 	UINT kings = 0x00000000;
 
 	UINT white2 = 0x00600000;
 	UINT black2 = 0x04000000;
-	Board board(white2, black2, kings);
+
+	Board board(white, black, kings);
     board.PrintBoard();
 
 	UINT whiteMovers = board.GetWhiteMovers();
 	Board::PrintBitboard(whiteMovers);
 
-	UINT whiteJumpers = board.GetWhiteJumpers();
-	Board::PrintBitboard(whiteJumpers);
-
+	//UINT whiteJumpers = board.GetWhiteJumpers();
+	//Board::PrintBitboard(whiteJumpers);
+    
+    std::queue<Board> availableMoves;
+	board.GetWhiteAvailableMoves(availableMoves);
+    Board::PrintPossibleMoves(availableMoves);
     return 0;
 }
 

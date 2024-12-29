@@ -50,11 +50,12 @@ UINT Board::GetWhiteJumpers()
 	captBlackPawns |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & _blackPawns;
 	jumpers |= (captBlackPawns >> BASE_DIAGONAL_SHIFT) & _whitePawns;
 
-	// TODO: Check for kings
+	// TODO: Consider if there is a need for analizing kings - there IS
 
     return jumpers;
 }
 
+// TODO: reconsider last row edge case
 UINT Board::GetWhiteMovers()
 {
 	const UINT emptyFields = ~(_whitePawns | _blackPawns);
@@ -80,11 +81,64 @@ UINT Board::GetWhiteMovers()
 	return movers;
 }
 
+void Board::AddMoveWhite(std::queue<Board>& availableMoves, UINT src, UINT dst)
+{
+    UINT newWhitePawns = _whitePawns & ~src;
+    newWhitePawns |= dst;
+
+    availableMoves.push(Board(newWhitePawns, _blackPawns, _kings));
+}
+
 void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
 {
-	// Find all of the moveable white pieces
-	// Get the first index of the movable piece and mark it in the bitboard as 0
-	// For each moveable piece, find all of the available moves
+	// Find all of the jumpers
+    UINT jumpers = GetWhiteJumpers();
+
+    if (jumpers)
+    {
+        // Generate moves for jumpers
+    }
+    else
+    {
+        // Generate moves for movers
+		UINT whiteMovers = GetWhiteMovers();
+		UINT empty_fields = ~(_whitePawns | _blackPawns);
+
+        while (whiteMovers)
+        {
+            // Get the first bit set
+			UINT mover = whiteMovers & -whiteMovers;  
+            
+            // Clear the bit from the bitboard
+            whiteMovers ^= mover;  
+
+            // Generate moves in the base diagonal direction
+            if ((mover >> BASE_DIAGONAL_SHIFT) & empty_fields)
+			{
+                AddMoveWhite(availableMoves, mover, mover >> BASE_DIAGONAL_SHIFT);
+			}
+
+			if (mover & MOVES_DOWN_LEFT_AVAILABLE)
+			{
+				// Generate moves in the down left direction
+				if ((mover >> DOWN_LEFT_SHIFT) & empty_fields)
+				{
+                    AddMoveWhite(availableMoves, mover, mover >> DOWN_LEFT_SHIFT);
+				}
+			}
+
+            if (mover & MOVES_DOWN_RIGHT_AVAILABLE)
+            {
+                // Generate moves in the down right direction
+                if ((mover >> DOWN_RIGHT_SHIFT) & empty_fields)
+                {
+                    AddMoveWhite(availableMoves, mover, mover >> DOWN_RIGHT_SHIFT);
+                }
+            }
+
+            // TODO: consider kings move generation
+        }
+    }
 }
 
 void Board::GetBlackAvailableMoves(std::queue<Board>& availableMoves)
@@ -163,4 +217,24 @@ void Board::PrintBitboard(UINT bitboard)
     std::cout << "  -----------------\n";
     std::cout << "   A B C D E F G H\n";
     printf("Full values: 0x%08X\n\n", bitboard);
+}
+
+void Board::PrintPossibleMoves(const std::queue<Board>& availableMoves)
+{
+    if (availableMoves.empty()) {
+        std::cout << "No moves available!\n\n";
+        return;
+    }
+
+    std::queue<Board> movesCopy = availableMoves;
+    int moveNumber = 1;
+
+    while (!movesCopy.empty()) {
+        std::cout << "Move #" << moveNumber << ":\n";
+        movesCopy.front().PrintBoard();
+        movesCopy.pop();
+        moveNumber++;
+    }
+
+    std::cout << "Total number of possible moves: " << moveNumber - 1 << "\n\n";
 }

@@ -8,6 +8,8 @@ private:
 	UINT _blackPawns;
 	UINT _kings;
 
+	void AddMoveWhite(std::queue<Board>& availableMoves, UINT src, UINT dst);
+
 public:
 	Board(UINT whitePieces, UINT blackPieces, UINT kings) : _whitePawns(whitePieces), _blackPawns(blackPieces), _kings(kings) {};
 	void GetWhiteAvailableMoves(std::queue<Board>& availableMoves);
@@ -21,5 +23,6 @@ public:
 	UINT GetWhiteMovers();
 
 	static void PrintBitboard(UINT bitboard);
+	static void PrintPossibleMoves(const std::queue<Board>& availableMoves);
 };
 
