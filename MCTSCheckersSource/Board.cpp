@@ -89,7 +89,7 @@ UINT Board::GetWhiteMovers()
 	return movers;
 }
 
-void Board::AddMoveWhite(std::queue<Board>& availableMoves, UINT src, UINT dst)
+void Board::AddWhitePawnMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
 {
     UINT newWhitePawns = _whitePawns & ~src;
     newWhitePawns |= dst;
@@ -99,6 +99,47 @@ void Board::AddMoveWhite(std::queue<Board>& availableMoves, UINT src, UINT dst)
         newKings |= dst;
 
     availableMoves.push(Board(newWhitePawns, _blackPawns, newKings));
+}
+
+void Board::AddWhiteKingMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
+{
+    UINT newWhitePawns = _whitePawns & ~src;
+    newWhitePawns |= dst;
+
+	UINT newKings = _kings & ~src;
+	newKings |= dst;
+
+	availableMoves.push(Board(newWhitePawns, _blackPawns, newKings));
+}
+
+void Board::GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT position)
+{
+    UINT empty_fields = ~(_whitePawns | _blackPawns);
+	UINT newPosition = position;
+    int iteration = 0;
+
+	while (newPosition)
+	{
+        if (iteration & 1)
+        {
+            if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
+                newPosition >>= DOWN_LEFT_SHIFT;
+            else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
+                newPosition >>= DOWN_RIGHT_SHIFT;
+            else
+                break;
+        }
+        else
+        {
+            newPosition >>= BASE_DIAGONAL_SHIFT;
+        }
+
+		if (!(newPosition & empty_fields))
+			break;
+
+        iteration++;
+		AddWhiteKingMove(availableMoves, position, newPosition);
+	}
 }
 
 void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
@@ -124,31 +165,37 @@ void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
             // Clear the bit from the bitboard
             whiteMovers ^= mover;  
 
-            // Generate moves in the base diagonal direction
-            if ((mover >> BASE_DIAGONAL_SHIFT) & empty_fields)
-			{
-                AddMoveWhite(availableMoves, mover, mover >> BASE_DIAGONAL_SHIFT);
-			}
-
-			if (mover & MOVES_DOWN_LEFT_AVAILABLE)
-			{
-				// Generate moves in the down left direction
-				if ((mover >> DOWN_LEFT_SHIFT) & empty_fields)
-				{
-                    AddMoveWhite(availableMoves, mover, mover >> DOWN_LEFT_SHIFT);
-				}
-			}
-
-            if (mover & MOVES_DOWN_RIGHT_AVAILABLE)
+            // King moves generation, without capturing enemy pieces
+            if (mover & _kings)
             {
-                // Generate moves in the down right direction
-                if ((mover >> DOWN_RIGHT_SHIFT) & empty_fields)
-                {
-                    AddMoveWhite(availableMoves, mover, mover >> DOWN_RIGHT_SHIFT);
-                }
+				GenerateWhiteKingBasicMoves(availableMoves, mover);
             }
+            else
+            {
+                // Generate moves in the base diagonal direction
+                if ((mover >> BASE_DIAGONAL_SHIFT) & empty_fields)
+                {
+                    AddWhitePawnMove(availableMoves, mover, mover >> BASE_DIAGONAL_SHIFT);
+                }
 
-            // TODO: kings move generation
+                if (mover & MOVES_DOWN_LEFT_AVAILABLE)
+                {
+                    // Generate moves in the down left direction
+                    if ((mover >> DOWN_LEFT_SHIFT) & empty_fields)
+                    {
+                        AddWhitePawnMove(availableMoves, mover, mover >> DOWN_LEFT_SHIFT);
+                    }
+                }
+
+                if (mover & MOVES_DOWN_RIGHT_AVAILABLE)
+                {
+                    // Generate moves in the down right direction
+                    if ((mover >> DOWN_RIGHT_SHIFT) & empty_fields)
+                    {
+                        AddWhitePawnMove(availableMoves, mover, mover >> DOWN_RIGHT_SHIFT);
+                    }
+                }
+            }            
         }
     }
 }
