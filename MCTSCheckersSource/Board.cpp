@@ -140,6 +140,29 @@ void Board::GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT 
         iteration++;
 		AddWhiteKingMove(availableMoves, position, newPosition);
 	}
+
+    newPosition = position;
+    iteration = 0;
+    while (newPosition)
+    {
+        if (!(iteration & 1))
+        {
+            if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
+                newPosition >>= DOWN_LEFT_SHIFT;
+            else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
+                newPosition >>= DOWN_RIGHT_SHIFT;
+            else
+                break;
+        }
+        else
+        {
+            newPosition >>= BASE_DIAGONAL_SHIFT;
+        }
+        if (!(newPosition & empty_fields))
+            break;
+        iteration++;
+        AddWhiteKingMove(availableMoves, position, newPosition);
+    }
 }
 
 void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
