@@ -29,6 +29,14 @@ UINT Board::GetWhiteJumpers()
 		jumpers |= ((captBlackPawns & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _whitePawns;
 	}
 
+	// Get the black pawns that might be captured in the other diagonal direction
+	captBlackPawns = ((emptyFields & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & _blackPawns;
+	captBlackPawns |= ((emptyFields & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _blackPawns;
+
+	jumpers |= (captBlackPawns << BASE_DIAGONAL_SHIFT) & _whitePawns;
+
+	// TODO: Check for kings
+
     return jumpers;
 }
 
