@@ -4,14 +4,12 @@
 class Board
 {
 private:
-	UINT _whitePieces;
-	UINT _blackPieces;
+	UINT _whitePawns;
+	UINT _blackPawns;
 	UINT _kings;
 
-	
-
 public:
-	Board(UINT whitePieces, UINT blackPieces, UINT kings) : _whitePieces(whitePieces), _blackPieces(blackPieces), _kings(kings) {};
+	Board(UINT whitePieces, UINT blackPieces, UINT kings) : _whitePawns(whitePieces), _blackPawns(blackPieces), _kings(kings) {};
 	void GetWhiteAvailableMoves(std::queue<Board>& availableMoves);
 	void GetBlackAvailableMoves(std::queue<Board>& availableMoves);
 	void PrintBoard();

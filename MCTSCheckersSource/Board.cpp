@@ -13,29 +13,51 @@ UINT Board::GetBlackMovers()
 
 UINT Board::GetWhiteJumpers()
 {
-	return 0;
+    const UINT emptyFields = ~(_whitePawns | _blackPawns);
+    const UINT whiteKings = _whitePawns & _kings;
+
+	UINT jumpers = 0;
+    
+	// Get the black pawns that might be captured in base diagonal direction
+    UINT captBlackPawns = (emptyFields << BASE_DIAGONAL_SHIFT) & _blackPawns;
+
+	// Check whether previously specified black pawns can actually be captured
+	if (captBlackPawns)
+	{
+		// Get the white pawns that can capture black pawn in the base diagonal direction
+		jumpers |= ((captBlackPawns & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & _whitePawns;
+		//PrintBitboard(captBlackPawns);
+  //      printf("before values: 0x%08X\n", captBlackPawns & MOVES_UP_LEFT_AVAILABLE);
+		//PrintBitboard(captBlackPawns & MOVES_UP_LEFT_AVAILABLE);
+  //      printf("after values: 0x%08X\n", (captBlackPawns & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT);
+		//PrintBitboard((captBlackPawns & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT);
+		//PrintBitboard(1 << 16);
+		jumpers |= ((captBlackPawns & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _whitePawns;
+	}
+
+    return jumpers;
 }
 
 UINT Board::GetWhiteMovers()
 {
-	const UINT emptyFields = ~(_whitePieces | _blackPieces);
-	const UINT whiteKings = _whitePieces & _kings;
+	const UINT emptyFields = ~(_whitePawns | _blackPawns);
+	const UINT whiteKings = _whitePawns & _kings;
 
 	// Get the white pieces that can move in the basic diagonal direction (right down or left down, depending on the row)
-	UINT movers = (emptyFields << BASE_DIAGONAL_SHIFT) & _whitePieces;
+	UINT movers = (emptyFields << BASE_DIAGONAL_SHIFT) & _whitePawns;
 	
 	// Get the white pieces that can move in the right down direction
-	movers |= ((emptyFields & MOVES_UP_LEFT_AVAILABLE) << LEFT_UP_SHIFT) & _whitePieces;
+	movers |= ((emptyFields & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & _whitePawns;
 
 	// Get the white pieces that can move in the left down direction
-	movers |= ((emptyFields & MOVES_UP_RIGHT_AVAILABLE) << RIGHT_UP_SHIFT) & _whitePieces;
+	movers |= ((emptyFields & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _whitePawns;
 
 	// Get the white kings that can move in the upper diagonal direction (right up or left up)
 	if (whiteKings)
 	{
 		movers |= (emptyFields >> BASE_DIAGONAL_SHIFT) & whiteKings;
-		movers |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> RIGHT_DOWN_SHIFT) & whiteKings;
-		movers |= ((emptyFields & MOVES_DOWN_LEFT_AVAILABLE) >> LEFT_DOWN_SHIFT) & whiteKings;
+		movers |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & whiteKings;
+		movers |= ((emptyFields & MOVES_DOWN_LEFT_AVAILABLE) >> DOWN_LEFT_SHIFT) & whiteKings;
 	}
 
 	return movers;
@@ -60,41 +82,35 @@ void Board::PrintBoard()
 {
     std::cout << "   A B C D E F G H\n";
     std::cout << "  -----------------\n";
-
     for (int row = 0; row < 8; row++) {
         std::cout << 8 - row << "| ";
-
         for (int col = 0; col < 8; col++) {
             // Only dark squares can have pieces
             bool isDarkSquare = (row + col) % 2 != 0;
-
             if (!isDarkSquare) {
                 std::cout << "  ";  // Light square - always empty
                 continue;
             }
 
-            // Calculate bit position for dark squares
-            // We need to map board position to bit position
-            int darkSquareNumber = (row * 4) + (col / 2);  // Calculate which dark square this is
-            UINT mask = 1U << (31 - darkSquareNumber);  // Map to bitboard position
+            // Calculate bit position for dark squares (bottom to top, left to right)
+            int darkSquareNumber = (7 - row) * 4 + (col / 2);
+            UINT mask = 1U << darkSquareNumber;
 
             char piece = ' ';  // Empty dark square
 
             // Check if square has a piece
-            if (_whitePieces & mask) {
+            if (_whitePawns & mask) {
                 piece = (_kings & mask) ? 'W' : 'w';
             }
-            else if (_blackPieces & mask) {
+            else if (_blackPawns & mask) {
                 piece = (_kings & mask) ? 'B' : 'b';
             }
 
             // Print the piece
             std::cout << piece << ' ';
         }
-
         std::cout << "|" << 8 - row << '\n';
     }
-
     std::cout << "  -----------------\n";
     std::cout << "   A B C D E F G H\n\n";
 }
@@ -103,38 +119,30 @@ void Board::PrintBitboard(UINT bitboard)
 {
     std::cout << "   A B C D E F G H\n";
     std::cout << "  -----------------\n";
-
     for (int row = 0; row < 8; row++) {
         std::cout << 8 - row << "| ";
-
         for (int col = 0; col < 8; col++) {
             // Only dark squares are used
             bool isDarkSquare = (row + col) % 2 != 0;
-
             if (!isDarkSquare) {
                 std::cout << "  ";  // Light square - always empty
                 continue;
             }
-
             // Calculate bit position for dark squares
-            int darkSquareNumber = (row * 4) + (col / 2);  // Which dark square (0-31)
-            UINT mask = 1U << (31 - darkSquareNumber);     // Corresponding bit in the bitboard
-
+            int darkSquareNumber = (7 - row) * 4 + (col / 2);  // Bottom to top, left to right
+            UINT mask = 1U << darkSquareNumber;  // No need to subtract from 31 anymore
             // Check if bit is set in the bitboard
             char piece = (bitboard & mask) ? '1' : '0';
-
             std::cout << piece << ' ';
         }
-
         std::cout << "|" << 8 - row;
 
-        int startBit = 28 - (row * 4);
+        // Calculate row bits based on the new numbering scheme
+        int startBit = (7 - row) * 4;  // Bottom row starts at bit 0
         UINT rowBits = (bitboard >> startBit) & 0xF;
         std::cout << "  " << std::hex << rowBits;
-
         std::cout << '\n';
     }
-
     std::cout << "  -----------------\n";
     std::cout << "   A B C D E F G H\n";
     printf("Full values: 0x%08X\n\n", bitboard);
