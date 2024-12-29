@@ -35,6 +35,21 @@ UINT Board::GetWhiteJumpers()
 
 	jumpers |= (captBlackPawns << BASE_DIAGONAL_SHIFT) & _whitePawns;
 
+	// Find all of the black pawns that might be captured backwards in base diagonal
+    captBlackPawns = (emptyFields >> BASE_DIAGONAL_SHIFT) & _blackPawns;
+
+    // Check whether previously specified black pawns can actually be captured
+    if (captBlackPawns)
+    {
+		jumpers |= ((captBlackPawns & MOVES_DOWN_LEFT_AVAILABLE) >> DOWN_LEFT_SHIFT) & _whitePawns;
+		jumpers |= ((captBlackPawns & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & _whitePawns;
+    }
+
+	// Find all of the black pawns that might be captured backwards in the other diagonal
+	captBlackPawns = ((emptyFields & MOVES_DOWN_LEFT_AVAILABLE) >> DOWN_LEFT_SHIFT) & _blackPawns;
+	captBlackPawns |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & _blackPawns;
+	jumpers |= (captBlackPawns >> BASE_DIAGONAL_SHIFT) & _whitePawns;
+
 	// TODO: Check for kings
 
     return jumpers;

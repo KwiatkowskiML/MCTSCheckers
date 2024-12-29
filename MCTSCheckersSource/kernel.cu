@@ -41,7 +41,10 @@ int main()
 	UINT white = 0xFFF00000;
 	UINT black = 0x00080FFF; // TODO: look into 0x00030FFF
 	UINT kings = 0x00000000;
-	Board board(white, black, kings);
+
+	UINT white2 = 0x00600000;
+	UINT black2 = 0x04000000;
+	Board board(white2, black2, kings);
     board.PrintBoard();
 
 	UINT whiteMovers = board.GetWhiteMovers();
