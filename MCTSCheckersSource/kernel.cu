@@ -42,20 +42,15 @@ int main()
 	UINT black = 0x00000000; // TODO: look into 0x00030FFF
 	UINT kings = 0x00000000;
 
-	UINT white2 = 0x00600000;
-	UINT black2 = 0x04000000;
+	UINT white2 = 0x00040000;
+	UINT black2 = 0x00606000;
 
-	UINT white3 = 0x02040000;
+	UINT white3 = 0x80000000;
+	UINT black3 = 0x080C0E00;
 	UINT kings3 = 0x00040000;
 
-	Board board(white2, black2, kings);
+	Board board(white3, black3, kings);
     board.PrintBoard();
-
-	UINT whiteMovers = board.GetWhiteMovers();
-	Board::PrintBitboard(whiteMovers);
-
-	//UINT whiteJumpers = board.GetWhiteJumpers();
-	//Board::PrintBitboard(whiteJumpers);
     
     std::queue<Board> availableMoves;
 	board.GetWhiteAvailableMoves(availableMoves);

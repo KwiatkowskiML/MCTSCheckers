@@ -89,7 +89,7 @@ UINT Board::GetWhiteMovers()
 	return movers;
 }
 
-void Board::AddWhiteMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
+void Board::AddWhiteBasicMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
 {
 	// Adding the move to the board
     UINT newWhitePawns = _whitePawns & ~src;
@@ -105,6 +105,46 @@ void Board::AddWhiteMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
         newKings |= dst;
 
     availableMoves.push(Board(newWhitePawns, _blackPawns, newKings));
+}
+
+void Board::AddWhiteCapturingMove(std::queue<Board>& availableMoves, UINT src, UINT captured, UINT dst)
+{
+	// Adding the move to the board
+    UINT newWhitePawns = _whitePawns & ~src;
+    newWhitePawns |= dst;
+    UINT newKings = _kings;
+
+	// Handing the case when the pawn becomes a king, or the king is moved
+    if (src & _kings)
+    {
+        newKings = _kings & ~src;
+        newKings |= dst;
+    }
+    else if (dst & WHITE_CROWNING)
+        newKings |= dst;
+
+	// Removing the captured piece from the board
+	UINT newBlackPawns = _blackPawns & ~captured;
+	Board newBoard(newWhitePawns, newBlackPawns, newKings);
+    
+	// Capturing continuation
+    UINT newJumpers = newBoard.GetWhiteJumpers();
+	if (newJumpers & dst)
+	{
+		// Continue capturing
+		std::queue<Board> capturingMovesContinuation;
+		newBoard.GenerateWhitePawnCapturingMoves(capturingMovesContinuation, dst);
+
+		while (!capturingMovesContinuation.empty())
+		{
+			availableMoves.push(capturingMovesContinuation.front());
+			capturingMovesContinuation.pop();
+		}
+	}
+	else
+	{
+		availableMoves.push(newBoard);
+	}
 }
 
 // TODO: add capturing moves
@@ -134,7 +174,7 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
 			break;
 
         iteration++;
-		AddWhiteMove(availableMoves, position, newPosition);
+		AddWhiteBasicMove(availableMoves, position, newPosition);
 	}
 
     newPosition = position;
@@ -157,7 +197,7 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
         if (!(newPosition & empty_fields))
             break;
         iteration++;
-        AddWhiteMove(availableMoves, position, newPosition);
+        AddWhiteBasicMove(availableMoves, position, newPosition);
     }
 
 	newPosition = position;
@@ -180,7 +220,7 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
         if (!(newPosition & empty_fields))
             break;
         iteration++;
-        AddWhiteMove(availableMoves, position, newPosition);
+        AddWhiteBasicMove(availableMoves, position, newPosition);
     }
 
     newPosition = position;
@@ -203,7 +243,7 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
         if (!(newPosition & empty_fields))
             break;
         iteration++;
-        AddWhiteMove(availableMoves, position, newPosition);
+        AddWhiteBasicMove(availableMoves, position, newPosition);
     }
 }
 
@@ -214,7 +254,7 @@ void Board::GenerateWhitePawnBasicMoves(std::queue<Board>& availableMoves, UINT 
     // Generate moves in the base diagonal direction
     if ((position >> BASE_DIAGONAL_SHIFT) & empty_fields)
     {
-        AddWhiteMove(availableMoves, position, position >> BASE_DIAGONAL_SHIFT);
+        AddWhiteBasicMove(availableMoves, position, position >> BASE_DIAGONAL_SHIFT);
     }
 
     if (position & MOVES_DOWN_LEFT_AVAILABLE)
@@ -222,7 +262,7 @@ void Board::GenerateWhitePawnBasicMoves(std::queue<Board>& availableMoves, UINT 
         // Generate moves in the down left direction
         if ((position >> DOWN_LEFT_SHIFT) & empty_fields)
         {
-            AddWhiteMove(availableMoves, position, position >> DOWN_LEFT_SHIFT);
+            AddWhiteBasicMove(availableMoves, position, position >> DOWN_LEFT_SHIFT);
         }
     }
 
@@ -231,7 +271,7 @@ void Board::GenerateWhitePawnBasicMoves(std::queue<Board>& availableMoves, UINT 
         // Generate moves in the down right direction
         if ((position >> DOWN_RIGHT_SHIFT) & empty_fields)
         {
-            AddWhiteMove(availableMoves, position, position >> DOWN_RIGHT_SHIFT);
+            AddWhiteBasicMove(availableMoves, position, position >> DOWN_RIGHT_SHIFT);
         }
     }
 }
@@ -240,21 +280,26 @@ void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, U
 {
 	UINT empty_fields = ~(_whitePawns | _blackPawns);
 
-	// Generate capturing moves in the base diagonal direction
+	//--------------------------------------------------------------------------------
+	// Capturing black pawns below the white pawn
+	//--------------------------------------------------------------------------------
+    
+	// Generate capturing moves in the base down diagonal direction
     UINT newPosition = position >> BASE_DIAGONAL_SHIFT;
 	if (newPosition & _blackPawns)
 	{
+		UINT captured = newPosition;
 		if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
 		{
 			newPosition >>= DOWN_LEFT_SHIFT;
 			if (newPosition & empty_fields)
-				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 		else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
 		{
 			newPosition >>= DOWN_RIGHT_SHIFT;
 			if (newPosition & empty_fields)
-				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
@@ -264,9 +309,10 @@ void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, U
 		newPosition = position >> DOWN_LEFT_SHIFT;
 		if (newPosition & _blackPawns)
 		{
+            UINT captured = newPosition;
 			newPosition >>= BASE_DIAGONAL_SHIFT;
 			if (newPosition & empty_fields)
-				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
@@ -276,27 +322,33 @@ void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, U
 		newPosition = position >> DOWN_RIGHT_SHIFT;
 		if (newPosition & _blackPawns)
 		{
+            UINT captured = newPosition;
 			newPosition >>= BASE_DIAGONAL_SHIFT;
 			if (newPosition & empty_fields)
-				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
-	// Generate capturing moves in the upper diagonal direction
+	//--------------------------------------------------------------------------------
+	// Capturing black pawns above the white pawn
+	//--------------------------------------------------------------------------------
+
+	// Generate capturing moves in the base upper diagonal direction
 	newPosition = position << BASE_DIAGONAL_SHIFT;
 	if (newPosition & _blackPawns)
 	{
+        UINT captured = newPosition;
 		if (newPosition & MOVES_UP_LEFT_AVAILABLE)
 		{
 			newPosition <<= UP_LEFT_SHIFT;
 			if (newPosition & empty_fields)
-				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 		else if (newPosition & MOVES_UP_RIGHT_AVAILABLE)
 		{
 			newPosition <<= UP_RIGHT_SHIFT;
 			if (newPosition & empty_fields)
-				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
@@ -306,9 +358,10 @@ void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, U
 		newPosition = position << UP_LEFT_SHIFT;
 		if (newPosition & _blackPawns)
 		{
+            UINT captured = newPosition;
 			newPosition <<= BASE_DIAGONAL_SHIFT;
 			if (newPosition & empty_fields)
-				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
@@ -318,9 +371,10 @@ void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, U
         newPosition = position << UP_RIGHT_SHIFT;
         if (newPosition & _blackPawns)
         {
+            UINT captured = newPosition;
             newPosition <<= BASE_DIAGONAL_SHIFT;
             if (newPosition & empty_fields)
-                AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+                AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
         }
     }
 }
@@ -377,39 +431,36 @@ void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
 
 void Board::PrintBoard()
 {
-    std::cout << "   A B C D E F G H\n";
-    std::cout << "  -----------------\n";
+    std::cout << "     A   B   C   D   E   F   G   H\n";
+    std::cout << "   +---+---+---+---+---+---+---+---+\n";
     for (int row = 0; row < 8; row++) {
-        std::cout << 8 - row << "| ";
+        std::cout << " " << 8 - row << " |";
         for (int col = 0; col < 8; col++) {
             // Only dark squares can have pieces
             bool isDarkSquare = (row + col) % 2 != 0;
             if (!isDarkSquare) {
-                std::cout << "  ";  // Light square - always empty
-                continue;
+                std::cout << "   |";  // Light square - always empty with no vertical line
             }
-
-            // Calculate bit position for dark squares (bottom to top, left to right)
-            int darkSquareNumber = (7 - row) * 4 + (col / 2);
-            UINT mask = 1U << darkSquareNumber;
-
-            char piece = ' ';  // Empty dark square
-
-            // Check if square has a piece
-            if (_whitePawns & mask) {
-                piece = (_kings & mask) ? 'W' : 'w';
+            else {
+                // Calculate bit position for dark squares (bottom to top, left to right)
+                int darkSquareNumber = (7 - row) * 4 + (col / 2);
+                UINT mask = 1U << darkSquareNumber;
+                // Check if square has a piece
+                if (_whitePawns & mask) {
+                    std::cout << " " << (_kings & mask ? 'W' : 'w') << " |";
+                }
+                else if (_blackPawns & mask) {
+                    std::cout << " " << (_kings & mask ? 'B' : 'b') << " |";
+                }
+                else {
+                    std::cout << "   |";  // Empty dark square
+                }
             }
-            else if (_blackPawns & mask) {
-                piece = (_kings & mask) ? 'B' : 'b';
-            }
-
-            // Print the piece
-            std::cout << piece << ' ';
         }
-        std::cout << "|" << 8 - row << '\n';
+        std::cout << " " << 8 - row << '\n';
+        std::cout << "   +---+---+---+---+---+---+---+---+\n";  // Horizontal separator after each row
     }
-    std::cout << "  -----------------\n";
-    std::cout << "   A B C D E F G H\n\n";
+    std::cout << "     A   B   C   D   E   F   G   H\n\n";
 }
 
 void Board::PrintBitboard(UINT bitboard)
@@ -462,5 +513,5 @@ void Board::PrintPossibleMoves(const std::queue<Board>& availableMoves)
         moveNumber++;
     }
 
-    std::cout << "Total number of possible moves: " << moveNumber - 1 << "\n\n";
+	printf("Total number of possible moves: %d\n\n", moveNumber - 1);
 }
