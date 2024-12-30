@@ -9,7 +9,8 @@ private:
 	UINT _kings;
 
 	void AddWhiteMove(std::queue<Board>& availableMoves, UINT src, UINT dst);
-	void GenerateWhiteKingBasicMoves(std::queue<Board>& availableMoves, UINT position);
+	void GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT position);
+	void GenerateWhitePawnBasicMoves(std::queue<Board>& availableMoves, UINT position);
 
 public:
 	Board(UINT whitePieces, UINT blackPieces, UINT kings) : _whitePawns(whitePieces), _blackPawns(blackPieces), _kings(kings) {};

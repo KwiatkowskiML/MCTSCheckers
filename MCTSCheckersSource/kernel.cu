@@ -45,7 +45,7 @@ int main()
 	UINT white2 = 0x00600000;
 	UINT black2 = 0x04000000;
 
-	UINT white3 = 0x00040000;
+	UINT white3 = 0x02040000;
 	UINT kings3 = 0x00040000;
 
 	Board board(white3, black, kings3);
