@@ -107,6 +107,7 @@ void Board::AddWhiteMove(std::queue<Board>& availableMoves, UINT src, UINT dst)
     availableMoves.push(Board(newWhitePawns, _blackPawns, newKings));
 }
 
+// TODO: add capturing moves
 void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT position)
 {
     UINT empty_fields = ~(_whitePawns | _blackPawns);
@@ -235,6 +236,95 @@ void Board::GenerateWhitePawnBasicMoves(std::queue<Board>& availableMoves, UINT 
     }
 }
 
+void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, UINT position)
+{
+	UINT empty_fields = ~(_whitePawns | _blackPawns);
+
+	// Generate capturing moves in the base diagonal direction
+    UINT newPosition = position >> BASE_DIAGONAL_SHIFT;
+	if (newPosition & _blackPawns)
+	{
+		if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
+		{
+			newPosition >>= DOWN_LEFT_SHIFT;
+			if (newPosition & empty_fields)
+				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+		}
+		else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
+		{
+			newPosition >>= DOWN_RIGHT_SHIFT;
+			if (newPosition & empty_fields)
+				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+		}
+	}
+
+	// Generate capturing moves in the down left direction
+	if (position & MOVES_DOWN_LEFT_AVAILABLE)
+	{
+		newPosition = position >> DOWN_LEFT_SHIFT;
+		if (newPosition & _blackPawns)
+		{
+			newPosition >>= BASE_DIAGONAL_SHIFT;
+			if (newPosition & empty_fields)
+				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+		}
+	}
+
+	// Generate capturing moves in the down right direction
+	if (position & MOVES_DOWN_RIGHT_AVAILABLE)
+	{
+		newPosition = position >> DOWN_RIGHT_SHIFT;
+		if (newPosition & _blackPawns)
+		{
+			newPosition >>= BASE_DIAGONAL_SHIFT;
+			if (newPosition & empty_fields)
+				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+		}
+	}
+
+	// Generate capturing moves in the upper diagonal direction
+	newPosition = position << BASE_DIAGONAL_SHIFT;
+	if (newPosition & _blackPawns)
+	{
+		if (newPosition & MOVES_UP_LEFT_AVAILABLE)
+		{
+			newPosition <<= UP_LEFT_SHIFT;
+			if (newPosition & empty_fields)
+				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+		}
+		else if (newPosition & MOVES_UP_RIGHT_AVAILABLE)
+		{
+			newPosition <<= UP_RIGHT_SHIFT;
+			if (newPosition & empty_fields)
+				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+		}
+	}
+
+	// Generate capturing moves in the up left direction
+	if (position & MOVES_UP_LEFT_AVAILABLE)
+	{
+		newPosition = position << UP_LEFT_SHIFT;
+		if (newPosition & _blackPawns)
+		{
+			newPosition <<= BASE_DIAGONAL_SHIFT;
+			if (newPosition & empty_fields)
+				AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+		}
+	}
+
+	// Generate capturing moves in the up right direction
+    if (position & MOVES_UP_RIGHT_AVAILABLE)
+    {
+        newPosition = position << UP_RIGHT_SHIFT;
+        if (newPosition & _blackPawns)
+        {
+            newPosition <<= BASE_DIAGONAL_SHIFT;
+            if (newPosition & empty_fields)
+                AddWhiteMove(availableMoves, position, newPosition); // TODO: removing captured pieces and continuing the jumping
+        }
+    }
+}
+
 void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
 {
 	// Find all of the jumpers
@@ -243,6 +333,25 @@ void Board::GetWhiteAvailableMoves(std::queue<Board>& availableMoves)
     if (jumpers)
     {
         // Generate moves for jumpers
+        while (jumpers)
+        {
+			// Get the first bit set
+			UINT jumper = jumpers & -jumpers;
+
+			// Clear the bit from the bitboard
+			jumpers ^= jumper;
+
+			// King moves generation, with capturing enemy pieces
+            if (jumper & _kings)
+            {
+				// Generate king moves
+			}
+            else
+            {
+                // Generate white pawn moves
+				GenerateWhitePawnCapturingMoves(availableMoves, jumper);
+            }
+        }
     }
     else
     {

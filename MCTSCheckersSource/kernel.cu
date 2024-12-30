@@ -48,7 +48,7 @@ int main()
 	UINT white3 = 0x02040000;
 	UINT kings3 = 0x00040000;
 
-	Board board(white3, black, kings3);
+	Board board(white2, black2, kings);
     board.PrintBoard();
 
 	UINT whiteMovers = board.GetWhiteMovers();
