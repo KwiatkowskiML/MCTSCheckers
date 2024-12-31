@@ -2,6 +2,7 @@
 
 #include "MoveGenerator.h"
 #include "Utils.h"
+#include "Board2.h"
 
 MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor color)
 {
@@ -146,6 +147,140 @@ void MoveGenerator::generatePawnCaptures(const BitBoard& pieces, PieceColor colo
 {
 	// TODO: Implement for black pieces
 	assert(color == PieceColor::White);
+	UINT empty_fields = pieces.getEmptyFields();
+	MoveList singleCaptureMoves;
+
+	//--------------------------------------------------------------------------------
+	// Capturing black pawns below the white pawn
+	//--------------------------------------------------------------------------------
+
+	// Generate capturing moves in the base down diagonal direction
+	UINT newPosition = position >> BASE_DIAGONAL_SHIFT;
+	if (newPosition & pieces.blackPawns)
+	{
+		UINT captured = newPosition;
+		if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
+		{
+			newPosition >>= DOWN_LEFT_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+		else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
+		{
+			newPosition >>= DOWN_RIGHT_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+	}
+
+	// Generate capturing moves in the down left direction
+	if (position & MOVES_DOWN_LEFT_AVAILABLE)
+	{
+		newPosition = position >> DOWN_LEFT_SHIFT;
+		if (newPosition & pieces.blackPawns)
+		{
+			UINT captured = newPosition;
+			newPosition >>= BASE_DIAGONAL_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+	}
+
+	// Generate capturing moves in the down right direction
+	if (position & MOVES_DOWN_RIGHT_AVAILABLE)
+	{
+		newPosition = position >> DOWN_RIGHT_SHIFT;
+		if (newPosition & pieces.blackPawns)
+		{
+			UINT captured = newPosition;
+			newPosition >>= BASE_DIAGONAL_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+	}
+
+	//--------------------------------------------------------------------------------
+	// Capturing black pawns above the white pawn
+	//--------------------------------------------------------------------------------
+
+	// Generate capturing moves in the base upper diagonal direction
+	newPosition = position << BASE_DIAGONAL_SHIFT;
+	if (newPosition & pieces.blackPawns)
+	{
+		UINT captured = newPosition;
+		if (newPosition & MOVES_UP_LEFT_AVAILABLE)
+		{
+			newPosition <<= UP_LEFT_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+		else if (newPosition & MOVES_UP_RIGHT_AVAILABLE)
+		{
+			newPosition <<= UP_RIGHT_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+	}
+
+	// Generate capturing moves in the up left direction
+	if (position & MOVES_UP_LEFT_AVAILABLE)
+	{
+		newPosition = position << UP_LEFT_SHIFT;
+		if (newPosition & pieces.blackPawns)
+		{
+			UINT captured = newPosition;
+			newPosition <<= BASE_DIAGONAL_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+	}
+
+	// Generate capturing moves in the up right direction
+	if (position & MOVES_UP_RIGHT_AVAILABLE)
+	{
+		newPosition = position << UP_RIGHT_SHIFT;
+		if (newPosition & pieces.blackPawns)
+		{
+			UINT captured = newPosition;
+			newPosition <<= BASE_DIAGONAL_SHIFT;
+			if (newPosition & empty_fields)
+				singleCaptureMoves.emplace_back(position, newPosition, captured);
+		}
+	}
+
+	Board2 currentState(pieces.whitePawns, pieces.blackPawns, pieces.kings);
+
+	// Process each single capture and check for continuations
+	for (const Move& singleCapture : singleCaptureMoves) {
+
+		// Create new board state after capture
+		BitBoard newState = singleCapture.getBitboardAfterMove(pieces);
+
+		// Check for additional captures from the new position
+		UINT newJumpers = getJumpers(newState, PieceColor::White);
+
+		if (newJumpers & singleCapture.destination) {
+			// Recursively generate additional captures
+			MoveList continuationMoves;
+			generatePawnCaptures(newState, PieceColor::White, singleCapture.destination, continuationMoves);
+
+			// If no continuations found, add the single capture
+			if (continuationMoves.empty()) {
+				moves.push_back(singleCapture);
+			}
+			// Add all continuation moves
+			for (const Move& continuation : continuationMoves) {
+				Move combinedMove = singleCapture;
+				combinedMove.destination = continuation.destination;
+				combinedMove.captured |= continuation.captured;
+				moves.push_back(combinedMove);
+			}
+		}
+		else {
+			// No continuations possible, add the single capture
+			moves.push_back(singleCapture);
+		}
+	}
 }
 
 void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)

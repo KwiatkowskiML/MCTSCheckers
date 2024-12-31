@@ -1,3 +1,4 @@
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\assert.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_malloc.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\corecrt_math.h
@@ -33,6 +34,7 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\sys\types.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\time.h
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\wchar.h
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\atomic
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\cassert
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\cctype
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\cerrno
 C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\include\cfloat
