@@ -5,8 +5,24 @@
 
 MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor color)
 {
-	return MoveList();
+	// Find all of the jumpers
+	UINT jumpers = getJumpers(pieces, color);
+	MoveList moves;
+
+	if (jumpers)
+	{
+		generateCapturingMoves(pieces, color, jumpers, moves);
+		return moves;
+	}
+
+	UINT movers = getMovers(pieces, color);
+	generateBasicMoves(pieces, color, movers, moves);	
+	return moves;
 }
+
+//----------------------------------------------------------------
+// Getting moveable pieces
+//----------------------------------------------------------------
 
 UINT MoveGenerator::getJumpers(const BitBoard& pieces, PieceColor color)
 {
@@ -56,6 +72,9 @@ UINT MoveGenerator::getJumpers(const BitBoard& pieces, PieceColor color)
 
 UINT MoveGenerator::getMovers(const BitBoard& pieces, PieceColor color)
 {
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
 	const UINT emptyFields = pieces.getEmptyFields();
 	const UINT whiteKings = pieces.whitePawns & pieces.kings;
 
@@ -77,4 +96,60 @@ UINT MoveGenerator::getMovers(const BitBoard& pieces, PieceColor color)
 	}
 
 	return movers;
+}
+
+//----------------------------------------------------------------
+// Generating a list of moves
+//----------------------------------------------------------------
+
+void MoveGenerator::generateBasicMoves(const BitBoard& pieces, PieceColor color, UINT movers, MoveList& moves)
+{
+	while (movers) {
+		UINT mover = movers & -movers;
+		movers ^= mover;
+
+		bool isKing = (mover & pieces.kings) != 0;
+		if (isKing) {
+			generateKingMoves(pieces, color, mover, moves);
+		}
+		else {
+			generatePawnMoves(pieces, color, mover, moves);
+		}
+	}
+}
+
+void MoveGenerator::generateCapturingMoves(const BitBoard& pieces, PieceColor color, UINT jumpers, MoveList& moves)
+{
+	while (jumpers) {
+		UINT jumper = jumpers & -jumpers;
+		jumpers ^= jumper;
+
+		bool isKing = (jumper & pieces.kings) != 0;
+		if (isKing) {
+			generateKingCaptures(pieces, color, jumper, moves);
+		}
+		else {
+			generatePawnCaptures(pieces, color, jumper, moves);
+		}
+	}
+}
+
+//----------------------------------------------------------------
+// Generating specified move
+//----------------------------------------------------------------
+
+void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+{
+}
+
+void MoveGenerator::generatePawnCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+{
+}
+
+void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+{
+}
+
+void MoveGenerator::generatePawnMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+{
 }

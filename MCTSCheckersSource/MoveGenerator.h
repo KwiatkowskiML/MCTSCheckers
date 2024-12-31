@@ -8,14 +8,17 @@ class MoveGenerator {
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
 //private:
+	// Getting moveable pieces
     static UINT getJumpers(const BitBoard& pieces, PieceColor color);
     static UINT getMovers(const BitBoard& pieces, PieceColor color);
 
-    //static MoveList generateBasicMoves(const BitBoard& pieces, UINT position, bool isKing);
-    //static MoveList generateCapturingMoves(const BitBoard& pieces, UINT position, bool isKing);
-    //
-    //static void generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
-    //static void generatePawnCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
-    //static void generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
-    //static void generatePawnMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
+    // Generating a list of moves
+    static void generateBasicMoves(const BitBoard& pieces, PieceColor color, UINT movers, MoveList& moves);
+    static void generateCapturingMoves(const BitBoard& pieces, PieceColor color, UINT jumpers, MoveList& moves);
+    
+    // Generating specified move
+    static void generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
+    static void generatePawnCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
+    static void generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
+    static void generatePawnMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
 };
