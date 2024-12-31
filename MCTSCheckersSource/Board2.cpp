@@ -1,11 +1,49 @@
 #include "Board2.h"
+#include <cassert>;
+#include "MoveGenerator.h"
 
 //----------------------------------------------------------------
 // Move generation
 //----------------------------------------------------------------
-std::vector<Board2> Board2::getAvailableMoves(PieceColor color) const
+MoveList Board2::getAvailableMoves(PieceColor color) const
 {
-    return std::vector<Board2>();
+    return MoveGenerator::generateMoves(_pieces, color);
+
+}
+
+Board2 Board2::getBoardAfterMove(const Move& move) const
+{
+    // TODO: Implement for black pieces
+    assert(move.color == PieceColor::White);
+
+    // Deleting the initial position of the moved piece
+    UINT newWhitePawns = _pieces.whitePawns & ~move.source;
+	UINT newBlackPawns = _pieces.blackPawns;
+    UINT newKings = _pieces.kings;
+
+    // Deleting captured pieces
+	if (move.isCapture())
+	{
+		newBlackPawns = _pieces.blackPawns & ~move.captured;
+		newKings = _pieces.kings & ~move.captured;
+  	}
+
+    // Adding new piece position
+    newWhitePawns |= move.destination;
+
+    // Handing the case when the pawn becomes a king, or the king is moved
+    if (move.source & _pieces.kings)
+    {
+        newKings = _pieces.kings & ~move.source;
+        newKings |= move.destination;
+    }
+    else if (move.destination & WHITE_CROWNING)
+        newKings |= move.destination;
+
+	Board2 newBoard(newWhitePawns, newBlackPawns, newKings);
+    return newBoard;
+
+	// TODO: consider capturing continuation here
 }
 
 //----------------------------------------------------------------

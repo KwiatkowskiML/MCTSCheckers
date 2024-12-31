@@ -47,7 +47,7 @@ int main()
 	UINT white2 = 0x00040000;
 	UINT black2 = 0x00606000;
 
-	UINT white3 = 0x90000000;
+	UINT white3 = 0x10000000;
 	UINT black3 = 0x080C0E00;
 	UINT kings3 = 0x00000000;
 
@@ -66,6 +66,13 @@ int main()
 
     UINT movers = MoveGenerator::getMovers(board2._pieces, PieceColor::White);
     Board2::printBitboard(movers);
+
+	MoveList moves = MoveGenerator::generateMoves(board2._pieces, PieceColor::White);
+	for (auto move : moves)
+	{
+		Board2 newBoard = board2.getBoardAfterMove(move);
+		newBoard.printBoard();
+	}
 
     return 0;
 }

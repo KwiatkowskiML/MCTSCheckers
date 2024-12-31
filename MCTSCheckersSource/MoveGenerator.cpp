@@ -108,8 +108,7 @@ void MoveGenerator::generateBasicMoves(const BitBoard& pieces, PieceColor color,
 		UINT mover = movers & -movers;
 		movers ^= mover;
 
-		bool isKing = (mover & pieces.kings) != 0;
-		if (isKing) {
+		if (mover & pieces.kings) {
 			generateKingMoves(pieces, color, mover, moves);
 		}
 		else {
@@ -124,8 +123,7 @@ void MoveGenerator::generateCapturingMoves(const BitBoard& pieces, PieceColor co
 		UINT jumper = jumpers & -jumpers;
 		jumpers ^= jumper;
 
-		bool isKing = (jumper & pieces.kings) != 0;
-		if (isKing) {
+		if (jumper & pieces.kings) {
 			generateKingCaptures(pieces, color, jumper, moves);
 		}
 		else {
@@ -140,16 +138,50 @@ void MoveGenerator::generateCapturingMoves(const BitBoard& pieces, PieceColor co
 
 void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
 {
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
 }
 
 void MoveGenerator::generatePawnCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
 {
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
 }
 
 void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
 {
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
 }
 
 void MoveGenerator::generatePawnMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
 {
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
+	UINT empty_fields = pieces.getEmptyFields();
+
+	// Generate moves in the base diagonal direction
+	if ((position >> BASE_DIAGONAL_SHIFT) & empty_fields)
+	{
+		moves.emplace_back(position, position >> BASE_DIAGONAL_SHIFT);
+	}
+
+	if (position & MOVES_DOWN_LEFT_AVAILABLE)
+	{
+		// Generate moves in the down left direction
+		if ((position >> DOWN_LEFT_SHIFT) & empty_fields)
+		{
+			moves.emplace_back(position, position >> DOWN_LEFT_SHIFT);
+		}
+	}
+
+	if (position & MOVES_DOWN_RIGHT_AVAILABLE)
+	{
+		// Generate moves in the down right direction
+		if ((position >> DOWN_RIGHT_SHIFT) & empty_fields)
+		{
+			moves.emplace_back(position, position >> DOWN_RIGHT_SHIFT);
+		}
+	}
 }

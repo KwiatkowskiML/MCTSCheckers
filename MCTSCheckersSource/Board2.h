@@ -13,8 +13,8 @@ public:
     BitBoard _pieces;
     Board2(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
 
-    std::vector<Board2> getAvailableMoves(PieceColor color) const;
-    void makeMove(const Move& move);
+    MoveList getAvailableMoves(PieceColor color) const;
+    Board2 getBoardAfterMove(const Move& move) const;
 
     // Visualization
     void printBoard() const;
