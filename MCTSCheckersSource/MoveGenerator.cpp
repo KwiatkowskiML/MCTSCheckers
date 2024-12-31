@@ -56,5 +56,25 @@ UINT MoveGenerator::getJumpers(const BitBoard& pieces, PieceColor color)
 
 UINT MoveGenerator::getMovers(const BitBoard& pieces, PieceColor color)
 {
-	return 0;
+	const UINT emptyFields = pieces.getEmptyFields();
+	const UINT whiteKings = pieces.whitePawns & pieces.kings;
+
+	// Get the white pieces that can move in the basic diagonal direction (right down or left down, depending on the row)
+	UINT movers = (emptyFields << BASE_DIAGONAL_SHIFT) & pieces.whitePawns;
+
+	// Get the white pieces that can move in the right down direction
+	movers |= ((emptyFields & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & pieces.whitePawns;
+
+	// Get the white pieces that can move in the left down direction
+	movers |= ((emptyFields & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & pieces.whitePawns;
+
+	// Get the white kings that can move in the upper diagonal direction (right up or left up)
+	if (whiteKings)
+	{
+		movers |= (emptyFields >> BASE_DIAGONAL_SHIFT) & whiteKings;
+		movers |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & whiteKings;
+		movers |= ((emptyFields & MOVES_DOWN_LEFT_AVAILABLE) >> DOWN_LEFT_SHIFT) & whiteKings;
+	}
+
+	return movers;
 }

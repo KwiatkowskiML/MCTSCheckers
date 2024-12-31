@@ -47,9 +47,9 @@ int main()
 	UINT white2 = 0x00040000;
 	UINT black2 = 0x00606000;
 
-	UINT white3 = 0x80000000;
+	UINT white3 = 0x90000000;
 	UINT black3 = 0x080C0E00;
-	UINT kings3 = 0x00040000;
+	UINT kings3 = 0x00000000;
 
 	/*Board board(white3, black3, kings);
     board.PrintBoard();
@@ -63,6 +63,9 @@ int main()
 
 	UINT jumpers = MoveGenerator::getJumpers(board2._pieces, PieceColor::White);
 	Board2::printBitboard(jumpers);
+
+    UINT movers = MoveGenerator::getMovers(board2._pieces, PieceColor::White);
+    Board2::printBitboard(movers);
 
     return 0;
 }
