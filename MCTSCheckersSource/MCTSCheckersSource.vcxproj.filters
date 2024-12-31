@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Board2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveGenerator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Board.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="BitBoard.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Direction.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Move.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PieceColor.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Board2.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveGenerator.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{c2ea33c9-2f8c-407b-a930-05de1f11493a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{72d7e5e9-d335-49bf-bb09-31e64eaff7bf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

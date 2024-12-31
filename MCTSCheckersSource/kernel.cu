@@ -4,6 +4,8 @@
 #include "Board.h"
 
 #include <stdio.h>
+#include "Board2.h"
+#include "MoveGenerator.h"
 
 cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
 
@@ -49,12 +51,19 @@ int main()
 	UINT black3 = 0x080C0E00;
 	UINT kings3 = 0x00040000;
 
-	Board board(white3, black3, kings);
+	/*Board board(white3, black3, kings);
     board.PrintBoard();
     
     std::queue<Board> availableMoves;
 	board.GetWhiteAvailableMoves(availableMoves);
-    Board::PrintPossibleMoves(availableMoves);
+    Board::PrintPossibleMoves(availableMoves);*/
+
+	Board2 board2(white3, black3, kings3);
+	board2.printBoard();
+
+	UINT jumpers = MoveGenerator::getJumpers(board2._pieces, PieceColor::White);
+	Board2::printBitboard(jumpers);
+
     return 0;
 }
 

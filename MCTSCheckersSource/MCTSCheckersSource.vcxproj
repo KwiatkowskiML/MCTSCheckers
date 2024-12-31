@@ -81,10 +81,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="BitBoard.h" />
+    <ClInclude Include="Board2.h" />
+    <ClInclude Include="Direction.h" />
+    <ClInclude Include="Move.h" />
+    <ClInclude Include="MoveGenerator.h" />
+    <ClInclude Include="PieceColor.h" />
+    <ClInclude Include="Types.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Board2.cpp" />
+    <ClCompile Include="MoveGenerator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
