@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "Board2.h"
 #include "MoveGenerator.h"
-#include "GetJumpersTest.h"
+#include "CheckersTestSuite.h"
 
 cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
 
@@ -38,8 +38,7 @@ int main()
 		newBoard.printBoard();
 	}*/
 
-    GetJumpersTest test;
-	test.runAllTests();
+	CheckersTestSuite::runAll();
 
     return 0;
 }

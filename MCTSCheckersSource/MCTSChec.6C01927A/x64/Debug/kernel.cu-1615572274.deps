@@ -152,10 +152,13 @@ C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include\vector_types.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\BitBoard.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\Board.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\Board2.h
+C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\CheckersTest.h
+C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\CheckersTestSuite.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\Direction.h
-C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\GetJumpersTest.h
+C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\JumpersTest.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\Move.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\MoveGenerator.h
+C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\MoversTest.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\PieceColor.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\Types.h
 C:\Users\Kmicha\studia\sem5\gpu\p2\MCTSCheckers\MCTSCheckersSource\Utils.h

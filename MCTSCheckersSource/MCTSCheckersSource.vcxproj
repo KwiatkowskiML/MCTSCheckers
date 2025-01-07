@@ -83,19 +83,26 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="BitBoard.h" />
     <ClInclude Include="Board2.h" />
+    <ClInclude Include="CheckersTest.h" />
+    <ClInclude Include="CheckersTestSuite.h" />
     <ClInclude Include="Direction.h" />
-    <ClInclude Include="GetJumpersTest.h" />
+    <ClInclude Include="JumpersTest.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MoveGenerator.h" />
+    <ClInclude Include="MoversTest.h" />
     <ClInclude Include="PieceColor.h" />
+    <ClInclude Include="TestUtils.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="Board2.cpp" />
-    <ClCompile Include="GetJumpersTest.cpp" />
+    <ClCompile Include="CheckersTest.cpp" />
+    <ClCompile Include="JumpersTest.cpp" />
     <ClCompile Include="MoveGenerator.cpp" />
+    <ClCompile Include="MoversTest.cpp" />
+    <ClCompile Include="TestUtils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

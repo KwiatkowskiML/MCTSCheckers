@@ -11,7 +11,16 @@
     <ClCompile Include="MoveGenerator.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="GetJumpersTest.cpp">
+    <ClCompile Include="JumpersTest.cpp">
+      <Filter>Tests\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="TestUtils.cpp">
+      <Filter>Tests\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckersTest.cpp">
+      <Filter>Tests\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MoversTest.cpp">
       <Filter>Tests\Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,7 +52,19 @@
     <ClInclude Include="Types.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="GetJumpersTest.h">
+    <ClInclude Include="JumpersTest.h">
+      <Filter>Tests\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="TestUtils.h">
+      <Filter>Tests\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckersTest.h">
+      <Filter>Tests\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckersTestSuite.h">
+      <Filter>Tests\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MoversTest.h">
       <Filter>Tests\Headers</Filter>
     </ClInclude>
   </ItemGroup>
