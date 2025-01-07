@@ -1,6 +1,7 @@
 #pragma once
 #include "JumpersTest.h"
 #include "MoversTest.h"
+#include "MoveGenerationTest.h"
 
 class CheckersTestSuite {
 public:
@@ -14,6 +15,10 @@ public:
         JumpersTest jumpersTest;
         printf("Running Jumpers Tests...\n");
         jumpersTest.runAllTests();
+
+		MoveGenerationTest moveGenTest;
+		printf("Running Move Generation Tests...\n");
+		moveGenTest.runAllTests();
 
         printf("=== Checkers Test Suite Completed ===\n");
     }

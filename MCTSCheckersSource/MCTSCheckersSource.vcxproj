@@ -88,6 +88,7 @@
     <ClInclude Include="Direction.h" />
     <ClInclude Include="JumpersTest.h" />
     <ClInclude Include="Move.h" />
+    <ClInclude Include="MoveGenerationTest.h" />
     <ClInclude Include="MoveGenerator.h" />
     <ClInclude Include="MoversTest.h" />
     <ClInclude Include="PieceColor.h" />
@@ -100,6 +101,7 @@
     <ClCompile Include="Board2.cpp" />
     <ClCompile Include="CheckersTest.cpp" />
     <ClCompile Include="JumpersTest.cpp" />
+    <ClCompile Include="MoveGenerationTest.cpp" />
     <ClCompile Include="MoveGenerator.cpp" />
     <ClCompile Include="MoversTest.cpp" />
     <ClCompile Include="TestUtils.cpp" />
