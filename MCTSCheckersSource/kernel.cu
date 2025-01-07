@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "Board2.h"
 #include "MoveGenerator.h"
+#include "GetJumpersTest.h"
 
 cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
 
@@ -17,46 +18,9 @@ __global__ void addKernel(int *c, const int *a, const int *b)
 
 int main()
 {
-    //const int arraySize = 5;
-    //const int a[arraySize] = { 1, 2, 3, 4, 5 };
-    //const int b[arraySize] = { 10, 20, 30, 40, 50 };
-    //int c[arraySize] = { 0 };
-
-    //// Add vectors in parallel.
-    //cudaError_t cudaStatus = addWithCuda(c, a, b, arraySize);
-    //if (cudaStatus != cudaSuccess) {
-    //    fprintf(stderr, "addWithCuda failed!");
-    //    return 1;
-    //}
-
-    //printf("{1,2,3,4,5} + {10,20,30,40,50} = {%d,%d,%d,%d,%d}\n",
-    //    c[0], c[1], c[2], c[3], c[4]);
-
-    //// cudaDeviceReset must be called before exiting in order for profiling and
-    //// tracing tools such as Nsight and Visual Profiler to show complete traces.
-    //cudaStatus = cudaDeviceReset();
-    //if (cudaStatus != cudaSuccess) {
-    //    fprintf(stderr, "cudaDeviceReset failed!");
-    //    return 1;
-    //}
-
-	UINT white = 0xFFF000068;
-	UINT black = 0x00000000; // TODO: look into 0x00030FFF
-	UINT kings = 0x00000000;
-
-	UINT white2 = 0x00040000;
-	UINT black2 = 0x00606000;
-
-	UINT white3 = 0x90000000;
+	/*UINT white3 = 0x90000000;
 	UINT black3 = 0x080C0E00;
 	UINT kings3 = 0x00000000;
-
-	/*Board board(white3, black3, kings);
-    board.PrintBoard();
-    
-    std::queue<Board> availableMoves;
-	board.GetWhiteAvailableMoves(availableMoves);
-    Board::PrintPossibleMoves(availableMoves);*/
 
 	Board2 board2(white3, black3, kings3);
 	board2.printBoard();
@@ -72,7 +36,10 @@ int main()
 	{
 		Board2 newBoard = board2.getBoardAfterMove(move);
 		newBoard.printBoard();
-	}
+	}*/
+
+    GetJumpersTest test;
+	test.runAllTests();
 
     return 0;
 }

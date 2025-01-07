@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>;
+#include <vector>
 #include "Types.h"
 #include "PieceColor.h"
 #include <cassert>

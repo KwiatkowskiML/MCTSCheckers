@@ -11,6 +11,9 @@
     <ClCompile Include="MoveGenerator.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="GetJumpersTest.cpp">
+      <Filter>Tests\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -40,6 +43,9 @@
     <ClInclude Include="Types.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="GetJumpersTest.h">
+      <Filter>Tests\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -47,6 +53,15 @@
     </Filter>
     <Filter Include="Source">
       <UniqueIdentifier>{72d7e5e9-d335-49bf-bb09-31e64eaff7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{9bf6f1a8-99e9-4df6-b1c7-1d5d6967db58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests\Headers">
+      <UniqueIdentifier>{73a34424-0696-49f0-b871-bcd10a4fcd21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests\Source">
+      <UniqueIdentifier>{dfe83af9-19a8-4f9a-88f8-2bc7217fac28}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

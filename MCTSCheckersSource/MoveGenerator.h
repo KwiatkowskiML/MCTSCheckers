@@ -7,7 +7,7 @@
 class MoveGenerator {
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
-//private:
+
 	// Getting moveable pieces
     static UINT getJumpers(const BitBoard& pieces, PieceColor color);
     static UINT getMovers(const BitBoard& pieces, PieceColor color);

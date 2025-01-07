@@ -106,7 +106,7 @@ UINT MoveGenerator::getMovers(const BitBoard& pieces, PieceColor color)
 void MoveGenerator::generateBasicMoves(const BitBoard& pieces, PieceColor color, UINT movers, MoveList& moves)
 {
 	while (movers) {
-		UINT mover = movers & -movers;
+		UINT mover = movers & -movers; // TODO: reconsider this
 		movers ^= mover;
 
 		if (mover & pieces.kings) {

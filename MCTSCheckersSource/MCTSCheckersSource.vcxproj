@@ -84,6 +84,7 @@
     <ClInclude Include="BitBoard.h" />
     <ClInclude Include="Board2.h" />
     <ClInclude Include="Direction.h" />
+    <ClInclude Include="GetJumpersTest.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MoveGenerator.h" />
     <ClInclude Include="PieceColor.h" />
@@ -93,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="Board2.cpp" />
+    <ClCompile Include="GetJumpersTest.cpp" />
     <ClCompile Include="MoveGenerator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

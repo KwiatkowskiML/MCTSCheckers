@@ -1,5 +1,5 @@
 #include "Board2.h"
-#include <cassert>;
+#include <cassert>
 #include "MoveGenerator.h"
 
 //----------------------------------------------------------------
@@ -8,7 +8,6 @@
 MoveList Board2::getAvailableMoves(PieceColor color) const
 {
     return MoveGenerator::generateMoves(_pieces, color);
-
 }
 
 Board2 Board2::getBoardAfterMove(const Move& move) const
@@ -49,6 +48,7 @@ Board2 Board2::getBoardAfterMove(const Move& move) const
 //----------------------------------------------------------------
 // Visualization
 //----------------------------------------------------------------
+
 void Board2::printBoard() const
 {
     std::cout << "     A   B   C   D   E   F   G   H\n";
