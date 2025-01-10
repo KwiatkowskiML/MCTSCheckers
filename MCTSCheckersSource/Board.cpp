@@ -27,36 +27,36 @@ UINT Board::GetWhiteJumpers()
 	UINT jumpers = 0;
     
 	// Get the black pawns that might be captured in base diagonal direction
-    UINT captBlackPawns = (emptyFields << BASE_DIAGONAL_SHIFT) & _blackPawns;
+    UINT captBlackPawns = (emptyFields << SHIFT_BASE) & _blackPawns;
 
 	// Check whether previously specified black pawns can actually be captured
 	if (captBlackPawns)
 	{
 		// Get the white pawns that can capture black pawn in the base diagonal direction
-		jumpers |= ((captBlackPawns & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & _whitePawns;
-		jumpers |= ((captBlackPawns & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _whitePawns;
+		jumpers |= ((captBlackPawns & MASK_L3) << SHIFT_L3) & _whitePawns;
+		jumpers |= ((captBlackPawns & MASK_L5) << SHIFT_L5) & _whitePawns;
 	}
 
 	// Get the black pawns that might be captured in the other diagonal direction
-	captBlackPawns = ((emptyFields & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & _blackPawns;
-	captBlackPawns |= ((emptyFields & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _blackPawns;
+	captBlackPawns = ((emptyFields & MASK_L3) << SHIFT_L3) & _blackPawns;
+	captBlackPawns |= ((emptyFields & MASK_L5) << SHIFT_L5) & _blackPawns;
 
-	jumpers |= (captBlackPawns << BASE_DIAGONAL_SHIFT) & _whitePawns;
+	jumpers |= (captBlackPawns << SHIFT_BASE) & _whitePawns;
 
 	// Find all of the black pawns that might be captured backwards in base diagonal
-    captBlackPawns = (emptyFields >> BASE_DIAGONAL_SHIFT) & _blackPawns;
+    captBlackPawns = (emptyFields >> SHIFT_BASE) & _blackPawns;
 
     // Check whether previously specified black pawns can actually be captured
     if (captBlackPawns)
     {
-		jumpers |= ((captBlackPawns & MOVES_DOWN_LEFT_AVAILABLE) >> DOWN_LEFT_SHIFT) & _whitePawns;
-		jumpers |= ((captBlackPawns & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & _whitePawns;
+		jumpers |= ((captBlackPawns & MASK_R5) >> SHIFT_R5) & _whitePawns;
+		jumpers |= ((captBlackPawns & MASK_R3) >> SHIFT_R3) & _whitePawns;
     }
 
 	// Find all of the black pawns that might be captured backwards in the other diagonal
-	captBlackPawns = ((emptyFields & MOVES_DOWN_LEFT_AVAILABLE) >> DOWN_LEFT_SHIFT) & _blackPawns;
-	captBlackPawns |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & _blackPawns;
-	jumpers |= (captBlackPawns >> BASE_DIAGONAL_SHIFT) & _whitePawns;
+	captBlackPawns = ((emptyFields & MASK_R5) >> SHIFT_R5) & _blackPawns;
+	captBlackPawns |= ((emptyFields & MASK_R3) >> SHIFT_R3) & _blackPawns;
+	jumpers |= (captBlackPawns >> SHIFT_BASE) & _whitePawns;
 
 	// TODO: Consider if there is a need for analizing kings - there IS
 
@@ -70,20 +70,20 @@ UINT Board::GetWhiteMovers()
 	const UINT whiteKings = _whitePawns & _kings;
 
 	// Get the white pieces that can move in the basic diagonal direction (right down or left down, depending on the row)
-	UINT movers = (emptyFields << BASE_DIAGONAL_SHIFT) & _whitePawns;
+	UINT movers = (emptyFields << SHIFT_BASE) & _whitePawns;
 	
 	// Get the white pieces that can move in the right down direction
-	movers |= ((emptyFields & MOVES_UP_LEFT_AVAILABLE) << UP_LEFT_SHIFT) & _whitePawns;
+	movers |= ((emptyFields & MASK_L3) << SHIFT_L3) & _whitePawns;
 
 	// Get the white pieces that can move in the left down direction
-	movers |= ((emptyFields & MOVES_UP_RIGHT_AVAILABLE) << UP_RIGHT_SHIFT) & _whitePawns;
+	movers |= ((emptyFields & MASK_L5) << SHIFT_L5) & _whitePawns;
 
 	// Get the white kings that can move in the upper diagonal direction (right up or left up)
 	if (whiteKings)
 	{
-		movers |= (emptyFields >> BASE_DIAGONAL_SHIFT) & whiteKings;
-		movers |= ((emptyFields & MOVES_DOWN_RIGHT_AVAILABLE) >> DOWN_RIGHT_SHIFT) & whiteKings;
-		movers |= ((emptyFields & MOVES_DOWN_LEFT_AVAILABLE) >> DOWN_LEFT_SHIFT) & whiteKings;
+		movers |= (emptyFields >> SHIFT_BASE) & whiteKings;
+		movers |= ((emptyFields & MASK_R3) >> SHIFT_R3) & whiteKings;
+		movers |= ((emptyFields & MASK_R5) >> SHIFT_R5) & whiteKings;
 	}
 
 	return movers;
@@ -158,16 +158,16 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
 	{
         if (iteration & 1)
         {
-            if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
-                newPosition >>= DOWN_LEFT_SHIFT;
-            else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
-                newPosition >>= DOWN_RIGHT_SHIFT;
+            if (newPosition & MASK_R5)
+                newPosition >>= SHIFT_R5;
+            else if (newPosition & MASK_R3)
+                newPosition >>= SHIFT_R3;
             else
                 break;
         }
         else
         {
-            newPosition >>= BASE_DIAGONAL_SHIFT;
+            newPosition >>= SHIFT_BASE;
         }
 
 		if (!(newPosition & empty_fields))
@@ -183,16 +183,16 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
     {
         if (!(iteration & 1))
         {
-            if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
-                newPosition >>= DOWN_LEFT_SHIFT;
-            else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
-                newPosition >>= DOWN_RIGHT_SHIFT;
+            if (newPosition & MASK_R5)
+                newPosition >>= SHIFT_R5;
+            else if (newPosition & MASK_R3)
+                newPosition >>= SHIFT_R3;
             else
                 break;
         }
         else
         {
-            newPosition >>= BASE_DIAGONAL_SHIFT;
+            newPosition >>= SHIFT_BASE;
         }
         if (!(newPosition & empty_fields))
             break;
@@ -206,16 +206,16 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
     {
         if (iteration & 1)
         {
-            if (newPosition & MOVES_UP_LEFT_AVAILABLE)
-                newPosition <<= UP_LEFT_SHIFT;
-            else if (newPosition & MOVES_UP_RIGHT_AVAILABLE)
-                newPosition <<= UP_RIGHT_SHIFT;
+            if (newPosition & MASK_L3)
+                newPosition <<= SHIFT_L3;
+            else if (newPosition & MASK_L5)
+                newPosition <<= SHIFT_L5;
             else
                 break;
         }
         else
         {
-            newPosition <<= BASE_DIAGONAL_SHIFT;
+            newPosition <<= SHIFT_BASE;
         }
         if (!(newPosition & empty_fields))
             break;
@@ -229,16 +229,16 @@ void Board::GenerateKingBasicMoves(std::queue<Board>& availableMoves, UINT posit
     {
         if (!(iteration & 1))
         {
-            if (newPosition & MOVES_UP_LEFT_AVAILABLE)
-                newPosition <<= UP_LEFT_SHIFT;
-            else if (newPosition & MOVES_UP_RIGHT_AVAILABLE)
-                newPosition <<= UP_RIGHT_SHIFT;
+            if (newPosition & MASK_L3)
+                newPosition <<= SHIFT_L3;
+            else if (newPosition & MASK_L5)
+                newPosition <<= SHIFT_L5;
             else
                 break;
         }
         else
         {
-            newPosition <<= BASE_DIAGONAL_SHIFT;
+            newPosition <<= SHIFT_BASE;
         }
         if (!(newPosition & empty_fields))
             break;
@@ -252,26 +252,26 @@ void Board::GenerateWhitePawnBasicMoves(std::queue<Board>& availableMoves, UINT 
     UINT empty_fields = ~(_whitePawns | _blackPawns);
 
     // Generate moves in the base diagonal direction
-    if ((position >> BASE_DIAGONAL_SHIFT) & empty_fields)
+    if ((position >> SHIFT_BASE) & empty_fields)
     {
-        AddWhiteBasicMove(availableMoves, position, position >> BASE_DIAGONAL_SHIFT);
+        AddWhiteBasicMove(availableMoves, position, position >> SHIFT_BASE);
     }
 
-    if (position & MOVES_DOWN_LEFT_AVAILABLE)
+    if (position & MASK_R5)
     {
         // Generate moves in the down left direction
-        if ((position >> DOWN_LEFT_SHIFT) & empty_fields)
+        if ((position >> SHIFT_R5) & empty_fields)
         {
-            AddWhiteBasicMove(availableMoves, position, position >> DOWN_LEFT_SHIFT);
+            AddWhiteBasicMove(availableMoves, position, position >> SHIFT_R5);
         }
     }
 
-    if (position & MOVES_DOWN_RIGHT_AVAILABLE)
+    if (position & MASK_R3)
     {
         // Generate moves in the down right direction
-        if ((position >> DOWN_RIGHT_SHIFT) & empty_fields)
+        if ((position >> SHIFT_R3) & empty_fields)
         {
-            AddWhiteBasicMove(availableMoves, position, position >> DOWN_RIGHT_SHIFT);
+            AddWhiteBasicMove(availableMoves, position, position >> SHIFT_R3);
         }
     }
 }
@@ -285,45 +285,45 @@ void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, U
 	//--------------------------------------------------------------------------------
     
 	// Generate capturing moves in the base down diagonal direction
-    UINT newPosition = position >> BASE_DIAGONAL_SHIFT;
+    UINT newPosition = position >> SHIFT_BASE;
 	if (newPosition & _blackPawns)
 	{
 		UINT captured = newPosition;
-		if (newPosition & MOVES_DOWN_LEFT_AVAILABLE)
+		if (newPosition & MASK_R5)
 		{
-			newPosition >>= DOWN_LEFT_SHIFT;
+			newPosition >>= SHIFT_R5;
 			if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
-		else if (newPosition & MOVES_DOWN_RIGHT_AVAILABLE)
+		else if (newPosition & MASK_R3)
 		{
-			newPosition >>= DOWN_RIGHT_SHIFT;
+			newPosition >>= SHIFT_R3;
 			if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
 	// Generate capturing moves in the down left direction
-	if (position & MOVES_DOWN_LEFT_AVAILABLE)
+	if (position & MASK_R5)
 	{
-		newPosition = position >> DOWN_LEFT_SHIFT;
+		newPosition = position >> SHIFT_R5;
 		if (newPosition & _blackPawns)
 		{
             UINT captured = newPosition;
-			newPosition >>= BASE_DIAGONAL_SHIFT;
+			newPosition >>= SHIFT_BASE;
 			if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
 	// Generate capturing moves in the down right direction
-	if (position & MOVES_DOWN_RIGHT_AVAILABLE)
+	if (position & MASK_R3)
 	{
-		newPosition = position >> DOWN_RIGHT_SHIFT;
+		newPosition = position >> SHIFT_R3;
 		if (newPosition & _blackPawns)
 		{
             UINT captured = newPosition;
-			newPosition >>= BASE_DIAGONAL_SHIFT;
+			newPosition >>= SHIFT_BASE;
 			if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
@@ -334,45 +334,45 @@ void Board::GenerateWhitePawnCapturingMoves(std::queue<Board>& availableMoves, U
 	//--------------------------------------------------------------------------------
 
 	// Generate capturing moves in the base upper diagonal direction
-	newPosition = position << BASE_DIAGONAL_SHIFT;
+	newPosition = position << SHIFT_BASE;
 	if (newPosition & _blackPawns)
 	{
         UINT captured = newPosition;
-		if (newPosition & MOVES_UP_LEFT_AVAILABLE)
+		if (newPosition & MASK_L3)
 		{
-			newPosition <<= UP_LEFT_SHIFT;
+			newPosition <<= SHIFT_L3;
 			if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
-		else if (newPosition & MOVES_UP_RIGHT_AVAILABLE)
+		else if (newPosition & MASK_L5)
 		{
-			newPosition <<= UP_RIGHT_SHIFT;
+			newPosition <<= SHIFT_L5;
 			if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
 	// Generate capturing moves in the up left direction
-	if (position & MOVES_UP_LEFT_AVAILABLE)
+	if (position & MASK_L3)
 	{
-		newPosition = position << UP_LEFT_SHIFT;
+		newPosition = position << SHIFT_L3;
 		if (newPosition & _blackPawns)
 		{
             UINT captured = newPosition;
-			newPosition <<= BASE_DIAGONAL_SHIFT;
+			newPosition <<= SHIFT_BASE;
 			if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
 		}
 	}
 
 	// Generate capturing moves in the up right direction
-    if (position & MOVES_UP_RIGHT_AVAILABLE)
+    if (position & MASK_L5)
     {
-        newPosition = position << UP_RIGHT_SHIFT;
+        newPosition = position << SHIFT_L5;
         if (newPosition & _blackPawns)
         {
             UINT captured = newPosition;
-            newPosition <<= BASE_DIAGONAL_SHIFT;
+            newPosition <<= SHIFT_BASE;
             if (newPosition & empty_fields)
                 AddWhiteCapturingMove(availableMoves, position, captured, newPosition);
         }
