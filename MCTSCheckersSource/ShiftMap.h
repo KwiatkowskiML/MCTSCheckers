@@ -9,9 +9,9 @@ private:
 		ShiftOperation(SHIFT_L3, MASK_L3),
 		ShiftOperation(SHIFT_BASE),
 		ShiftOperation(SHIFT_L5, MASK_L5),
-		ShiftOperation(-SHIFT_R5, MASK_R5),
+		ShiftOperation(-SHIFT_R3, MASK_R3),
 		ShiftOperation(-SHIFT_BASE),
-		ShiftOperation(-SHIFT_R3, MASK_R3)
+		ShiftOperation(-SHIFT_R5, MASK_R5)
 	};
 
 public:

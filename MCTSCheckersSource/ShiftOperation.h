@@ -11,6 +11,6 @@ struct ShiftOperation {
     UINT Apply(UINT position) const 
     {
         position &= mask;
-        return shiftAmount >= 0 ? position << shiftAmount : position >> -shiftAmount;
+        return shiftAmount >= 0 ? position << shiftAmount : position >> (-shiftAmount);
     }
 };

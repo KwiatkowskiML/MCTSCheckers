@@ -29,12 +29,12 @@ MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor color)
 	UINT moversR4 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R4);
 	UINT moversR5 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R5);
 
-	UINT movers2 = moversL3 | moversL4 | moversL5 | moversR3 | moversR4 | moversR5;
-
-	printf("Movers: %d\n", movers);
-	printf("Movers2: %d\n", movers2);
-	assert(movers == movers2);
-	generateBasicMoves(pieces, color, movers, moves);	
+	generateBasicMovesInShift(pieces, color, moversL3, BitShift::BIT_SHIFT_L3, moves);
+	generateBasicMovesInShift(pieces, color, moversL4, BitShift::BIT_SHIFT_L4, moves);
+	generateBasicMovesInShift(pieces, color, moversL5, BitShift::BIT_SHIFT_L5, moves);
+	generateBasicMovesInShift(pieces, color, moversR3, BitShift::BIT_SHIFT_R3, moves);
+	generateBasicMovesInShift(pieces, color, moversR4, BitShift::BIT_SHIFT_R4, moves);
+	generateBasicMovesInShift(pieces, color, moversR5, BitShift::BIT_SHIFT_R5, moves);
 	return moves;
 }
 
@@ -164,6 +164,21 @@ void MoveGenerator::generateBasicMoves(const BitBoard& pieces, PieceColor color,
 		}
 		else {
 			generatePawnMoves(pieces, color, mover, moves);
+		}
+	}
+}
+
+void MoveGenerator::generateBasicMovesInShift(const BitBoard& pieces, PieceColor color, UINT movers, BitShift shift, MoveList& moves)
+{
+	while (movers) {
+		UINT mover = movers & -movers; // TODO: reconsider this
+		movers ^= mover;
+
+		if (mover & pieces.kings) {
+			generateKingMoves(pieces, color, mover, moves);
+		}
+		else {
+			generatePawnMovesInShift(pieces, color, mover, shift, moves);
 		}
 	}
 }
@@ -369,4 +384,14 @@ void MoveGenerator::generatePawnMoves(const BitBoard& pieces, PieceColor color, 
 			moves.emplace_back(position, position >> SHIFT_R3);
 		}
 	}
+}
+
+void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
+	UINT empty_fields = pieces.getEmptyFields();
+	UINT newPosition = ShiftMap::shift(position, shift);
+	moves.emplace_back(position, newPosition);
 }
