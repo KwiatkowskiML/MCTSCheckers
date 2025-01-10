@@ -5,10 +5,6 @@
 #include "BitShift.h"
 
 class MoveGenerator {
-private:
-	static UINT applyBitShift(UINT position, BitShift shift);
-	static UINT applyBitShiftWithMask(UINT position, BitShift shift);
-	static BitShift getReverseShift(BitShift shift);
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
 

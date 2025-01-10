@@ -3,73 +3,7 @@
 #include "MoveGenerator.h"
 #include "Utils.h"
 #include "Board2.h"
-
-//----------------------------------------------------------------
-// Helper functions
-//----------------------------------------------------------------
-
-UINT MoveGenerator::applyBitShift(UINT position, BitShift shift)
-{
-	switch (shift)	
-	{
-	case BitShift::BIT_SHIFT_L4:
-		return position << SHIFT_BASE;
-	case BitShift::BIT_SHIFT_L3:
-		return position << SHIFT_L3;
-	case BitShift::BIT_SHIFT_L5:
-		return position << SHIFT_L5;
-	case BitShift::BIT_SHIFT_R4:
-		return position >> SHIFT_BASE;
-	case BitShift::BIT_SHIFT_R3:
-		return position >> SHIFT_R3;
-	case BitShift::BIT_SHIFT_R5:
-		return position >> SHIFT_R5;
-	default:
-		return 0;
-	}
-}
-
-UINT MoveGenerator::applyBitShiftWithMask(UINT position, BitShift shift)
-{
-	switch (shift)
-	{
-	case BitShift::BIT_SHIFT_L4:
-		return position << SHIFT_BASE;
-	case BitShift::BIT_SHIFT_L3:
-		return (position & MASK_L3) << SHIFT_L3;
-	case BitShift::BIT_SHIFT_L5:
-		return (position & MASK_L5) << SHIFT_L5;
-	case BitShift::BIT_SHIFT_R4:
-		return position >> SHIFT_BASE;
-	case BitShift::BIT_SHIFT_R3:
-		return (position & MASK_R3) >> SHIFT_R3;
-	case BitShift::BIT_SHIFT_R5:
-		return (position & MASK_R5) >> SHIFT_R5;
-	default:
-		return 0;
-	}
-}
-
-BitShift MoveGenerator::getReverseShift(BitShift shift)
-{
-	switch (shift)
-	{
-	case BitShift::BIT_SHIFT_L4:
-		return BitShift::BIT_SHIFT_R4;
-	case BitShift::BIT_SHIFT_L3:
-		return BitShift::BIT_SHIFT_R3;
-	case BitShift::BIT_SHIFT_L5:
-		return BitShift::BIT_SHIFT_R5;
-	case BitShift::BIT_SHIFT_R4:
-		return BitShift::BIT_SHIFT_L4;
-	case BitShift::BIT_SHIFT_R3:
-		return BitShift::BIT_SHIFT_L3;
-	case BitShift::BIT_SHIFT_R5:
-		return BitShift::BIT_SHIFT_L5;
-	default:
-		return BitShift::BIT_SHIFT_L4;
-	}
-}
+#include "ShiftMap.h"
 
 //----------------------------------------------------------------
 // Generating moves
@@ -201,15 +135,15 @@ UINT MoveGenerator::getMoversInShift(const BitBoard& pieces, PieceColor color, B
 	const UINT whiteKings = pieces.whitePawns & pieces.kings;
 
 	UINT movers = 0;
-	BitShift reverseShift = getReverseShift(shift);
+	BitShift reverseShift = ShiftMap::getOpposite(shift);
 
 	if (shift == BitShift::BIT_SHIFT_R4 || shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
 	{
-		movers |= applyBitShiftWithMask(emptyFields, reverseShift) & pieces.whitePawns;
+		movers |= ShiftMap::shift(emptyFields, reverseShift) & pieces.whitePawns;
 	}
 	else if (whiteKings && (shift == BitShift::BIT_SHIFT_L4 || shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5))
 	{
-		movers |= applyBitShiftWithMask(emptyFields, reverseShift) & whiteKings;
+		movers |= ShiftMap::shift(emptyFields, reverseShift) & whiteKings;
 	}
 	
 	return movers;
