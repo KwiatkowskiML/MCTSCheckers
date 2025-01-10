@@ -34,25 +34,13 @@
     <ClInclude Include="BitBoard.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Direction.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Move.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="PieceColor.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Board2.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="MoveGenerator.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Types.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="JumpersTest.h">
@@ -73,6 +61,21 @@
     <ClInclude Include="MoveGenerationTest.h">
       <Filter>Tests\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Headers\Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Headers\Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="PieceColor.h">
+      <Filter>Headers\Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="BitShift.h">
+      <Filter>Headers\Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="ShiftOperation.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -89,6 +92,9 @@
     </Filter>
     <Filter Include="Tests\Source">
       <UniqueIdentifier>{dfe83af9-19a8-4f9a-88f8-2bc7217fac28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Constants">
+      <UniqueIdentifier>{558544d1-bba6-4d02-88d6-517016240691}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

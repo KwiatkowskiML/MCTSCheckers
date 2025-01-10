@@ -4,6 +4,77 @@
 #include "Utils.h"
 #include "Board2.h"
 
+//----------------------------------------------------------------
+// Helper functions
+//----------------------------------------------------------------
+
+UINT MoveGenerator::applyBitShift(UINT position, BitShift shift)
+{
+	switch (shift)	
+	{
+	case BitShift::BIT_SHIFT_L4:
+		return position << SHIFT_BASE;
+	case BitShift::BIT_SHIFT_L3:
+		return position << SHIFT_L3;
+	case BitShift::BIT_SHIFT_L5:
+		return position << SHIFT_L5;
+	case BitShift::BIT_SHIFT_R4:
+		return position >> SHIFT_BASE;
+	case BitShift::BIT_SHIFT_R3:
+		return position >> SHIFT_R3;
+	case BitShift::BIT_SHIFT_R5:
+		return position >> SHIFT_R5;
+	default:
+		return 0;
+	}
+}
+
+UINT MoveGenerator::applyBitShiftWithMask(UINT position, BitShift shift)
+{
+	switch (shift)
+	{
+	case BitShift::BIT_SHIFT_L4:
+		return position << SHIFT_BASE;
+	case BitShift::BIT_SHIFT_L3:
+		return (position & MASK_L3) << SHIFT_L3;
+	case BitShift::BIT_SHIFT_L5:
+		return (position & MASK_L5) << SHIFT_L5;
+	case BitShift::BIT_SHIFT_R4:
+		return position >> SHIFT_BASE;
+	case BitShift::BIT_SHIFT_R3:
+		return (position & MASK_R3) >> SHIFT_R3;
+	case BitShift::BIT_SHIFT_R5:
+		return (position & MASK_R5) >> SHIFT_R5;
+	default:
+		return 0;
+	}
+}
+
+BitShift MoveGenerator::getReverseShift(BitShift shift)
+{
+	switch (shift)
+	{
+	case BitShift::BIT_SHIFT_L4:
+		return BitShift::BIT_SHIFT_R4;
+	case BitShift::BIT_SHIFT_L3:
+		return BitShift::BIT_SHIFT_R3;
+	case BitShift::BIT_SHIFT_L5:
+		return BitShift::BIT_SHIFT_R5;
+	case BitShift::BIT_SHIFT_R4:
+		return BitShift::BIT_SHIFT_L4;
+	case BitShift::BIT_SHIFT_R3:
+		return BitShift::BIT_SHIFT_L3;
+	case BitShift::BIT_SHIFT_R5:
+		return BitShift::BIT_SHIFT_L5;
+	default:
+		return BitShift::BIT_SHIFT_L4;
+	}
+}
+
+//----------------------------------------------------------------
+// Generating moves
+//----------------------------------------------------------------
+
 MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor color)
 {
 	// Find all of the jumpers
@@ -17,6 +88,18 @@ MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor color)
 	}
 
 	UINT movers = getMovers(pieces, color);
+	UINT moversL3 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_L3);
+	UINT moversL4 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_L4);
+	UINT moversL5 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_L5);
+	UINT moversR3 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R3);
+	UINT moversR4 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R4);
+	UINT moversR5 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R5);
+
+	UINT movers2 = moversL3 | moversL4 | moversL5 | moversR3 | moversR4 | moversR5;
+
+	printf("Movers: %d\n", movers);
+	printf("Movers2: %d\n", movers2);
+	assert(movers == movers2);
 	generateBasicMoves(pieces, color, movers, moves);	
 	return moves;
 }
@@ -76,26 +159,59 @@ UINT MoveGenerator::getMovers(const BitBoard& pieces, PieceColor color)
 	// TODO: Implement for black pieces
 	assert(color == PieceColor::White);
 
+	//const UINT emptyFields = pieces.getEmptyFields();
+	//const UINT whiteKings = pieces.whitePawns & pieces.kings;
+
+	//// Get the white pieces that can move in the basic diagonal direction (right down or left down, depending on the row)
+	//UINT movers = (emptyFields << SHIFT_BASE) & pieces.whitePawns;
+
+	//// Get the white pieces that can move in the right down direction
+	//movers |= ((emptyFields & MASK_L3) << SHIFT_L3) & pieces.whitePawns;
+
+	//// Get the white pieces that can move in the left down direction
+	//movers |= ((emptyFields & MASK_L5) << SHIFT_L5) & pieces.whitePawns;
+
+	//// Get the white kings that can move in the upper diagonal direction (right up or left up)
+	//if (whiteKings)
+	//{
+	//	movers |= (emptyFields >> SHIFT_BASE) & whiteKings;
+	//	movers |= ((emptyFields & MASK_R3) >> SHIFT_R3) & whiteKings;
+	//	movers |= ((emptyFields & MASK_R5) >> SHIFT_R5) & whiteKings;
+	//}
+
+
+	UINT moversL3 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_L3);
+	UINT moversL4 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_L4);
+	UINT moversL5 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_L5);
+	UINT moversR3 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R3);
+	UINT moversR4 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R4);
+	UINT moversR5 = getMoversInShift(pieces, color, BitShift::BIT_SHIFT_R5);
+
+	UINT movers = moversL3 | moversL4 | moversL5 | moversR3 | moversR4 | moversR5;
+
+	return movers;
+}
+
+UINT MoveGenerator::getMoversInShift(const BitBoard& pieces, PieceColor color, BitShift shift)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
 	const UINT emptyFields = pieces.getEmptyFields();
 	const UINT whiteKings = pieces.whitePawns & pieces.kings;
 
-	// Get the white pieces that can move in the basic diagonal direction (right down or left down, depending on the row)
-	UINT movers = (emptyFields << SHIFT_BASE) & pieces.whitePawns;
+	UINT movers = 0;
+	BitShift reverseShift = getReverseShift(shift);
 
-	// Get the white pieces that can move in the right down direction
-	movers |= ((emptyFields & MASK_L3) << SHIFT_L3) & pieces.whitePawns;
-
-	// Get the white pieces that can move in the left down direction
-	movers |= ((emptyFields & MASK_L5) << SHIFT_L5) & pieces.whitePawns;
-
-	// Get the white kings that can move in the upper diagonal direction (right up or left up)
-	if (whiteKings)
+	if (shift == BitShift::BIT_SHIFT_R4 || shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
 	{
-		movers |= (emptyFields >> SHIFT_BASE) & whiteKings;
-		movers |= ((emptyFields & MASK_R3) >> SHIFT_R3) & whiteKings;
-		movers |= ((emptyFields & MASK_R5) >> SHIFT_R5) & whiteKings;
+		movers |= applyBitShiftWithMask(emptyFields, reverseShift) & pieces.whitePawns;
 	}
-
+	else if (whiteKings && (shift == BitShift::BIT_SHIFT_L4 || shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5))
+	{
+		movers |= applyBitShiftWithMask(emptyFields, reverseShift) & whiteKings;
+	}
+	
 	return movers;
 }
 

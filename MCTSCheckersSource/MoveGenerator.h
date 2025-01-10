@@ -1,16 +1,23 @@
 #pragma once
-#include "Direction.h"
 #include "Move.h"
 #include "PieceColor.h"
 #include "BitBoard.h"
+#include "BitShift.h"
 
 class MoveGenerator {
+private:
+	static UINT applyBitShift(UINT position, BitShift shift);
+	static UINT applyBitShiftWithMask(UINT position, BitShift shift);
+	static BitShift getReverseShift(BitShift shift);
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
 
 	// Getting moveable pieces
     static UINT getJumpers(const BitBoard& pieces, PieceColor color);
     static UINT getMovers(const BitBoard& pieces, PieceColor color);
+
+    // Getting specified moveable pieces
+	static UINT getMoversInShift(const BitBoard& pieces, PieceColor color, BitShift shift);
 
     // Generating a list of moves
     static void generateBasicMoves(const BitBoard& pieces, PieceColor color, UINT movers, MoveList& moves);
