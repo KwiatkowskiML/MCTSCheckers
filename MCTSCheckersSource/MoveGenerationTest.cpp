@@ -44,7 +44,7 @@ void MoveGenerationTest::runAllTests()
 {
     printf("\nRunning Move Generation Tests...\n");
 
-    // Test 1: Basic moves - no captures available
+    // Basic Pawn Moves
     {
         setUp();
         board.whitePawns = 1ULL << 25;  // White pawn at position 25
@@ -52,11 +52,29 @@ void MoveGenerationTest::runAllTests()
             Move(1ULL << 25, 1ULL << 20),  // Down-right move
             Move(1ULL << 25, 1ULL << 21)   // Down-left move
         };
-        MoveList actual = moveGen.generateMoves(board, PieceColor::White);
-        verifyMoveList("Basic moves - no captures", expected, actual);
+        verifyMoveList("Basic pawn moves - center position", expected,
+            moveGen.generateMoves(board, PieceColor::White));
+    }
+    {
+        setUp();
+        board.whitePawns = 1ULL << 7;  // White pawn at left edge
+        MoveList expected = {
+            Move(1ULL << 7, 1ULL << 3)  // Only down-right possible
+        };
+        verifyMoveList("Basic pawn moves - left edge", expected,
+            moveGen.generateMoves(board, PieceColor::White));
+    }
+    {
+        setUp();
+        board.whitePawns = 1ULL << 31;  // White pawn at right edge
+        MoveList expected = {
+            Move(1ULL << 31, 1ULL << 27)  // Only down-left possible
+        };
+        verifyMoveList("Basic pawn moves - right edge", expected,
+            moveGen.generateMoves(board, PieceColor::White));
     }
 
-    // Test 2: Simple capture
+    // Single Captures
     {
         setUp();
         board.whitePawns = 1ULL << 25;   // White pawn
@@ -64,20 +82,52 @@ void MoveGenerationTest::runAllTests()
         MoveList expected = {
             Move(1ULL << 25, 1ULL << 18, 1ULL << 21)  // Capture move
         };
-        MoveList actual = moveGen.generateMoves(board, PieceColor::White);
-        verifyMoveList("Simple capture", expected, actual);
+        verifyMoveList("Single capture - right diagonal", expected,
+            moveGen.generateMoves(board, PieceColor::White));
+    }
+    {
+        setUp();
+        board.whitePawns = 1ULL << 26;   // White pawn
+        board.blackPawns = 1ULL << 21;   // Black pawn to capture
+        MoveList expected = {
+            Move(1ULL << 26, 1ULL << 17, 1ULL << 21)  // Capture move
+        };
+        verifyMoveList("Single capture - left diagonal", expected,
+            moveGen.generateMoves(board, PieceColor::White));
     }
 
-    // Test 3: Multiple capture opportunities
+    // Chain Captures
     {
         setUp();
         board.whitePawns = 1ULL << 29;    // White pawn
-        board.blackPawns = (1ULL << 25) | (1ULL << 17);  // Two black pawns to capture
+        board.blackPawns = (1ULL << 25) | (1ULL << 17);  // Chain of black pawns
         MoveList expected = {
             Move(1ULL << 29, 1ULL << 13, (1ULL << 25) | (1ULL << 17))  // Double capture
         };
-        MoveList actual = moveGen.generateMoves(board, PieceColor::White);
-        verifyMoveList("Multiple captures", expected, actual);
+        verifyMoveList("Chain capture - double", expected,
+            moveGen.generateMoves(board, PieceColor::White));
+    }
+    {
+        setUp();
+        board.whitePawns = 1ULL << 29;    // White pawn
+        board.blackPawns = (1ULL << 25) | (1ULL << 17) | (1ULL << 10);  // Triple chain
+        MoveList expected = {
+            Move(1ULL << 29, 1ULL << 6, (1ULL << 25) | (1ULL << 17) | (1ULL << 10))  // Triple capture
+        };
+        verifyMoveList("Chain capture - triple", expected,
+            moveGen.generateMoves(board, PieceColor::White));
+    }
+    {
+        setUp();
+        board.whitePawns = 1ULL << 21;    // White pawn
+        board.blackPawns = (1ULL << 25) | (1ULL << 18) | (1ULL << 19) | (1ULL << 10) ;  // Triple chain
+        MoveList expected = {
+            Move(1ULL << 21, 1ULL << 28, (1ULL << 25)),
+            Move(1ULL << 21, 1ULL << 23, (1ULL << 18) | (1ULL << 19)),
+            Move(1ULL << 21, 1ULL << 5, (1ULL << 18) | (1ULL << 10)),
+        };
+        verifyMoveList("Chain capture - multiple", expected,
+            moveGen.generateMoves(board, PieceColor::White));
     }
 
     // Test 4: King basic moves
@@ -117,6 +167,20 @@ void MoveGenerationTest::runAllTests()
         MoveList actual = moveGen.generateMoves(board, PieceColor::White);
         verifyMoveList("King single captures", expected, actual);
     }
+    {
+        setUp();
+        board.whitePawns = 1ULL << 28;  // White king
+        board.kings = 1ULL << 28;       // Mark as king
+        board.blackPawns = (1ULL << 21) | (1ULL << 13) | (1ULL << 10) | (1ULL << 27) | (1ULL << 11);  // Black pawn to capture
+        MoveList expected = {
+            Move(1ULL << 28, 1ULL << 9, (1ULL << 21) | (1ULL << 13), true),
+            Move(1ULL << 28, 1ULL << 5, (1ULL << 21) | (1ULL << 10), true),
+            Move(1ULL << 28, 1ULL << 31, (1ULL << 21) | (1ULL << 27), true),
+            Move(1ULL << 28, 1ULL << 7, (1ULL << 21) | (1ULL << 11), true),
+        };
+        MoveList actual = moveGen.generateMoves(board, PieceColor::White);
+        verifyMoveList("King chain of captures", expected, actual);
+    }
 
     // Test 6: Multiple pieces with moves
     {
@@ -133,6 +197,7 @@ void MoveGenerationTest::runAllTests()
 
     // Test 7: Crowning move
     {
+        // TODO: look into it
         setUp();
         board.whitePawns = 1ULL << 4;   // White pawn about to crown
         MoveList expected = {
