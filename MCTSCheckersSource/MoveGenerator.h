@@ -20,6 +20,7 @@ public:
     static void generateBasicMoves(const BitBoard& pieces, PieceColor color, UINT movers, MoveList& moves);
     static void generateBasicMovesInShift(const BitBoard& pieces, PieceColor color, UINT movers, BitShift shift, MoveList& moves);
     static void generateCapturingMoves(const BitBoard& pieces, PieceColor color, UINT jumpers, MoveList& moves);
+    static void generateCapturingMovesInShift(const BitBoard& pieces, PieceColor color, UINT jumpers, BitShift shift, MoveList& moves);
     
     // Generating specified move
     static void generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);

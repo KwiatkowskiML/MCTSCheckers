@@ -4,6 +4,8 @@
 #include "Utils.h"
 #include "Board2.h"
 #include "ShiftMap.h"
+#include <list>
+#include <tuple>
 
 //----------------------------------------------------------------
 // Generating moves
@@ -12,7 +14,6 @@
 MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor color)
 {
 	// Find all of the jumpers
-	UINT jumpers = getJumpers(pieces, color);
 	MoveList moves;
 
 	UINT jumpersL3 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_L3);
@@ -26,7 +27,12 @@ MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor color)
 
 	if (jumpers2)
 	{
-		generateCapturingMoves(pieces, color, jumpers, moves);
+		generateCapturingMovesInShift(pieces, color, jumpersL3, BitShift::BIT_SHIFT_L3, moves);
+		generateCapturingMovesInShift(pieces, color, jumpersL4, BitShift::BIT_SHIFT_L4, moves);
+		generateCapturingMovesInShift(pieces, color, jumpersL5, BitShift::BIT_SHIFT_L5, moves);
+		generateCapturingMovesInShift(pieces, color, jumpersR3, BitShift::BIT_SHIFT_R3, moves);
+		generateCapturingMovesInShift(pieces, color, jumpersR4, BitShift::BIT_SHIFT_R4, moves);
+		generateCapturingMovesInShift(pieces, color, jumpersR5, BitShift::BIT_SHIFT_R5, moves);
 		return moves;
 	}
 
@@ -79,7 +85,7 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R3) & pieces.blackPawns;
 		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R5) & pieces.blackPawns;
 	}
-	
+
 	// No black pawns to capture
 	if (!captBlackPawns)
 		return jumpers;
@@ -112,7 +118,7 @@ UINT MoveGenerator::getMoversInShift(const BitBoard& pieces, PieceColor color, B
 	{
 		movers |= ShiftMap::shift(emptyFields, reverseShift) & whiteKings;
 	}
-	
+
 	return movers;
 }
 
@@ -135,7 +141,7 @@ void MoveGenerator::generateBasicMovesInShift(const BitBoard& pieces, PieceColor
 	}
 }
 
-void MoveGenerator::generateCapturingMoves(const BitBoard& pieces, PieceColor color, UINT jumpers, MoveList& moves)
+void MoveGenerator::generateCapturingMovesInShift(const BitBoard& pieces, PieceColor color, UINT jumpers, BitShift shift, MoveList& moves)
 {
 	while (jumpers) {
 		UINT jumper = jumpers & -jumpers;
@@ -145,7 +151,7 @@ void MoveGenerator::generateCapturingMoves(const BitBoard& pieces, PieceColor co
 			generateKingCaptures(pieces, color, jumper, moves);
 		}
 		else {
-			generatePawnCaptures(pieces, color, jumper, moves);
+			generatePawnCapturesInShift(pieces, color, jumper, shift, moves);
 		}
 	}
 }
@@ -158,6 +164,246 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 {
 	// TODO: Implement for black pieces
 	assert(color == PieceColor::White);
+}
+
+void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+}
+
+void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
+	UINT newPosition = ShiftMap::shift(position, shift);
+	moves.emplace_back(position, newPosition);
+}
+
+void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
+{
+	// TODO: Implement for black pieces
+	// TODO: Add validation for the shift
+
+	assert(color == PieceColor::White);
+	UINT empty_fields = pieces.getEmptyFields();
+
+	UINT captured = ShiftMap::shift(position, shift);
+	UINT newPosition = 0;
+
+	// Capturing black pawns below the white pawn
+	if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
+		newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_R4);
+
+	if (shift == BitShift::BIT_SHIFT_R4)
+	{
+		if (captured & MASK_R3)
+		{
+			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_R3);
+		}
+
+		if (captured & MASK_R5)
+		{
+			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_R5);
+		}
+	}
+
+	// Capturing black pawns above the white pawn
+	if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
+		newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_L4);
+
+	if (shift == BitShift::BIT_SHIFT_L4)
+	{
+		if (captured & MASK_L3)
+		{
+			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_L3);
+		}
+		if (captured & MASK_L5)
+		{
+			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_L5);
+		}
+	}
+
+	// Create the move
+	assert(newPosition != 0);
+	Move singleCapture = Move(position, newPosition, captured);
+
+	// Create new board state after capture
+	BitBoard newState = singleCapture.getBitboardAfterMove(pieces);
+
+	// Generate all possible continuations
+	std::queue<std::tuple<UINT, BitShift>> newJumpers;
+	BitShift reverseShift = ShiftMap::getOpposite(shift);
+
+	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
+		BitShift nextShift = static_cast<BitShift>(i);
+		if (nextShift == reverseShift)
+			continue;
+
+		UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
+		if (jumpers & singleCapture.destination)
+			newJumpers.push(std::make_tuple(jumpers, nextShift));
+	}
+
+	if (!newJumpers.empty()) {
+		// Recursively generate additional captures
+		while (!newJumpers.empty()) {
+			UINT newJumper;
+			BitShift nextShift;
+			std::tie(newJumper, nextShift) = newJumpers.front();
+			newJumpers.pop();
+			MoveList continuationMoves;
+			generatePawnCapturesInShift(newState, PieceColor::White, singleCapture.destination, nextShift, continuationMoves);
+
+			// Add all continuation moves
+			for (const Move& continuation : continuationMoves) {
+				Move combinedMove = singleCapture;
+				combinedMove.destination = continuation.destination;
+				combinedMove.captured |= continuation.captured;
+				moves.push_back(combinedMove);
+			}
+		}
+	}
+	else {
+		// No continuations possible, add the single capture
+		moves.push_back(singleCapture);
+	}
+
+}
+
+//----------------------------------------------------------------
+// Deprecated
+//----------------------------------------------------------------
+
+void MoveGenerator::generateBasicMoves(const BitBoard& pieces, PieceColor color, UINT movers, MoveList& moves)
+{
+	while (movers) {
+		UINT mover = movers & -movers; // TODO: reconsider this
+		movers ^= mover;
+
+		if (mover & pieces.kings) {
+			generateKingMoves(pieces, color, mover, moves);
+		}
+		else {
+			generatePawnMoves(pieces, color, mover, moves);
+		}
+	}
+}
+
+UINT MoveGenerator::getMovers(const BitBoard& pieces, PieceColor color)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
+	const UINT emptyFields = pieces.getEmptyFields();
+	const UINT whiteKings = pieces.whitePawns & pieces.kings;
+
+	// Get the white pieces that can move in the basic diagonal direction (right down or left down, depending on the row)
+	UINT movers = (emptyFields << SHIFT_BASE) & pieces.whitePawns;
+
+	// Get the white pieces that can move in the right down direction
+	movers |= ((emptyFields & MASK_L3) << SHIFT_L3) & pieces.whitePawns;
+
+	// Get the white pieces that can move in the left down direction
+	movers |= ((emptyFields & MASK_L5) << SHIFT_L5) & pieces.whitePawns;
+
+	// Get the white kings that can move in the upper diagonal direction (right up or left up)
+	if (whiteKings)
+	{
+		movers |= (emptyFields >> SHIFT_BASE) & whiteKings;
+		movers |= ((emptyFields & MASK_R3) >> SHIFT_R3) & whiteKings;
+		movers |= ((emptyFields & MASK_R5) >> SHIFT_R5) & whiteKings;
+	}
+
+	return movers;
+}
+
+void MoveGenerator::generatePawnMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
+	UINT empty_fields = pieces.getEmptyFields();
+
+	// Generate moves in the base diagonal direction
+	if ((position >> SHIFT_BASE) & empty_fields)
+	{
+		moves.emplace_back(position, position >> SHIFT_BASE);
+	}
+
+	if (position & MASK_R5)
+	{
+		// Generate moves in the down left direction
+		if ((position >> SHIFT_R5) & empty_fields)
+		{
+			moves.emplace_back(position, position >> SHIFT_R5);
+		}
+	}
+
+	if (position & MASK_R3)
+	{
+		// Generate moves in the down right direction
+		if ((position >> SHIFT_R3) & empty_fields)
+		{
+			moves.emplace_back(position, position >> SHIFT_R3);
+		}
+	}
+}
+
+UINT MoveGenerator::getJumpers(const BitBoard& pieces, PieceColor color)
+{
+	//// TODO: Implement for black pieces
+	//assert(color == PieceColor::White);
+
+	//const UINT emptyFields = pieces.getEmptyFields();
+	//const UINT whiteKings = pieces.whitePawns & pieces.kings;
+	//UINT jumpers = 0;
+
+	//// Get the black pawns that might be captured in base diagonal direction
+	//UINT captBlackPawns = (emptyFields << SHIFT_BASE) & pieces.blackPawns;
+
+	//// Check whether previously specified black pawns can actually be captured
+	//if (captBlackPawns)
+	//{
+	//	// Get the white pawns that can capture black pawn in the base diagonal direction
+	//	jumpers |= ((captBlackPawns & MASK_L3) << SHIFT_L3) & pieces.whitePawns;
+	//	jumpers |= ((captBlackPawns & MASK_L5) << SHIFT_L5) & pieces.whitePawns;
+	//}
+
+	//// Get the black pawns that might be captured in the other diagonal direction
+	//captBlackPawns = ((emptyFields & MASK_L3) << SHIFT_L3) & pieces.blackPawns;
+	//captBlackPawns |= ((emptyFields & MASK_L5) << SHIFT_L5) & pieces.blackPawns;
+
+	//jumpers |= (captBlackPawns << SHIFT_BASE) & pieces.whitePawns;
+
+	//// Find all of the black pawns that might be captured backwards in base diagonal
+	//captBlackPawns = (emptyFields >> SHIFT_BASE) & pieces.blackPawns;
+
+	//// Check whether previously specified black pawns can actually be captured
+	//if (captBlackPawns)
+	//{
+	//	jumpers |= ((captBlackPawns & MASK_R5) >> SHIFT_R5) & pieces.whitePawns;
+	//	jumpers |= ((captBlackPawns & MASK_R3) >> SHIFT_R3) & pieces.whitePawns;
+	//}
+
+	//// Find all of the black pawns that might be captured backwards in the other diagonal
+	//captBlackPawns = ((emptyFields & MASK_R5) >> SHIFT_R5) & pieces.blackPawns;
+	//captBlackPawns |= ((emptyFields & MASK_R3) >> SHIFT_R3) & pieces.blackPawns;
+	//jumpers |= (captBlackPawns >> SHIFT_BASE) & pieces.whitePawns;
+
+	// TODO: Consider if there is a need for analizing kings - there IS
+
+	UINT jumpersL3 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_L3);
+	UINT jumpersL4 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_L4);
+	UINT jumpersL5 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_L5);
+	UINT jumpersR3 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_R3);
+	UINT jumpersR4 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_R4);
+	UINT jumpersR5 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_R5);
+
+	UINT jumpers = jumpersL3 | jumpersL4 | jumpersL5 | jumpersR3 | jumpersR4 | jumpersR5;
+
+	return jumpers;
 }
 
 void MoveGenerator::generatePawnCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
@@ -298,248 +544,17 @@ void MoveGenerator::generatePawnCaptures(const BitBoard& pieces, PieceColor colo
 	}
 }
 
-void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+void MoveGenerator::generateCapturingMoves(const BitBoard& pieces, PieceColor color, UINT jumpers, MoveList& moves)
 {
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-}
+	while (jumpers) {
+		UINT jumper = jumpers & -jumpers;
+		jumpers ^= jumper;
 
-void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
-{
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-
-	UINT newPosition = ShiftMap::shift(position, shift);
-	moves.emplace_back(position, newPosition);
-}
-
-void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
-{
-	// TODO: Implement for black pieces
-	// TODO: Add validation for the shift
-
-	assert(color == PieceColor::White);
-	UINT empty_fields = pieces.getEmptyFields();
-	MoveList singleCaptureMoves;
-
-	UINT captured = ShiftMap::shift(position, shift);
-	UINT newPosition = 0;
-
-	// Capturing black pawns below the white pawn
-	if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
-		newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_R4);
-
-	if (shift == BitShift::BIT_SHIFT_R4)
-	{
-		if (captured & MASK_R3)
-		{
-			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_R3);
-		}
-
-		if (captured & MASK_R5)
-		{
-			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_R5);
-		}
-	}
-
-	// Capturing black pawns above the white pawn
-	if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
-		newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_L4);
-
-	if (shift == BitShift::BIT_SHIFT_L4)
-	{
-		if (captured & MASK_L3)
-		{
-			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_L3);
-		}
-		if (captured & MASK_L5)
-		{
-			newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_L5);
-		}
-	}
-
-	assert(newPosition != 0);
-	singleCaptureMoves.emplace_back(position, newPosition, captured);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//TODO: Implement the rest of the function
-
-
-	// Process each single capture and check for continuations
-	for (const Move& singleCapture : singleCaptureMoves) {
-
-		// Create new board state after capture
-		BitBoard newState = singleCapture.getBitboardAfterMove(pieces);
-
-		// Check for additional captures from the new position
-		UINT newJumpers = getJumpers(newState, PieceColor::White);
-
-		if (newJumpers & singleCapture.destination) {
-			// Recursively generate additional captures
-			MoveList continuationMoves;
-			generatePawnCaptures(newState, PieceColor::White, singleCapture.destination, continuationMoves);
-
-			// If no continuations found, add the single capture
-			if (continuationMoves.empty()) {
-				moves.push_back(singleCapture);
-			}
-			// Add all continuation moves
-			for (const Move& continuation : continuationMoves) {
-				Move combinedMove = singleCapture;
-				combinedMove.destination = continuation.destination;
-				combinedMove.captured |= continuation.captured;
-				moves.push_back(combinedMove);
-			}
+		if (jumper & pieces.kings) {
+			generateKingCaptures(pieces, color, jumper, moves);
 		}
 		else {
-			// No continuations possible, add the single capture
-			moves.push_back(singleCapture);
+			generatePawnCaptures(pieces, color, jumper, moves);
 		}
 	}
-}
-
-//----------------------------------------------------------------
-// Deprecated
-//----------------------------------------------------------------
-
-void MoveGenerator::generateBasicMoves(const BitBoard& pieces, PieceColor color, UINT movers, MoveList& moves)
-{
-	while (movers) {
-		UINT mover = movers & -movers; // TODO: reconsider this
-		movers ^= mover;
-
-		if (mover & pieces.kings) {
-			generateKingMoves(pieces, color, mover, moves);
-		}
-		else {
-			generatePawnMoves(pieces, color, mover, moves);
-		}
-	}
-}
-
-UINT MoveGenerator::getMovers(const BitBoard& pieces, PieceColor color)
-{
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-
-	const UINT emptyFields = pieces.getEmptyFields();
-	const UINT whiteKings = pieces.whitePawns & pieces.kings;
-
-	// Get the white pieces that can move in the basic diagonal direction (right down or left down, depending on the row)
-	UINT movers = (emptyFields << SHIFT_BASE) & pieces.whitePawns;
-
-	// Get the white pieces that can move in the right down direction
-	movers |= ((emptyFields & MASK_L3) << SHIFT_L3) & pieces.whitePawns;
-
-	// Get the white pieces that can move in the left down direction
-	movers |= ((emptyFields & MASK_L5) << SHIFT_L5) & pieces.whitePawns;
-
-	// Get the white kings that can move in the upper diagonal direction (right up or left up)
-	if (whiteKings)
-	{
-		movers |= (emptyFields >> SHIFT_BASE) & whiteKings;
-		movers |= ((emptyFields & MASK_R3) >> SHIFT_R3) & whiteKings;
-		movers |= ((emptyFields & MASK_R5) >> SHIFT_R5) & whiteKings;
-	}
-
-	return movers;
-}
-
-void MoveGenerator::generatePawnMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
-{
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-
-	UINT empty_fields = pieces.getEmptyFields();
-
-	// Generate moves in the base diagonal direction
-	if ((position >> SHIFT_BASE) & empty_fields)
-	{
-		moves.emplace_back(position, position >> SHIFT_BASE);
-	}
-
-	if (position & MASK_R5)
-	{
-		// Generate moves in the down left direction
-		if ((position >> SHIFT_R5) & empty_fields)
-		{
-			moves.emplace_back(position, position >> SHIFT_R5);
-		}
-	}
-
-	if (position & MASK_R3)
-	{
-		// Generate moves in the down right direction
-		if ((position >> SHIFT_R3) & empty_fields)
-		{
-			moves.emplace_back(position, position >> SHIFT_R3);
-		}
-	}
-}
-
-UINT MoveGenerator::getJumpers(const BitBoard& pieces, PieceColor color)
-{
-	//// TODO: Implement for black pieces
-	//assert(color == PieceColor::White);
-
-	//const UINT emptyFields = pieces.getEmptyFields();
-	//const UINT whiteKings = pieces.whitePawns & pieces.kings;
-	//UINT jumpers = 0;
-
-	//// Get the black pawns that might be captured in base diagonal direction
-	//UINT captBlackPawns = (emptyFields << SHIFT_BASE) & pieces.blackPawns;
-
-	//// Check whether previously specified black pawns can actually be captured
-	//if (captBlackPawns)
-	//{
-	//	// Get the white pawns that can capture black pawn in the base diagonal direction
-	//	jumpers |= ((captBlackPawns & MASK_L3) << SHIFT_L3) & pieces.whitePawns;
-	//	jumpers |= ((captBlackPawns & MASK_L5) << SHIFT_L5) & pieces.whitePawns;
-	//}
-
-	//// Get the black pawns that might be captured in the other diagonal direction
-	//captBlackPawns = ((emptyFields & MASK_L3) << SHIFT_L3) & pieces.blackPawns;
-	//captBlackPawns |= ((emptyFields & MASK_L5) << SHIFT_L5) & pieces.blackPawns;
-
-	//jumpers |= (captBlackPawns << SHIFT_BASE) & pieces.whitePawns;
-
-	//// Find all of the black pawns that might be captured backwards in base diagonal
-	//captBlackPawns = (emptyFields >> SHIFT_BASE) & pieces.blackPawns;
-
-	//// Check whether previously specified black pawns can actually be captured
-	//if (captBlackPawns)
-	//{
-	//	jumpers |= ((captBlackPawns & MASK_R5) >> SHIFT_R5) & pieces.whitePawns;
-	//	jumpers |= ((captBlackPawns & MASK_R3) >> SHIFT_R3) & pieces.whitePawns;
-	//}
-
-	//// Find all of the black pawns that might be captured backwards in the other diagonal
-	//captBlackPawns = ((emptyFields & MASK_R5) >> SHIFT_R5) & pieces.blackPawns;
-	//captBlackPawns |= ((emptyFields & MASK_R3) >> SHIFT_R3) & pieces.blackPawns;
-	//jumpers |= (captBlackPawns >> SHIFT_BASE) & pieces.whitePawns;
-
-	// TODO: Consider if there is a need for analizing kings - there IS
-
-	UINT jumpersL3 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_L3);
-	UINT jumpersL4 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_L4);
-	UINT jumpersL5 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_L5);
-	UINT jumpersR3 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_R3);
-	UINT jumpersR4 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_R4);
-	UINT jumpersR5 = getJumpersInShift(pieces, color, BitShift::BIT_SHIFT_R5);
-
-	UINT jumpers = jumpersL3 | jumpersL4 | jumpersL5 | jumpersR3 | jumpersR4 | jumpersR5;
-
-	return jumpers;
 }
