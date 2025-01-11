@@ -167,7 +167,7 @@ void MoveGenerator::generateBasicMovesInShift(const BitBoard& pieces, PieceColor
 		movers ^= mover;
 
 		if (mover & pieces.kings) {
-			generateKingMoves(pieces, color, mover, moves);
+			generateKingMoves(pieces, color, mover, shift, moves);
 		}
 		else {
 			generatePawnMovesInShift(pieces, color, mover, shift, moves);
@@ -200,10 +200,68 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 	assert(color == PieceColor::White);
 }
 
-void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
 {
 	// TODO: Implement for black pieces
 	assert(color == PieceColor::White);
+	UINT emptyFields = pieces.getEmptyFields();
+	UINT newPosition = position;
+	int iteration = 0;
+
+	while (newPosition)
+	{
+		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
+		{
+			if (iteration & 1)
+				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L4);
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
+		{
+			if (iteration & 1)
+				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R4);
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_L4)
+		{
+			if (iteration & 1)
+			{
+				if (newPosition & MASK_L3)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L3);
+				else if (newPosition & MASK_L5)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L5);
+				else
+					break;
+			}
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_R4)
+		{
+			if (iteration & 1)
+			{
+				if (newPosition & MASK_R3)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R3);
+				else if (newPosition & MASK_R5)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R5);
+				else
+					break;
+			}
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (!(newPosition & emptyFields))
+			break;
+
+		moves.emplace_back(position, newPosition);
+		iteration++;
+	}
 }
 
 void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
