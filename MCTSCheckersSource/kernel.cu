@@ -1,7 +1,6 @@
 ﻿
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "Board.h"
 
 #include <stdio.h>
 #include "Board2.h"

@@ -2,7 +2,6 @@
 #define MOVE_GENERATION_TEST_H
 
 #include "CheckersTest.h"
-#include "Move.h"
 
 class MoveGenerationTest : public CheckersTest {
 private:

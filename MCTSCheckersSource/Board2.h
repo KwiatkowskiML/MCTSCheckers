@@ -1,6 +1,5 @@
 #pragma once
 #include "Utils.h"
-#include "Move.h"
 #include "PieceColor.h"
 #include "BitBoard.h"
 #include <vector>
