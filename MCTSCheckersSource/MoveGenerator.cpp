@@ -529,8 +529,8 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 
 	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 		BitShift nextShift = static_cast<BitShift>(i);
-		if (nextShift == reverseShift)
-			continue;
+		//if (nextShift == reverseShift)
+		//	continue; 
 
 		UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
 		if (jumpers & singleCapture.getDestination())

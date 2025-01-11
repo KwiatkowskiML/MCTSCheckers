@@ -14,6 +14,7 @@ private:
     void testSingleCaptureLeftDiagonal();
     void testChainCaptureDouble();
     void testChainCaptureTriple();
+    void testChainCaptureMultiple();
     void testKingBasicMoves();
     void testCrowningMove();
 
