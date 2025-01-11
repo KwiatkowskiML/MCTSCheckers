@@ -119,6 +119,16 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 	jumpers |= ShiftMap::shift(captBlackPawns, reverseShift) & pieces.whitePawns;
 
 	// TODO: Consider if there is a need for analizing kings - there IS, because kings must capture if there is such possibility
+	//UINT nonTaggedKings = whiteKings & ~jumpers;
+	//if (nonTaggedKings)
+	//{
+	//	BitShift rever
+	//	UINT kingCaptBlackPieces = 
+	//	while (nonTaggedKings)
+	//	{
+
+	//	}
+	//}
 
 	return jumpers;
 }
@@ -295,7 +305,3 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 	}
 
 }
-
-//----------------------------------------------------------------
-// Deprecated
-//----------------------------------------------------------------
