@@ -387,7 +387,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
 				// Add all continuation moves
 				for (const Move2& continuation : continuationMoves) {
-					Move2 combinedMove = move.getExtendedMove(continuation.getDestination(), continuation.getCaptured());
+					Move2 combinedMove = move.getExtendedMove(continuation, continuation.getCaptured());
 					moves.push_back(combinedMove);
 				}
 			}
@@ -549,7 +549,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 
 			// Add all continuation moves
 			for (const Move2& continuation : continuationMoves) {
-				Move2 combinedMove = singleCapture.getExtendedMove(singleCapture.getDestination(), singleCapture.getCaptured());
+				Move2 combinedMove = singleCapture.getExtendedMove(continuation, continuation.getCaptured());
 				moves.push_back(combinedMove);
 			}
 		}

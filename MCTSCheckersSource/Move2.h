@@ -24,8 +24,9 @@ public:
     Move2(std::vector<UINT> steps, UINT capt = 0, PieceColor col = PieceColor::White)
         : steps(steps), captured(capt), color(col) { }
 
-    Move2 getExtendedMove(UINT dst, UINT capt) const;
+    Move2 getExtendedMove(Move2 continuation, UINT capt) const;
     BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard) const;
+    const std::vector<UINT>& getSteps() const;
 
     UINT getDestination() const;
     UINT getSource() const;

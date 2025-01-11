@@ -1,9 +1,14 @@
 #include "Move2.h"
+#include <sstream> 
+#include <iomanip>
 
-Move2 Move2::getExtendedMove(UINT newDestination, UINT capt) const
+Move2 Move2::getExtendedMove(Move2 continuation, UINT capt) const
 {
 	std::vector<UINT> newSteps = steps;
-	newSteps.push_back(newDestination);
+	for (int i = 1; i < continuation.getSteps().size(); ++i)
+	{
+		newSteps.push_back(continuation.getSteps()[i]);
+	}
 
 	UINT newCaptured = captured | capt;
 	return Move2(newSteps, newCaptured, color);
@@ -47,6 +52,11 @@ BitBoard Move2::getBitboardAfterMove(const BitBoard& sourceBitboard) const
     }
 }
 
+const std::vector<UINT>& Move2::getSteps() const
+{
+    return steps;
+}
+
 UINT Move2::getDestination() const
 {
     return steps.back();
@@ -64,16 +74,21 @@ bool Move2::isCapture() const
 
 std::string Move2::toString() const
 {
-    std::string result;
+    std::ostringstream resultStream;
+    resultStream << std::hex << std::setfill('0'); // Set output to hexadecimal and pad with zeros
 
     if (isCapture())
     {
-        result = std::to_string(getSource());
-		for (int i = 1; i < steps.size(); i++)
-			result += ";" + std::to_string(steps[i]);
+        resultStream << std::setw(8) << getSource(); // Add leading zeros to ensure 32 bits (8 hex digits)
+        for (size_t i = 1; i < steps.size(); ++i)
+        {
+            resultStream << ";" << std::setw(8) << steps[i];
+        }
     }
-	else
-		result = std::to_string(getSource()) + "-" + std::to_string(getDestination());
+    else
+    {
+        resultStream << std::setw(8) << getSource() << "-" << std::setw(8) << getDestination();
+    }
 
-	return result;
+    return resultStream.str();
 }
