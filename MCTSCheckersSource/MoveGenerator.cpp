@@ -198,14 +198,9 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 
 					foundEnemyPiece = true;
 					continue;
-				}			
+				}
 			}
 		}
-
-		
-
-
-
 	}
 
 	return jumpers;
@@ -279,26 +274,23 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 	UINT emptyFields = pieces.getEmptyFields();
 	UINT newPosition = position;
 	int iteration = 0;
-	UINT foundEnemyPiece = 0;	
+	UINT foundEnemyPiece = 0;
 
-	std::list<Move> singleCapturedPieces;
+	std::list<std::tuple<Move, BitShift>> singleCapturedPieces;
 
 	while (newPosition)
 	{
+		BitShift nextShift = shift;
 		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
 		{
 			if (iteration & 1)
-				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L4);
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
+				nextShift = BitShift::BIT_SHIFT_L4;
 		}
 
 		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
 		{
 			if (iteration & 1)
-				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R4);
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
+				nextShift = BitShift::BIT_SHIFT_R4;
 		}
 
 		if (shift == BitShift::BIT_SHIFT_L4)
@@ -306,14 +298,12 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 			if (iteration & 1)
 			{
 				if (newPosition & MASK_L3)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L3);
+					nextShift = BitShift::BIT_SHIFT_L3;
 				else if (newPosition & MASK_L5)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L5);
+					nextShift = BitShift::BIT_SHIFT_L5;
 				else
 					break;
 			}
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
 		}
 
 		if (shift == BitShift::BIT_SHIFT_R4)
@@ -321,16 +311,16 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 			if (iteration & 1)
 			{
 				if (newPosition & MASK_R3)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R3);
+					nextShift = BitShift::BIT_SHIFT_R3;
 				else if (newPosition & MASK_R5)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R5);
+					nextShift = BitShift::BIT_SHIFT_R5;
 				else
 					break;
 			}
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
 		}
 
+		// Make the shift
+		newPosition = ShiftMap::shift(newPosition, nextShift);
 		iteration++;
 
 		// Shifted out of the board
@@ -347,11 +337,11 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 			continue;
 
 		// If the newPosition contains empty field and we have already found enemy piece, add the move
-		if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
-		{
-			singleCapturedPieces.emplace_back(position, newPosition, foundEnemyPiece, true);
+        if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
+        {
+			singleCapturedPieces.emplace_back(Move(position, newPosition, foundEnemyPiece), shift);
 			continue;
-		}
+        }
 
 		// Being here means the black piece is on the new position
 		assert((newPosition & pieces.blackPawns) > 0);
@@ -363,10 +353,52 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		foundEnemyPiece = newPosition;
 	}
 
-	for (const Move& move : singleCapturedPieces)
-	{
-		moves.push_back(move);
-	}
+    for (const auto& moveTuple : singleCapturedPieces)
+    {
+		const Move& move = std::get<0>(moveTuple);
+		const BitShift& nextShift = std::get<1>(moveTuple);
+
+		// Create new board state after capture
+		BitBoard newState = move.getBitboardAfterMove(pieces);
+
+		// Generate all possible continuations
+		std::queue<std::tuple<UINT, BitShift>> newJumpers;
+		BitShift reverseShift = ShiftMap::getOpposite(nextShift);
+
+		for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
+			BitShift nextShift = static_cast<BitShift>(i);
+			if (nextShift == reverseShift)
+				continue;
+			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
+			if (jumpers & move.destination)
+				newJumpers.push(std::make_tuple(jumpers, nextShift));
+		}
+
+		if (!newJumpers.empty()) {
+
+			// Recursively generate additional captures
+			while (!newJumpers.empty()) {
+				UINT newJumper;
+				BitShift nextShift;
+				std::tie(newJumper, nextShift) = newJumpers.front();
+				newJumpers.pop();
+				MoveList continuationMoves;
+				generateKingCaptures(newState, PieceColor::White, move.destination, nextShift, continuationMoves);
+
+				// Add all continuation moves
+				for (const Move& continuation : continuationMoves) {
+					Move combinedMove = move;
+					combinedMove.destination = continuation.destination;
+					combinedMove.captured |= continuation.captured;
+					moves.push_back(combinedMove);
+				}
+			}
+		}
+		else {
+			// No continuations possible, add the single capture
+			moves.push_back(move);
+		}
+    }
 }
 
 void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)

@@ -5,12 +5,13 @@
 #include <cassert>
 #include "Utils.h"
 #include "BitBoard.h"
+#include <string>
 
 struct Move {
     UINT source;
     UINT destination;
     UINT captured;
-	bool isKingMove;
+	bool isKingMove; // TODO: remove this
     PieceColor color;
 
     Move(UINT src, UINT dst, UINT capt = 0, bool king = false, PieceColor col = PieceColor::White)
@@ -50,7 +51,26 @@ struct Move {
         return newbitBoard;
     }
 
-    bool isCapture() const { return captured != 0; }
+	UINT getDestination() const 
+    { 
+        return destination;
+    }
+
+    bool isCapture() const 
+    { 
+        return captured != 0; 
+    }
+
+    std::string toString() const {
+        std::string result;
+
+        if (captured == 0)
+			result = std::to_string(source) + "-" + std::to_string(destination);
+        else
+        {
+			result = std::to_string(source) + "x" + std::to_string(destination);
+        }
+    }
 };
 
 using MoveList = std::vector<Move>;

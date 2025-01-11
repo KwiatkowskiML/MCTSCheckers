@@ -136,17 +136,17 @@ void MoveGenerationTest::runAllTests()
         board.whitePawns = 1ULL << 21;  // White king
         board.kings = 1ULL << 21;       // Mark as king
         MoveList expected = {
-            Move(1ULL << 21, 1ULL << 25, 0, true),  
-            Move(1ULL << 21, 1ULL << 28, 0, true),  
-            Move(1ULL << 21, 1ULL << 26, 0, true),  
-            Move(1ULL << 21, 1ULL << 30, 0, true),   
-            Move(1ULL << 21, 1ULL << 17, 0, true),   
-            Move(1ULL << 21, 1ULL << 12, 0, true),   
-            Move(1ULL << 21, 1ULL << 8, 0, true),   
-            Move(1ULL << 21, 1ULL << 18, 0, true),   
-            Move(1ULL << 21, 1ULL << 14, 0, true),   
-            Move(1ULL << 21, 1ULL << 11, 0, true),   
-            Move(1ULL << 21, 1ULL << 7, 0, true)   
+            Move(1ULL << 21, 1ULL << 25),  
+            Move(1ULL << 21, 1ULL << 28),  
+            Move(1ULL << 21, 1ULL << 26),  
+            Move(1ULL << 21, 1ULL << 30),   
+            Move(1ULL << 21, 1ULL << 17),   
+            Move(1ULL << 21, 1ULL << 12),   
+            Move(1ULL << 21, 1ULL << 8),   
+            Move(1ULL << 21, 1ULL << 18),   
+            Move(1ULL << 21, 1ULL << 14),   
+            Move(1ULL << 21, 1ULL << 11),   
+            Move(1ULL << 21, 1ULL << 7)   
         };
         MoveList actual = moveGen.generateMoves(board, PieceColor::White);
         verifyMoveList("King basic moves", expected, actual);
@@ -159,10 +159,8 @@ void MoveGenerationTest::runAllTests()
         board.kings = 1ULL << 18;       // Mark as king
         board.blackPawns = (1ULL << 22) | (1ULL << 9);  // Black pawn to capture
         MoveList expected = {
-            Move(1ULL << 18, 1ULL << 27, 1ULL << 22, true),
-            Move(1ULL << 18, 1ULL << 31, 1ULL << 22, true),
-            Move(1ULL << 18, 1ULL << 4, 1ULL << 9, true),
-            Move(1ULL << 18, 1ULL, 1ULL << 9, true),
+            Move(1ULL << 18, 1ULL << 4, (1ULL << 22) | (1ULL << 9)),
+            Move(1ULL << 18, 1ULL, (1ULL << 22) | (1ULL << 9)),
         };
         MoveList actual = moveGen.generateMoves(board, PieceColor::White);
         verifyMoveList("King single captures", expected, actual);
@@ -173,10 +171,10 @@ void MoveGenerationTest::runAllTests()
         board.kings = 1ULL << 28;       // Mark as king
         board.blackPawns = (1ULL << 21) | (1ULL << 13) | (1ULL << 10) | (1ULL << 27) | (1ULL << 11);  // Black pawn to capture
         MoveList expected = {
-            Move(1ULL << 28, 1ULL << 9, (1ULL << 21) | (1ULL << 13), true),
-            Move(1ULL << 28, 1ULL << 5, (1ULL << 21) | (1ULL << 10), true),
-            Move(1ULL << 28, 1ULL << 31, (1ULL << 21) | (1ULL << 27), true),
-            Move(1ULL << 28, 1ULL << 7, (1ULL << 21) | (1ULL << 11), true),
+            Move(1ULL << 28, 1ULL << 9, (1ULL << 21) | (1ULL << 13)),
+            Move(1ULL << 28, 1ULL << 5, (1ULL << 21) | (1ULL << 10)),
+            Move(1ULL << 28, 1ULL << 31, (1ULL << 21) | (1ULL << 27)),
+            Move(1ULL << 28, 1ULL << 7, (1ULL << 21) | (1ULL << 11)),
         };
         MoveList actual = moveGen.generateMoves(board, PieceColor::White);
         verifyMoveList("King chain of captures", expected, actual);
@@ -201,8 +199,8 @@ void MoveGenerationTest::runAllTests()
         setUp();
         board.whitePawns = 1ULL << 4;   // White pawn about to crown
         MoveList expected = {
-            Move(1ULL << 4, 1ULL << 0, 0, true),  // Crowning move
-            Move(1ULL << 4, 1ULL << 1, 0, true)   // Crowning move
+            Move(1ULL << 4, 1ULL << 0),  // Crowning move
+            Move(1ULL << 4, 1ULL << 1)   // Crowning move
         };
         MoveList actual = moveGen.generateMoves(board, PieceColor::White);
         verifyMoveList("Crowning move", expected, actual);
