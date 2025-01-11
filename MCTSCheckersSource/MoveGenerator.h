@@ -21,7 +21,7 @@ public:
     static void generateCapturingMovesInShift(const BitBoard& pieces, PieceColor color, UINT jumpers, BitShift shift, MoveList& moves);
     
     // Generating specified move
-    static void generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves);
+    static void generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves);
     static void generatePawnCapturesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves);
     static void generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves);
     static void generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves);

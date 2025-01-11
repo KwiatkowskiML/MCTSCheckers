@@ -118,17 +118,95 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 	BitShift reverseShift = ShiftMap::getOpposite(shift);
 	jumpers |= ShiftMap::shift(captBlackPawns, reverseShift) & pieces.whitePawns;
 
-	// TODO: Consider if there is a need for analizing kings - there IS, because kings must capture if there is such possibility
-	//UINT nonTaggedKings = whiteKings & ~jumpers;
-	//if (nonTaggedKings)
-	//{
-	//	BitShift rever
-	//	UINT kingCaptBlackPieces = 
-	//	while (nonTaggedKings)
-	//	{
+	// Find the kings that can capture black pawns
+	UINT nonTaggedKings = whiteKings & ~jumpers;
+	if (nonTaggedKings)
+	{
+		while (nonTaggedKings) {
+			UINT currentKing = nonTaggedKings & -nonTaggedKings;
+			nonTaggedKings ^= currentKing;
+			UINT movedCurrentKing = currentKing;
+			int iteration = 0;
+			bool foundEnemyPiece = false;
 
-	//	}
-	//}
+			// Move the kings untill capturable black pawn is found
+			while (movedCurrentKing)
+			{
+				BitShift nextShift = shift;
+				if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
+				{
+					if (iteration & 1)
+						nextShift = BitShift::BIT_SHIFT_L4;
+				}
+
+				if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
+				{
+					if (iteration & 1)
+						nextShift = BitShift::BIT_SHIFT_R4;
+				}
+
+				if (shift == BitShift::BIT_SHIFT_L4)
+				{
+					if (iteration & 1)
+					{
+						if (movedCurrentKing & MASK_L3)
+							nextShift = BitShift::BIT_SHIFT_L3;
+						else if (movedCurrentKing & MASK_L5)
+							nextShift = BitShift::BIT_SHIFT_L5;
+						else
+							break;
+					}
+				}
+
+				if (shift == BitShift::BIT_SHIFT_R4)
+				{
+					if (iteration & 1)
+					{
+						if (movedCurrentKing & MASK_R3)
+							nextShift = BitShift::BIT_SHIFT_R3;
+						else if (movedCurrentKing & MASK_R5)
+							nextShift = BitShift::BIT_SHIFT_R5;
+						else
+							break;
+					}
+				}
+
+				movedCurrentKing = ShiftMap::shift(movedCurrentKing, nextShift);
+				iteration++;
+
+				// found white pawn on the way
+				if (movedCurrentKing & pieces.whitePawns)
+					break;
+
+				// found empty field on the way
+				if (movedCurrentKing & emptyFields && !foundEnemyPiece)
+					continue;
+
+				// found empty field right after enemy piece
+				if (movedCurrentKing & emptyFields && foundEnemyPiece)
+				{
+					jumpers |= currentKing;
+					break;
+				}
+
+				// found enemy piece on the way
+				if (movedCurrentKing & pieces.blackPawns)
+				{
+					// found enemy piece right after enemy piece
+					if (foundEnemyPiece)
+						break;
+
+					foundEnemyPiece = true;
+					continue;
+				}			
+			}
+		}
+
+		
+
+
+
+	}
 
 	return jumpers;
 }
@@ -182,7 +260,7 @@ void MoveGenerator::generateCapturingMovesInShift(const BitBoard& pieces, PieceC
 		jumpers ^= jumper;
 
 		if (jumper & pieces.kings) {
-			generateKingCaptures(pieces, color, jumper, moves);
+			generateKingCaptures(pieces, color, jumper, shift, moves);
 		}
 		else {
 			generatePawnCapturesInShift(pieces, color, jumper, shift, moves);
@@ -194,10 +272,101 @@ void MoveGenerator::generateCapturingMovesInShift(const BitBoard& pieces, PieceC
 // Generating specified move
 //----------------------------------------------------------------
 
-void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, MoveList& moves)
+void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
 {
 	// TODO: Implement for black pieces
 	assert(color == PieceColor::White);
+	UINT emptyFields = pieces.getEmptyFields();
+	UINT newPosition = position;
+	int iteration = 0;
+	UINT foundEnemyPiece = 0;	
+
+	std::list<Move> singleCapturedPieces;
+
+	while (newPosition)
+	{
+		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
+		{
+			if (iteration & 1)
+				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L4);
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
+		{
+			if (iteration & 1)
+				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R4);
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_L4)
+		{
+			if (iteration & 1)
+			{
+				if (newPosition & MASK_L3)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L3);
+				else if (newPosition & MASK_L5)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L5);
+				else
+					break;
+			}
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_R4)
+		{
+			if (iteration & 1)
+			{
+				if (newPosition & MASK_R3)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R3);
+				else if (newPosition & MASK_R5)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R5);
+				else
+					break;
+			}
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		iteration++;
+
+		// Shifted out of the board
+		if (newPosition == 0)
+			break;
+
+		// There must not be any white pieces on the way
+		assert((newPosition & pieces.whitePawns) == 0);
+		if (newPosition & pieces.whitePawns)
+			break;
+
+		// If the newPosition contains empty field continue looking for enemy pieces
+		if ((newPosition & emptyFields) > 0 && !foundEnemyPiece)
+			continue;
+
+		// If the newPosition contains empty field and we have already found enemy piece, add the move
+		if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
+		{
+			singleCapturedPieces.emplace_back(position, newPosition, foundEnemyPiece, true);
+			continue;
+		}
+
+		// Being here means the black piece is on the new position
+		assert((newPosition & pieces.blackPawns) > 0);
+
+		// If we have already found enemy piece, we must not find another one
+		if (foundEnemyPiece > 0)
+			break;
+
+		foundEnemyPiece = newPosition;
+	}
+
+	for (const Move& move : singleCapturedPieces)
+	{
+		moves.push_back(move);
+	}
 }
 
 void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
@@ -259,7 +428,7 @@ void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, 
 		if (!(newPosition & emptyFields))
 			break;
 
-		moves.emplace_back(position, newPosition);
+		moves.emplace_back(position, newPosition, 0, true);
 		iteration++;
 	}
 }

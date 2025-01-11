@@ -102,17 +102,20 @@ void MoveGenerationTest::runAllTests()
         verifyMoveList("King basic moves", expected, actual);
     }
 
-    // Test 5: King capture
+    // Test 5: King single capture
     {
         setUp();
-        board.whitePawns = 1ULL << 25;  // White king
-        board.kings = 1ULL << 25;       // Mark as king
-        board.blackPawns = 1ULL << 21;  // Black pawn to capture
+        board.whitePawns = 1ULL << 18;  // White king
+        board.kings = 1ULL << 18;       // Mark as king
+        board.blackPawns = (1ULL << 22) | (1ULL << 9);  // Black pawn to capture
         MoveList expected = {
-            Move(1ULL << 25, 1ULL << 18, 1ULL << 21, true)  // King capture
+            Move(1ULL << 18, 1ULL << 27, 1ULL << 22, true),
+            Move(1ULL << 18, 1ULL << 31, 1ULL << 22, true),
+            Move(1ULL << 18, 1ULL << 4, 1ULL << 9, true),
+            Move(1ULL << 18, 1ULL, 1ULL << 9, true),
         };
         MoveList actual = moveGen.generateMoves(board, PieceColor::White);
-        verifyMoveList("King capture", expected, actual);
+        verifyMoveList("King single captures", expected, actual);
     }
 
     // Test 6: Multiple pieces with moves
