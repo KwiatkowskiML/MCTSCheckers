@@ -276,7 +276,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 	int iteration = 0;
 	UINT foundEnemyPiece = 0;
 
-	std::list<std::tuple<Move, BitShift>> singleCapturedPieces;
+	std::list<std::tuple<Move2, BitShift>> singleCapturedPieces;
 
 	while (newPosition)
 	{
@@ -339,7 +339,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		// If the newPosition contains empty field and we have already found enemy piece, add the move
         if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
         {
-			singleCapturedPieces.emplace_back(Move(position, newPosition, foundEnemyPiece), shift);
+			singleCapturedPieces.emplace_back(Move2(position, newPosition, foundEnemyPiece), shift);
 			continue;
         }
 
@@ -355,7 +355,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
     for (const auto& moveTuple : singleCapturedPieces)
     {
-		const Move& move = std::get<0>(moveTuple);
+		const Move2& move = std::get<0>(moveTuple);
 		const BitShift& nextShift = std::get<1>(moveTuple);
 
 		// Create new board state after capture
@@ -370,7 +370,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 			if (nextShift == reverseShift)
 				continue;
 			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
-			if (jumpers & move.destination)
+			if (jumpers & move.getDestination())
 				newJumpers.push(std::make_tuple(jumpers, nextShift));
 		}
 
@@ -383,13 +383,11 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 				std::tie(newJumper, nextShift) = newJumpers.front();
 				newJumpers.pop();
 				MoveList continuationMoves;
-				generateKingCaptures(newState, PieceColor::White, move.destination, nextShift, continuationMoves);
+				generateKingCaptures(newState, PieceColor::White, move.getDestination(), nextShift, continuationMoves);
 
 				// Add all continuation moves
-				for (const Move& continuation : continuationMoves) {
-					Move combinedMove = move;
-					combinedMove.destination = continuation.destination;
-					combinedMove.captured |= continuation.captured;
+				for (const Move2& continuation : continuationMoves) {
+					Move2 combinedMove = move.getExtendedMove(continuation.getDestination(), continuation.getCaptured());
 					moves.push_back(combinedMove);
 				}
 			}
@@ -460,7 +458,7 @@ void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, 
 		if (!(newPosition & emptyFields))
 			break;
 
-		moves.emplace_back(position, newPosition, 0, true);
+		moves.emplace_back(position, newPosition, 0);
 		iteration++;
 	}
 }
@@ -520,7 +518,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 
 	// Create the move
 	assert(newPosition != 0);
-	Move singleCapture = Move(position, newPosition, captured);
+	Move2 singleCapture = Move2(position, newPosition, captured);
 
 	// Create new board state after capture
 	BitBoard newState = singleCapture.getBitboardAfterMove(pieces);
@@ -535,7 +533,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 			continue;
 
 		UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
-		if (jumpers & singleCapture.destination)
+		if (jumpers & singleCapture.getDestination())
 			newJumpers.push(std::make_tuple(jumpers, nextShift));
 	}
 
@@ -547,13 +545,11 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 			std::tie(newJumper, nextShift) = newJumpers.front();
 			newJumpers.pop();
 			MoveList continuationMoves;
-			generatePawnCapturesInShift(newState, PieceColor::White, singleCapture.destination, nextShift, continuationMoves);
+			generatePawnCapturesInShift(newState, PieceColor::White, singleCapture.getDestination(), nextShift, continuationMoves);
 
 			// Add all continuation moves
-			for (const Move& continuation : continuationMoves) {
-				Move combinedMove = singleCapture;
-				combinedMove.destination = continuation.destination;
-				combinedMove.captured |= continuation.captured;
+			for (const Move2& continuation : continuationMoves) {
+				Move2 combinedMove = singleCapture.getExtendedMove(singleCapture.getDestination(), singleCapture.getCaptured());
 				moves.push_back(combinedMove);
 			}
 		}

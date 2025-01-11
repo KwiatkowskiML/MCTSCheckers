@@ -4,6 +4,7 @@
 #include "PieceColor.h"
 #include "BitBoard.h"
 #include <vector>
+#include "Move2.h"
 
 class Board2 {
 private:
@@ -14,7 +15,7 @@ public:
     Board2(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
 
     MoveList getAvailableMoves(PieceColor color) const;
-    Board2 getBoardAfterMove(const Move& move) const;
+    Board2 getBoardAfterMove(const Move2& move) const;
 
     // Visualization
     void printBoard() const;

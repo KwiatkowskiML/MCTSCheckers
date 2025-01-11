@@ -10,34 +10,37 @@ MoveList Board2::getAvailableMoves(PieceColor color) const
     return MoveGenerator::generateMoves(_pieces, color);
 }
 
-Board2 Board2::getBoardAfterMove(const Move& move) const
+Board2 Board2::getBoardAfterMove(const Move2& move) const
 {
     // TODO: Implement for black pieces
-    assert(move.color == PieceColor::White);
+    assert(move.getColor() == PieceColor::White);
+	UINT source = move.getSource();
+	UINT destination = move.getDestination();
+	UINT captured = move.getCaptured();
 
     // Deleting the initial position of the moved piece
-    UINT newWhitePawns = _pieces.whitePawns & ~move.source;
+    UINT newWhitePawns = _pieces.whitePawns & ~source;
 	UINT newBlackPawns = _pieces.blackPawns;
     UINT newKings = _pieces.kings;
 
     // Deleting captured pieces
 	if (move.isCapture())
 	{
-		newBlackPawns = _pieces.blackPawns & ~move.captured;
-		newKings = _pieces.kings & ~move.captured;
+		newBlackPawns = _pieces.blackPawns & ~captured;
+		newKings = _pieces.kings & ~captured;
   	}
 
     // Adding new piece position
-    newWhitePawns |= move.destination;
+    newWhitePawns |= destination;
 
     // Handing the case when the pawn becomes a king, or the king is moved
-    if (move.source & _pieces.kings)
+    if (source & _pieces.kings)
     {
-        newKings = _pieces.kings & ~move.source;
-        newKings |= move.destination;
+        newKings = _pieces.kings & ~source;
+        newKings |= destination;
     }
-    else if (move.destination & WHITE_CROWNING)
-        newKings |= move.destination;
+    else if (destination & WHITE_CROWNING)
+        newKings |= destination;
 
 	Board2 newBoard(newWhitePawns, newBlackPawns, newKings);
     return newBoard;
@@ -114,4 +117,8 @@ void Board2::printBitboard(UINT bitboard)
     std::cout << "  -----------------\n";
     std::cout << "   A B C D E F G H\n";
     printf("Full values: 0x%08X\n\n", bitboard);
+}
+
+void Board2::printPossibleMoves(const std::vector<Board2>& moves)
+{
 }

@@ -29,10 +29,14 @@ public:
 
     UINT getDestination() const;
     UINT getSource() const;
+	UINT getCaptured() const { return captured; }
     bool isCapture() const;
     std::string toString() const;
+	PieceColor getColor() const { return color; }
 
     bool operator==(const Move2& other) const {
         return steps == other.steps && captured == other.captured && color == other.color;
     }
 };
+
+using MoveList = std::vector<Move2>;
