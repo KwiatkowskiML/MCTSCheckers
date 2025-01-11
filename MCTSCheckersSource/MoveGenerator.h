@@ -1,5 +1,5 @@
 #pragma once
-#include "Move2.h"
+#include "Move.h"
 #include "PieceColor.h"
 #include "BitBoard.h"
 #include "BitShift.h"

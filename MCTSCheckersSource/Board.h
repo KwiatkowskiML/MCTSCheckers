@@ -3,21 +3,21 @@
 #include "PieceColor.h"
 #include "BitBoard.h"
 #include <vector>
-#include "Move2.h"
+#include "Move.h"
 
-class Board2 {
+class Board {
 private:
     
 
 public:
     BitBoard _pieces;
-    Board2(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
+    Board(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
 
     MoveList getAvailableMoves(PieceColor color) const;
-    Board2 getBoardAfterMove(const Move2& move) const;
+    Board getBoardAfterMove(const Move& move) const;
 
     // Visualization
     void printBoard() const;
     static void printBitboard(UINT bitboard);
-    static void printPossibleMoves(const std::vector<Board2>& moves);
+    static void printPossibleMoves(const std::vector<Board>& moves);
 };

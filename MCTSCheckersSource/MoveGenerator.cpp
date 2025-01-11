@@ -2,7 +2,7 @@
 
 #include "MoveGenerator.h"
 #include "Utils.h"
-#include "Board2.h"
+#include "Board.h"
 #include "ShiftMap.h"
 #include <list>
 #include <tuple>
@@ -276,7 +276,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 	int iteration = 0;
 	UINT foundEnemyPiece = 0;
 
-	std::list<std::tuple<Move2, BitShift>> singleCapturedPieces;
+	std::list<std::tuple<Move, BitShift>> singleCapturedPieces;
 
 	while (newPosition)
 	{
@@ -339,7 +339,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		// If the newPosition contains empty field and we have already found enemy piece, add the move
         if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
         {
-			singleCapturedPieces.emplace_back(Move2(position, newPosition, foundEnemyPiece), shift);
+			singleCapturedPieces.emplace_back(Move(position, newPosition, foundEnemyPiece), shift);
 			continue;
         }
 
@@ -355,7 +355,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
     for (const auto& moveTuple : singleCapturedPieces)
     {
-		const Move2& move = std::get<0>(moveTuple);
+		const Move& move = std::get<0>(moveTuple);
 		const BitShift& nextShift = std::get<1>(moveTuple);
 
 		// Create new board state after capture
@@ -386,8 +386,8 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 				generateKingCaptures(newState, PieceColor::White, move.getDestination(), nextShift, continuationMoves);
 
 				// Add all continuation moves
-				for (const Move2& continuation : continuationMoves) {
-					Move2 combinedMove = move.getExtendedMove(continuation, continuation.getCaptured());
+				for (const Move& continuation : continuationMoves) {
+					Move combinedMove = move.getExtendedMove(continuation, continuation.getCaptured());
 					moves.push_back(combinedMove);
 				}
 			}
@@ -518,7 +518,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 
 	// Create the move
 	assert(newPosition != 0);
-	Move2 singleCapture = Move2(position, newPosition, captured);
+	Move singleCapture = Move(position, newPosition, captured);
 
 	// Create new board state after capture
 	BitBoard newState = singleCapture.getBitboardAfterMove(pieces);
@@ -548,8 +548,8 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 			generatePawnCapturesInShift(newState, PieceColor::White, singleCapture.getDestination(), nextShift, continuationMoves);
 
 			// Add all continuation moves
-			for (const Move2& continuation : continuationMoves) {
-				Move2 combinedMove = singleCapture.getExtendedMove(continuation, continuation.getCaptured());
+			for (const Move& continuation : continuationMoves) {
+				Move combinedMove = singleCapture.getExtendedMove(continuation, continuation.getCaptured());
 				moves.push_back(combinedMove);
 			}
 		}

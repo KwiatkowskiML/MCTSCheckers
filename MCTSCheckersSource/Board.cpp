@@ -1,16 +1,16 @@
-#include "Board2.h"
+#include "Board.h"
 #include <cassert>
 #include "MoveGenerator.h"
 
 //----------------------------------------------------------------
 // Move generation
 //----------------------------------------------------------------
-MoveList Board2::getAvailableMoves(PieceColor color) const
+MoveList Board::getAvailableMoves(PieceColor color) const
 {
     return MoveGenerator::generateMoves(_pieces, color);
 }
 
-Board2 Board2::getBoardAfterMove(const Move2& move) const
+Board Board::getBoardAfterMove(const Move& move) const
 {
     // TODO: Implement for black pieces
     assert(move.getColor() == PieceColor::White);
@@ -42,7 +42,7 @@ Board2 Board2::getBoardAfterMove(const Move2& move) const
     else if (destination & WHITE_CROWNING)
         newKings |= destination;
 
-	Board2 newBoard(newWhitePawns, newBlackPawns, newKings);
+	Board newBoard(newWhitePawns, newBlackPawns, newKings);
     return newBoard;
 
 	// TODO: consider capturing continuation here
@@ -52,7 +52,7 @@ Board2 Board2::getBoardAfterMove(const Move2& move) const
 // Visualization
 //----------------------------------------------------------------
 
-void Board2::printBoard() const
+void Board::printBoard() const
 {
     std::cout << "     A   B   C   D   E   F   G   H\n";
     std::cout << "   +---+---+---+---+---+---+---+---+\n";
@@ -86,7 +86,7 @@ void Board2::printBoard() const
     std::cout << "     A   B   C   D   E   F   G   H\n\n";
 }
 
-void Board2::printBitboard(UINT bitboard)
+void Board::printBitboard(UINT bitboard)
 {
     std::cout << "   A B C D E F G H\n";
     std::cout << "  -----------------\n";
@@ -119,6 +119,6 @@ void Board2::printBitboard(UINT bitboard)
     printf("Full values: 0x%08X\n\n", bitboard);
 }
 
-void Board2::printPossibleMoves(const std::vector<Board2>& moves)
+void Board::printPossibleMoves(const std::vector<Board>& moves)
 {
 }

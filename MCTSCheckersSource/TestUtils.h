@@ -1,7 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include "Types.h"
-#include "Board2.h"
+#include "Board.h"
 
 class TestUtils
 {
@@ -10,9 +10,9 @@ public:
         printf("Test %s: %s\n", testName, passed ? "PASSED" : "FAILED");
         if (!passed) {
             printf("Expected: %u\n", expected);
-            Board2::printBitboard(expected);
+            Board::printBitboard(expected);
             printf("Actual: %u\n", actual);
-            Board2::printBitboard(actual);
+            Board::printBitboard(actual);
         }
     }
 };

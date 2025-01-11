@@ -1,8 +1,8 @@
-#include "Move2.h"
+#include "Move.h"
 #include <sstream> 
 #include <iomanip>
 
-Move2 Move2::getExtendedMove(Move2 continuation, UINT capt) const
+Move Move::getExtendedMove(Move continuation, UINT capt) const
 {
 	std::vector<UINT> newSteps = steps;
 	for (int i = 1; i < continuation.getSteps().size(); ++i)
@@ -11,10 +11,10 @@ Move2 Move2::getExtendedMove(Move2 continuation, UINT capt) const
 	}
 
 	UINT newCaptured = captured | capt;
-	return Move2(newSteps, newCaptured, color);
+	return Move(newSteps, newCaptured, color);
 }
 
-BitBoard Move2::getBitboardAfterMove(const BitBoard& sourceBitboard) const
+BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard) const
 {
     {
         // TODO: Implement for black pieces
@@ -52,27 +52,27 @@ BitBoard Move2::getBitboardAfterMove(const BitBoard& sourceBitboard) const
     }
 }
 
-const std::vector<UINT>& Move2::getSteps() const
+const std::vector<UINT>& Move::getSteps() const
 {
     return steps;
 }
 
-UINT Move2::getDestination() const
+UINT Move::getDestination() const
 {
     return steps.back();
 }
 
-UINT Move2::getSource() const
+UINT Move::getSource() const
 {
     return steps.front();
 }
 
-bool Move2::isCapture() const
+bool Move::isCapture() const
 {
     return captured > 0;
 }
 
-std::string Move2::toString() const
+std::string Move::toString() const
 {
     std::ostringstream resultStream;
     resultStream << std::hex << std::setfill('0'); // Set output to hexadecimal and pad with zeros

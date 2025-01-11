@@ -3,7 +3,7 @@
 #include "device_launch_parameters.h"
 
 #include <stdio.h>
-#include "Board2.h"
+#include "Board.h"
 #include "MoveGenerator.h"
 #include "CheckersTestSuite.h"
 

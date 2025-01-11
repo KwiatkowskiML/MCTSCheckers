@@ -1,5 +1,5 @@
 #include "MoveGenerationTest.h"
-#include "Move2.h"
+#include "Move.h"
 
 bool MoveGenerationTest::verifyMoveList(const char* testName, const MoveList& expected, const MoveList& actual)
 {
@@ -51,8 +51,8 @@ void MoveGenerationTest::testBasicPawnMovesCenter()
     setUp();
     board.whitePawns = 1ULL << 25;
     MoveList expected = {
-        Move2(1ULL << 25, 1ULL << 20),
-        Move2(1ULL << 25, 1ULL << 21)
+        Move(1ULL << 25, 1ULL << 20),
+        Move(1ULL << 25, 1ULL << 21)
     };
     verifyMoveList("Basic pawn moves - center position", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -62,7 +62,7 @@ void MoveGenerationTest::testBasicPawnMovesLeftEdge()
     setUp();
     board.whitePawns = 1ULL << 7;
     MoveList expected = {
-        Move2(1ULL << 7, 1ULL << 3)
+        Move(1ULL << 7, 1ULL << 3)
     };
     verifyMoveList("Basic pawn moves - left edge", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -72,7 +72,7 @@ void MoveGenerationTest::testBasicPawnMovesRightEdge()
     setUp();
     board.whitePawns = 1ULL << 31;
     MoveList expected = {
-        Move2(1ULL << 31, 1ULL << 27)
+        Move(1ULL << 31, 1ULL << 27)
     };
     verifyMoveList("Basic pawn moves - right edge", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -83,7 +83,7 @@ void MoveGenerationTest::testSingleCaptureRightDiagonal()
     board.whitePawns = 1ULL << 25;
     board.blackPawns = 1ULL << 21;
     MoveList expected = {
-        Move2(1ULL << 25, 1ULL << 18, 1ULL << 21)
+        Move(1ULL << 25, 1ULL << 18, 1ULL << 21)
     };
     verifyMoveList("Single capture - right diagonal", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -94,7 +94,7 @@ void MoveGenerationTest::testSingleCaptureLeftDiagonal()
     board.whitePawns = 1ULL << 26;
     board.blackPawns = 1ULL << 21;
     MoveList expected = {
-        Move2(1ULL << 26, 1ULL << 17, 1ULL << 21)
+        Move(1ULL << 26, 1ULL << 17, 1ULL << 21)
     };
     verifyMoveList("Single capture - left diagonal", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -105,7 +105,7 @@ void MoveGenerationTest::testChainCaptureDouble()
     board.whitePawns = 1ULL << 29;
     board.blackPawns = (1ULL << 25) | (1ULL << 17);
     MoveList expected = {
-        Move2({1ULL << 29, 1ULL << 20, 1ULL << 13}, (1ULL << 25) | (1ULL << 17))
+        Move({1ULL << 29, 1ULL << 20, 1ULL << 13}, (1ULL << 25) | (1ULL << 17))
     };
     verifyMoveList("Chain capture - double", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -116,7 +116,7 @@ void MoveGenerationTest::testChainCaptureTriple()
     board.whitePawns = 1ULL << 29;
     board.blackPawns = (1ULL << 25) | (1ULL << 17) | (1ULL << 10);
     MoveList expected = {
-        Move2({1ULL << 29, 1ULL << 20, 1ULL << 13, 1ULL << 6}, (1ULL << 25) | (1ULL << 17) | (1ULL << 10))
+        Move({1ULL << 29, 1ULL << 20, 1ULL << 13, 1ULL << 6}, (1ULL << 25) | (1ULL << 17) | (1ULL << 10))
     };
     verifyMoveList("Chain capture - triple", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -127,17 +127,17 @@ void MoveGenerationTest::testKingBasicMoves()
     board.whitePawns = 1ULL << 21;
     board.kings = 1ULL << 21;
     MoveList expected = {
-        Move2(1ULL << 21, 1ULL << 25),
-        Move2(1ULL << 21, 1ULL << 28),
-        Move2(1ULL << 21, 1ULL << 26),
-        Move2(1ULL << 21, 1ULL << 30),
-        Move2(1ULL << 21, 1ULL << 17),
-        Move2(1ULL << 21, 1ULL << 12),
-        Move2(1ULL << 21, 1ULL << 8),
-        Move2(1ULL << 21, 1ULL << 18),
-        Move2(1ULL << 21, 1ULL << 14),
-        Move2(1ULL << 21, 1ULL << 11),
-        Move2(1ULL << 21, 1ULL << 7)
+        Move(1ULL << 21, 1ULL << 25),
+        Move(1ULL << 21, 1ULL << 28),
+        Move(1ULL << 21, 1ULL << 26),
+        Move(1ULL << 21, 1ULL << 30),
+        Move(1ULL << 21, 1ULL << 17),
+        Move(1ULL << 21, 1ULL << 12),
+        Move(1ULL << 21, 1ULL << 8),
+        Move(1ULL << 21, 1ULL << 18),
+        Move(1ULL << 21, 1ULL << 14),
+        Move(1ULL << 21, 1ULL << 11),
+        Move(1ULL << 21, 1ULL << 7)
     };
     verifyMoveList("King basic moves", expected, moveGen.generateMoves(board, PieceColor::White));
 }
@@ -147,8 +147,8 @@ void MoveGenerationTest::testCrowningMove()
     setUp();
     board.whitePawns = 1ULL << 4;
     MoveList expected = {
-        Move2(1ULL << 4, 1ULL << 0),
-        Move2(1ULL << 4, 1ULL << 1)
+        Move(1ULL << 4, 1ULL << 0),
+        Move(1ULL << 4, 1ULL << 1)
     };
     verifyMoveList("Crowning move", expected, moveGen.generateMoves(board, PieceColor::White));
 }
