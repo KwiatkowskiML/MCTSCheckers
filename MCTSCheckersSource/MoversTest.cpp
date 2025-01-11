@@ -2,7 +2,7 @@
 
 bool MoversTest::testMover(const char* testName, UINT expectedMovers)
 {
-    UINT actualMovers = moveGen.getMovers(board, PieceColor::White);
+    UINT actualMovers = moveGen.getAllMovers(board, PieceColor::White);
     totalTests++;
     if (verifyTest(testName, expectedMovers, actualMovers)) {
         passedTests++;

@@ -2,7 +2,7 @@
 
 bool JumpersTest::testJumper(const char* testName, UINT expectedJumpers)
 {
-    UINT actualJumpers = moveGen.getJumpers(board, PieceColor::White);
+    UINT actualJumpers = moveGen.getAllJumpers(board, PieceColor::White);
     totalTests++;
     if (verifyTest(testName, expectedJumpers, actualJumpers)) {
         passedTests++;
