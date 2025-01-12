@@ -271,7 +271,7 @@ void MoveGenerator::generateCapturingMovesInShift(const BitBoard& pieces, PieceC
 // Generating specified move
 //----------------------------------------------------------------
 
-void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
+void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves, UINT captured)
 {
 	// TODO: Implement for black pieces
 	assert(color == PieceColor::White);
@@ -327,6 +327,10 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		newPosition = ShiftMap::shift(newPosition, nextShift);
 		iteration++;
 
+		// If the newPosition contains captured piece, there is nothing to do
+		if (newPosition & captured)
+			break;
+
 		// Shifted out of the board
 		if (newPosition == 0)
 			break;
@@ -369,7 +373,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		std::queue<std::tuple<UINT, BitShift>> newJumpers;
 		for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 			BitShift nextShift = static_cast<BitShift>(i);
-			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift, move.getCaptured());
+			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift, captured | move.getCaptured());
 
 			// Destination cannot move any further 
 			if ((jumpers & move.getDestination()) == 0)
@@ -387,11 +391,12 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 				std::tie(newJumper, nextShift) = newJumpers.front();
 				newJumpers.pop();
 				MoveList continuationMoves;
-				generateKingCaptures(newState, PieceColor::White, move.getDestination(), nextShift, continuationMoves);
+				generateKingCaptures(newState, PieceColor::White, move.getDestination(), nextShift, continuationMoves, captured | move.getCaptured());
 
 				// Add all continuation moves
 				for (const Move& continuation : continuationMoves) {
 					Move combinedMove = move.getExtendedMove(continuation, continuation.getCaptured());
+					//printf("Combined move: %s\n", combinedMove.toString().c_str());
 					moves.push_back(combinedMove);
 				}
 			}
