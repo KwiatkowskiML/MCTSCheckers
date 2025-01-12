@@ -1,5 +1,6 @@
 #pragma once
 #include "Types.h"
+#include "PieceColor.h"
 
 struct BitBoard {
     UINT whitePawns;
@@ -10,6 +11,9 @@ struct BitBoard {
         : whitePawns(white), blackPawns(black), kings(k) {
     }
 
+	// Getters
     UINT getAllPieces() const { return whitePawns | blackPawns; }
     UINT getEmptyFields() const { return ~getAllPieces(); }
+	UINT getEnemyPieces(PieceColor color) const { return color == PieceColor::White ? blackPawns : whitePawns; }
+	UINT getPieces(PieceColor color) const { return color == PieceColor::White ? whitePawns : blackPawns; }
 };

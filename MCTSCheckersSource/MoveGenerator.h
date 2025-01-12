@@ -5,6 +5,8 @@
 #include "BitShift.h"
 
 class MoveGenerator {
+private:
+	PieceColor getEnemyColor(PieceColor color);
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
 
