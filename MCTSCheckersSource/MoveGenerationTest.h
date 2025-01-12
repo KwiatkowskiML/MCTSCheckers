@@ -16,6 +16,8 @@ private:
     void testChainCaptureTriple();
     void testChainCaptureMultiple();
     void testKingBasicMoves();
+    void testKingCapturingMoves();
+    void testKingCapturingMoves2();
     void testCrowningMove();
 
 public:
