@@ -80,7 +80,7 @@ UINT MoveGenerator::getAllJumpers(const BitBoard& pieces, PieceColor color)
 	return jumpers;
 }
 
-UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, BitShift shift)
+UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, BitShift shift, UINT captured)
 {
 	// TODO: Implement for black pieces
 	assert(color == PieceColor::White);
@@ -173,6 +173,10 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 
 				movedCurrentKing = ShiftMap::shift(movedCurrentKing, nextShift);
 				iteration++;
+
+				// found captured piece on its way, there is nothing to do
+				if (movedCurrentKing & captured)
+					break;
 
 				// found white pawn on the way
 				if (movedCurrentKing & pieces.whitePawns)
@@ -363,17 +367,15 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
 		// Generate all possible continuations
 		std::queue<std::tuple<UINT, BitShift>> newJumpers;
-		BitShift reverseShift = ShiftMap::getOpposite(nextShift);
-
 		for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 			BitShift nextShift = static_cast<BitShift>(i);
-			// TODO: analize whether it is needed
-			//if (nextShift == reverseShift)
-			//	continue;
+			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift, move.getCaptured());
 
-			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
-			if (jumpers & move.getDestination())
-				newJumpers.push(std::make_tuple(jumpers, nextShift));
+			// Destination cannot move any further 
+			if ((jumpers & move.getDestination()) == 0)
+				continue;
+
+			newJumpers.push(std::make_tuple(jumpers, nextShift));
 		}
 
 		if (!newJumpers.empty()) {
@@ -399,79 +401,6 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 			moves.push_back(move);
 		}
     }
-}
-
-void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
-{
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-	UINT emptyFields = pieces.getEmptyFields();
-	UINT newPosition = position;
-	int iteration = 0;
-
-	while (newPosition)
-	{
-		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
-		{
-			if (iteration & 1)
-				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L4);
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
-
-		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
-		{
-			if (iteration & 1)
-				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R4);
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
-
-		if (shift == BitShift::BIT_SHIFT_L4)
-		{
-			if (iteration & 1)
-			{
-				if (newPosition & MASK_L3)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L3);
-				else if (newPosition & MASK_L5)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L5);
-				else
-					break;
-			}
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
-
-		if (shift == BitShift::BIT_SHIFT_R4)
-		{
-			if (iteration & 1)
-			{
-				if (newPosition & MASK_R3)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R3);
-				else if (newPosition & MASK_R5)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R5);
-				else
-					break;
-			}
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
-
-		if (!(newPosition & emptyFields))
-			break;
-
-		moves.emplace_back(position, newPosition, 0);
-		iteration++;
-	}
-}
-
-void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
-{
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-
-	UINT newPosition = ShiftMap::shift(position, shift);
-	moves.emplace_back(position, newPosition);
 }
 
 void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
@@ -562,3 +491,77 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 	}
 
 }
+
+void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+	UINT emptyFields = pieces.getEmptyFields();
+	UINT newPosition = position;
+	int iteration = 0;
+
+	while (newPosition)
+	{
+		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
+		{
+			if (iteration & 1)
+				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L4);
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
+		{
+			if (iteration & 1)
+				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R4);
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_L4)
+		{
+			if (iteration & 1)
+			{
+				if (newPosition & MASK_L3)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L3);
+				else if (newPosition & MASK_L5)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L5);
+				else
+					break;
+			}
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (shift == BitShift::BIT_SHIFT_R4)
+		{
+			if (iteration & 1)
+			{
+				if (newPosition & MASK_R3)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R3);
+				else if (newPosition & MASK_R5)
+					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R5);
+				else
+					break;
+			}
+			else
+				newPosition = ShiftMap::shift(newPosition, shift);
+		}
+
+		if (!(newPosition & emptyFields))
+			break;
+
+		moves.emplace_back(position, newPosition, 0);
+		iteration++;
+	}
+}
+
+void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
+{
+	// TODO: Implement for black pieces
+	assert(color == PieceColor::White);
+
+	UINT newPosition = ShiftMap::shift(position, shift);
+	moves.emplace_back(position, newPosition);
+}
+

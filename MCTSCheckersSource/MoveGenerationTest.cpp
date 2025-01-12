@@ -189,6 +189,35 @@ void MoveGenerationTest::testKingCapturingMoves2()
     verifyMoveList("King capturing moves", expected, moveGen.generateMoves(board, PieceColor::White));
 }
 
+void MoveGenerationTest::testKingCapturingMoves3()
+{
+    setUp();
+    board.whitePawns = 1ULL << 31;
+    board.kings = 1ULL << 31;
+    board.blackPawns = (1ULL << 27) | (1ULL << 18) | (1ULL << 19) | (1ULL << 9) | (1ULL << 10) | (1ULL << 11);
+    MoveList expected = {
+        Move({1ULL << 31, 1ULL << 22, 1ULL << 13, 1ULL << 4}, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
+        Move({1ULL << 31, 1ULL << 22, 1ULL << 13, 1ULL << 6, 1ULL << 15, 1ULL << 22}, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+        Move({1ULL << 31, 1ULL << 22, 1ULL << 15, 1ULL << 6, 1ULL << 13, 1ULL << 4}, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
+        Move({1ULL << 31, 1ULL << 22, 1ULL << 15, 1ULL << 6, 1ULL << 13, 1ULL << 22}, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
+    };
+    verifyMoveList("Chain capture - multiple", expected, moveGen.generateMoves(board, PieceColor::White));
+}
+
+void MoveGenerationTest::testKingCapturingMovesEdgeCase()
+{
+    setUp();
+    board.whitePawns = 1ULL << 21;
+    board.kings = 1ULL << 21;
+    board.blackPawns = (1ULL << 17) | (1ULL << 26);
+    MoveList expected = {
+        Move(1ULL << 21, 1ULL << 12, 1ULL << 17),
+        Move(1ULL << 21, 1ULL << 8, 1ULL << 17),
+        Move(1ULL << 21, 1ULL << 30, 1ULL << 26)
+    };
+    verifyMoveList("King capturing moves", expected, moveGen.generateMoves(board, PieceColor::White));
+}
+
 void MoveGenerationTest::testCrowningMove()
 {
     setUp();
@@ -213,7 +242,10 @@ void MoveGenerationTest::runAllTests()
     testKingBasicMoves();
 	testKingCapturingMoves();
 	testKingCapturingMoves2();
+    testKingCapturingMovesEdgeCase();
+    testKingCapturingMoves3();
     testCrowningMove();
+
 
     printSummary("Move Generation");
 }

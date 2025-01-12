@@ -14,7 +14,7 @@ public:
 
     // Getting specified moveable pieces
 	static UINT getMoversInShift(const BitBoard& pieces, PieceColor color, BitShift shift);
-	static UINT getJumpersInShift(const BitBoard& pieces, PieceColor color, BitShift shift);
+	static UINT getJumpersInShift(const BitBoard& pieces, PieceColor color, BitShift shift, UINT captured = 0);
 
     // Generating a list of moves
     static void generateBasicMovesInShift(const BitBoard& pieces, PieceColor color, UINT movers, BitShift shift, MoveList& moves);

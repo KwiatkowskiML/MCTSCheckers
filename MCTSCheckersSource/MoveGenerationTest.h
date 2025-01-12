@@ -18,6 +18,8 @@ private:
     void testKingBasicMoves();
     void testKingCapturingMoves();
     void testKingCapturingMoves2();
+    void testKingCapturingMoves3();
+    void testKingCapturingMovesEdgeCase();
     void testCrowningMove();
 
 public:
