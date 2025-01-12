@@ -55,7 +55,15 @@ void MoveGenerationTest::testBasicPawnMovesCenter()
         Move(1ULL << 25, 1ULL << 20),
         Move(1ULL << 25, 1ULL << 21)
     };
-    verifyMoveList("Basic pawn moves - center position", expected, moveGen.generateMoves(board, PieceColor::White));
+    verifyMoveList("Basic pawn moves - center position (White)", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL << 9;  // Mirrored position for black
+    MoveList expectedBlack = {
+        Move(1ULL << 9, 1ULL << 13, 0, PieceColor::Black),
+        Move(1ULL << 9, 1ULL << 12, 0, PieceColor::Black)
+    };
+    verifyMoveList("Basic pawn moves - center position (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
 }
 
 void MoveGenerationTest::testBasicPawnMovesLeftEdge()
@@ -65,7 +73,14 @@ void MoveGenerationTest::testBasicPawnMovesLeftEdge()
     MoveList expected = {
         Move(1ULL << 7, 1ULL << 3)
     };
-    verifyMoveList("Basic pawn moves - left edge", expected, moveGen.generateMoves(board, PieceColor::White));
+    verifyMoveList("Basic pawn moves - left edge (White)", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL << 7;  // Mirrored position for black
+    MoveList expectedBlack = {
+        Move(1ULL << 7, 1ULL << 11, 0, PieceColor::Black)
+    };
+    verifyMoveList("Basic pawn moves - left edge (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
 }
 
 void MoveGenerationTest::testBasicPawnMovesRightEdge()
@@ -75,7 +90,14 @@ void MoveGenerationTest::testBasicPawnMovesRightEdge()
     MoveList expected = {
         Move(1ULL << 31, 1ULL << 27)
     };
-    verifyMoveList("Basic pawn moves - right edge", expected, moveGen.generateMoves(board, PieceColor::White));
+    verifyMoveList("Basic pawn moves - right edge (White)", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL;  // Mirrored position for black
+    MoveList expectedBlack = {
+        Move(1ULL, 1ULL << 4, 0, PieceColor::Black)
+    };
+    verifyMoveList("Basic pawn moves - right edge (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
 }
 
 void MoveGenerationTest::testSingleCaptureRightDiagonal()

@@ -575,11 +575,8 @@ void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, 
 
 void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
 {
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-
 	UINT newPosition = ShiftMap::shift(position, shift);
-	moves.emplace_back(position, newPosition);
+	moves.emplace_back(position, newPosition, 0, color);
 }
 
 //----------------------------------------------------------------
