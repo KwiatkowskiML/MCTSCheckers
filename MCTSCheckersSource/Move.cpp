@@ -1,6 +1,5 @@
 #include "Move.h"
-#include <sstream> 
-#include <iomanip>
+#include "Board.h"
 
 Move Move::getExtendedMove(Move continuation, UINT capt) const
 {
@@ -74,21 +73,25 @@ bool Move::isCapture() const
 
 std::string Move::toString() const
 {
-    std::ostringstream resultStream;
-    resultStream << std::hex << std::setfill('0'); // Set output to hexadecimal and pad with zeros
-
-    if (isCapture())
-    {
-        resultStream << std::setw(8) << getSource(); // Add leading zeros to ensure 32 bits (8 hex digits)
-        for (size_t i = 1; i < steps.size(); ++i)
+    std::string result;
+    try {
+        if (isCapture())
         {
-            resultStream << ";" << std::setw(8) << steps[i];
+            result += Board::fieldMapping.at(getSource());
+            for (size_t i = 1; i < steps.size(); ++i)
+            {
+                result += ";" + Board::fieldMapping.at(steps[i]);
+            }
+        }
+        else
+        {
+            result = Board::fieldMapping.at(getSource()) + "-" + Board::fieldMapping.at(getDestination());
         }
     }
-    else
-    {
-        resultStream << std::setw(8) << getSource() << "-" << std::setw(8) << getDestination();
-    }
+	catch (const std::out_of_range& e)
+	{
+		result = "There is no such field in the fields dictionary";
+	}
 
-    return resultStream.str();
+    return result;
 }

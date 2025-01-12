@@ -127,8 +127,6 @@ void MoveGenerationTest::testChainCaptureMultiple()
     setUp();
     board.whitePawns = 0x90000000;
     board.blackPawns = (1ULL << 27) | (1ULL << 18) | (1ULL << 19) | (1ULL << 9) | (1ULL << 10) | (1ULL << 11);
-	Board board2 = Board(board.whitePawns, board.blackPawns, board.kings);
-	board2.printBoard();
     MoveList expected = {
         Move({1ULL << 31, 1ULL << 22, 1ULL << 13, 1ULL << 4}, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
 		Move({1ULL << 31, 1ULL << 22, 1ULL << 13, 1ULL << 6, 1ULL << 15, 1ULL << 22}, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
@@ -172,7 +170,7 @@ void MoveGenerationTest::testCrowningMove()
 
 void MoveGenerationTest::runAllTests()
 {
-    /*testBasicPawnMovesCenter();
+    testBasicPawnMovesCenter();
     testBasicPawnMovesLeftEdge();
     testBasicPawnMovesRightEdge();
     testSingleCaptureRightDiagonal();
@@ -180,7 +178,7 @@ void MoveGenerationTest::runAllTests()
     testChainCaptureDouble();
     testChainCaptureTriple();
     testKingBasicMoves();
-    testCrowningMove();*/
+    testCrowningMove();
 
 	testChainCaptureMultiple();
 

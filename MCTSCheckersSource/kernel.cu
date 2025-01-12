@@ -17,26 +17,6 @@ __global__ void addKernel(int *c, const int *a, const int *b)
 
 int main()
 {
-	/*UINT white3 = 0x90000000;
-	UINT black3 = 0x080C0E00;
-	UINT kings3 = 0x00000000;
-
-	Board2 board2(white3, black3, kings3);
-	board2.printBoard();
-
-	UINT jumpers = MoveGenerator::getJumpers(board2._pieces, PieceColor::White);
-	Board2::printBitboard(jumpers);
-
-    UINT movers = MoveGenerator::getMovers(board2._pieces, PieceColor::White);
-    Board2::printBitboard(movers);
-
-	MoveList moves = MoveGenerator::generateMoves(board2._pieces, PieceColor::White);
-	for (auto move : moves)
-	{
-		Board2 newBoard = board2.getBoardAfterMove(move);
-		newBoard.printBoard();
-	}*/
-
 	CheckersTestSuite::runAll();
 
     return 0;
