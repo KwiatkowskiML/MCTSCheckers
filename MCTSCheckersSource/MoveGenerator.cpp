@@ -74,7 +74,7 @@ UINT MoveGenerator::getAllJumpers(const BitBoard& pieces, PieceColor color)
 
 	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 		BitShift shift = static_cast<BitShift>(i);
-		jumpers |= getJumpersInShift(pieces, PieceColor::White, shift);
+		jumpers |= getJumpersInShift(pieces, color, shift);
 	}
 
 	return jumpers;
@@ -82,44 +82,44 @@ UINT MoveGenerator::getAllJumpers(const BitBoard& pieces, PieceColor color)
 
 UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, BitShift shift, UINT captured)
 {
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
-
 	const UINT emptyFields = pieces.getEmptyFields();
-	const UINT whiteKings = pieces.whitePawns & pieces.kings;
-	UINT jumpers = 0;
+	const UINT currentPieces = pieces.getPieces(color);
+	const UINT kings = currentPieces & pieces.kings;
+	const UINT enemyPieces = pieces.getPieces(getEnemyColor(color));
 
-	// Finding capturable black pawns
-	UINT captBlackPawns = 0;
+	UINT jumpers = 0;
+	UINT captPieces = 0;
+
+	// Finding capturable pieces
 	if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
 	{
-		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L4) & pieces.blackPawns;
+		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L4) & enemyPieces;
 	}
 	else if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
 	{
-		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R4) & pieces.blackPawns;
+		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R4) & enemyPieces;
 	}
 	else if (shift == BitShift::BIT_SHIFT_R4)
 	{
-		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L3) & pieces.blackPawns;
-		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L5) & pieces.blackPawns;
+		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L3) & enemyPieces;
+		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L5) & enemyPieces;
 	}
 	else if (shift == BitShift::BIT_SHIFT_L4)
 	{
-		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R3) & pieces.blackPawns;
-		captBlackPawns |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R5) & pieces.blackPawns;
+		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R3) & enemyPieces;
+		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R5) & enemyPieces;
 	}
 
-	// No black pawns to capture
-	if (!captBlackPawns)
+	// No pieces to capture
+	if (!captPieces)
 		return jumpers;
 
-	// Get the white pawns that can capture black pawns
+	// Get the pieces that can capture enemy pieces
 	BitShift reverseShift = ShiftMap::getOpposite(shift);
-	jumpers |= ShiftMap::shift(captBlackPawns, reverseShift) & pieces.whitePawns;
+	jumpers |= ShiftMap::shift(captPieces, reverseShift) & currentPieces;
 
 	// Find the kings that can capture black pawns
-	UINT nonTaggedKings = whiteKings & ~jumpers;
+	UINT nonTaggedKings = kings & ~jumpers;
 	if (nonTaggedKings)
 	{
 		while (nonTaggedKings) {

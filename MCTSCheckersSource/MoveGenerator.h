@@ -6,7 +6,7 @@
 
 class MoveGenerator {
 private:
-	PieceColor getEnemyColor(PieceColor color);
+	static PieceColor getEnemyColor(PieceColor color);
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
 
