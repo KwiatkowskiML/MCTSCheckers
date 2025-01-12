@@ -129,7 +129,7 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 			int iteration = 0;
 			bool foundEnemyPiece = false;
 
-			// Move the kings untill capturable black pawn is found
+			// Move the kings untill capturable enemy pawn is found
 			while (movedCurrentKing)
 			{
 				BitShift nextShift = shift;
@@ -178,8 +178,8 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 				if (movedCurrentKing & captured)
 					break;
 
-				// found white pawn on the way
-				if (movedCurrentKing & pieces.whitePawns)
+				// found current color piece on the way
+				if (movedCurrentKing & currentPieces)
 					break;
 
 				// found empty field on the way
@@ -194,7 +194,7 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 				}
 
 				// found enemy piece on the way
-				if (movedCurrentKing & pieces.blackPawns)
+				if (movedCurrentKing & enemyPieces)
 				{
 					// found enemy piece right after enemy piece
 					if (foundEnemyPiece)

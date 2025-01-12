@@ -267,7 +267,7 @@ void JumpersTest::runAllTests()
         board.whitePawns |= 1ULL << 13;  // White pawn to be captured by black
         board.blackPawns |= 1ULL << 21;  // Black pawn to be captured by white
         testJumper("Black jumper in mixed position", (1ULL << 9) | (1ULL << 21), PieceColor::Black);
-        testJumper("White jumper in mixed position", 1ULL << 25) | (1ULL << 13);
+        testJumper("White jumper in mixed position", (1ULL << 25) | (1ULL << 13));
     }
 
     printSummary("Jumpers");
