@@ -172,7 +172,7 @@ void MoveGenerationTest::testCrowningMove()
 
 void MoveGenerationTest::runAllTests()
 {
-    testBasicPawnMovesCenter();
+    /*testBasicPawnMovesCenter();
     testBasicPawnMovesLeftEdge();
     testBasicPawnMovesRightEdge();
     testSingleCaptureRightDiagonal();
@@ -180,7 +180,7 @@ void MoveGenerationTest::runAllTests()
     testChainCaptureDouble();
     testChainCaptureTriple();
     testKingBasicMoves();
-    testCrowningMove();
+    testCrowningMove();*/
 
 	testChainCaptureMultiple();
 

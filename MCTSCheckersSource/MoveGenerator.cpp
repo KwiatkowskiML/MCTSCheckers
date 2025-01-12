@@ -367,8 +367,10 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
 		for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 			BitShift nextShift = static_cast<BitShift>(i);
-			if (nextShift == reverseShift)
-				continue;
+			// TODO: analize whether it is needed
+			//if (nextShift == reverseShift)
+			//	continue;
+
 			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
 			if (jumpers & move.getDestination())
 				newJumpers.push(std::make_tuple(jumpers, nextShift));
