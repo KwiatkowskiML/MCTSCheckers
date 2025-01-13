@@ -109,6 +109,15 @@ void MoveGenerationTest::testSingleCaptureRightDiagonal()
         Move(1ULL << 25, 1ULL << 18, 1ULL << 21)
     };
     verifyMoveList("Single capture - right diagonal", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL << 9;
+    board.whitePawns = 1ULL << 13;
+    MoveList expectedBlack = {
+        Move(1ULL << 9, 1ULL << 18, 1ULL << 13, PieceColor::Black)
+    };
+    verifyMoveList("Single capture - right diagonal (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
+
 }
 
 void MoveGenerationTest::testSingleCaptureLeftDiagonal()
@@ -120,6 +129,14 @@ void MoveGenerationTest::testSingleCaptureLeftDiagonal()
         Move(1ULL << 26, 1ULL << 17, 1ULL << 21)
     };
     verifyMoveList("Single capture - left diagonal", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL << 10;
+    board.whitePawns = 1ULL << 13;
+    MoveList expectedBlack = {
+        Move(1ULL << 10, 1ULL << 17, 1ULL << 13, PieceColor::Black)
+    };
+    verifyMoveList("Single capture - left diagonal (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
 }
 
 void MoveGenerationTest::testChainCaptureDouble()
@@ -131,6 +148,16 @@ void MoveGenerationTest::testChainCaptureDouble()
         Move({1ULL << 29, 1ULL << 20, 1ULL << 13}, (1ULL << 25) | (1ULL << 17))
     };
     verifyMoveList("Chain capture - double", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    
+    setUp();
+    board.blackPawns = 1ULL << 5;
+    board.whitePawns = (1ULL << 9) | (1ULL << 17);
+    MoveList expectedBlack = {
+        Move({1ULL << 5, 1ULL << 12, 1ULL << 21}, (1ULL << 9) | (1ULL << 17), PieceColor::Black)
+    };
+    verifyMoveList("Chain capture - double (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
+
 }
 
 void MoveGenerationTest::testChainCaptureTriple()
@@ -142,6 +169,15 @@ void MoveGenerationTest::testChainCaptureTriple()
         Move({1ULL << 29, 1ULL << 20, 1ULL << 13, 1ULL << 6}, (1ULL << 25) | (1ULL << 17) | (1ULL << 10))
     };
     verifyMoveList("Chain capture - triple", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL << 5;
+    board.whitePawns = (1ULL << 9) | (1ULL << 17) | (1ULL << 26);
+    MoveList expectedBlack = {
+        Move({1ULL << 5, 1ULL << 12, 1ULL << 21, 1ULL << 30}, (1ULL << 9) | (1ULL << 17) | (1ULL << 26), PieceColor::Black)
+    };
+    verifyMoveList("Chain capture - triple (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
+
 }
 
 void MoveGenerationTest::testChainCaptureMultiple()
@@ -156,6 +192,17 @@ void MoveGenerationTest::testChainCaptureMultiple()
 		Move({1ULL << 31, 1ULL << 22, 1ULL << 15, 1ULL << 6, 1ULL << 13, 1ULL << 22}, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
     };
     verifyMoveList("Chain capture - multiple", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL;  // Mirrored position
+    board.whitePawns = (1ULL << 4) | (1ULL << 13) | (1ULL << 12) | (1ULL << 22) | (1ULL << 21) | (1ULL << 20);
+    MoveList expectedBlack = {
+        Move({1ULL, 1ULL << 9, 1ULL << 18, 1ULL << 27}, (1ULL << 4) | (1ULL << 13) | (1ULL << 22), PieceColor::Black),
+        Move({1ULL, 1ULL << 9, 1ULL << 18, 1ULL << 25, 1ULL << 16, 1ULL << 9}, (1ULL << 4) | (1ULL << 13) | (1ULL << 21) | (1ULL << 20) | (1ULL << 12), PieceColor::Black),
+        Move({1ULL, 1ULL << 9, 1ULL << 16, 1ULL << 25, 1ULL << 18, 1ULL << 27}, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 22), PieceColor::Black),
+        Move({1ULL, 1ULL << 9, 1ULL << 16, 1ULL << 25, 1ULL << 18, 1ULL << 9}, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 13), PieceColor::Black),
+    };
+    verifyMoveList("Chain capture - multiple (Black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
 }
 
 void MoveGenerationTest::testKingBasicMoves()

@@ -1,5 +1,6 @@
 #include "Move.h"
 #include "Board.h"
+#include "MoveGenerator.h"
 
 Move Move::getExtendedMove(Move continuation, UINT capt) const
 {
@@ -15,40 +16,44 @@ Move Move::getExtendedMove(Move continuation, UINT capt) const
 
 BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard) const
 {
+    UINT source = getSource();
+	UINT destination = getDestination();
+	UINT currentPieces = sourceBitboard.getPieces(color);
+	UINT enemyPieces = sourceBitboard.getPieces(MoveGenerator::getEnemyColor(color));
+
+    // Deleting the initial position of the moved piece
+    UINT newCurrentPieces = currentPieces & ~source;
+    UINT newEnemyPieces = enemyPieces;
+    UINT newKings = sourceBitboard.kings;
+
+    // Deleting captured pieces
+    if (isCapture())
     {
-        // TODO: Implement for black pieces
-        assert(color == PieceColor::White);
-
-        UINT source = getSource();
-		UINT destination = getDestination();
-
-        // Deleting the initial position of the moved piece
-        UINT newWhitePawns = sourceBitboard.whitePawns & ~source;
-        UINT newBlackPawns = sourceBitboard.blackPawns;
-        UINT newKings = sourceBitboard.kings;
-
-        // Deleting captured pieces
-        if (isCapture())
-        {
-            newBlackPawns = sourceBitboard.blackPawns & ~captured;
-            newKings = sourceBitboard.kings & ~captured;
-        }
-
-        // Adding new piece position
-        newWhitePawns |= destination;
-
-        // Handing the case when the pawn becomes a king, or the king is moved
-        if (source & sourceBitboard.kings)
-        {
-            newKings = sourceBitboard.kings & ~source;
-            newKings |= destination;
-        }
-        else if (destination & WHITE_CROWNING)
-            newKings |= destination;
-
-        BitBoard newbitBoard(newWhitePawns, newBlackPawns, newKings);
-        return newbitBoard;
+        newEnemyPieces = enemyPieces & ~captured;
+        newKings = sourceBitboard.kings & ~captured;
     }
+
+    // Adding new piece position
+    newCurrentPieces |= destination;
+
+    // Handing the case when the king is moved
+    if (source & sourceBitboard.kings)
+    {
+        newKings = sourceBitboard.kings & ~source;
+        newKings |= destination;
+    }
+
+    // Handling the case when the pawn is crowned
+    if (color == PieceColor::White && (destination & WHITE_CROWNING))
+        newKings |= destination;
+	if (color == PieceColor::Black && (destination & BLACK_CROWNING))
+		newKings |= destination;
+
+	UINT newWhitePawns = color == PieceColor::White ? newCurrentPieces : newEnemyPieces;
+	UINT newBlackPawns = color == PieceColor::Black ? newCurrentPieces : newEnemyPieces;
+
+    BitBoard newbitBoard(newWhitePawns, newBlackPawns, newKings);
+    return newbitBoard;
 }
 
 const std::vector<UINT>& Move::getSteps() const

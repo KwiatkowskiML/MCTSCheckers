@@ -422,16 +422,18 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
 void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
 {
-	// TODO: Implement for black pieces
 	// TODO: Add validation for the shift
 
-	assert(color == PieceColor::White);
-	UINT empty_fields = pieces.getEmptyFields();
-
+	UINT emptyFields = pieces.getEmptyFields();
 	UINT captured = ShiftMap::shift(position, shift);
+	UINT currentPieces = pieces.getPieces(color);
+	UINT enemyPieces = pieces.getPieces(getEnemyColor(color));
 	UINT newPosition = 0;
 
-	// Capturing black pawns below the white pawn
+	// There must be a captured piece
+	assert((captured & enemyPieces) != 0);
+
+	// Capturing pieces below the pawn
 	if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
 		newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_R4);
 
@@ -448,7 +450,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 		}
 	}
 
-	// Capturing black pawns above the white pawn
+	// Capturing pieces above the pawn
 	if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
 		newPosition = ShiftMap::shift(captured, BitShift::BIT_SHIFT_L4);
 
@@ -466,7 +468,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 
 	// Create the move
 	assert(newPosition != 0);
-	Move singleCapture = Move(position, newPosition, captured);
+	Move singleCapture = Move(position, newPosition, captured, color);
 
 	// Create new board state after capture
 	BitBoard newState = singleCapture.getBitboardAfterMove(pieces);
@@ -477,10 +479,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 
 	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 		BitShift nextShift = static_cast<BitShift>(i);
-		//if (nextShift == reverseShift)
-		//	continue; 
-
-		UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift);
+		UINT jumpers = getJumpersInShift(newState, color, nextShift);
 		if (jumpers & singleCapture.getDestination())
 			newJumpers.push(std::make_tuple(jumpers, nextShift));
 	}
@@ -493,7 +492,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 			std::tie(newJumper, nextShift) = newJumpers.front();
 			newJumpers.pop();
 			MoveList continuationMoves;
-			generatePawnCapturesInShift(newState, PieceColor::White, singleCapture.getDestination(), nextShift, continuationMoves);
+			generatePawnCapturesInShift(newState, color, singleCapture.getDestination(), nextShift, continuationMoves);
 
 			// Add all continuation moves
 			for (const Move& continuation : continuationMoves) {
