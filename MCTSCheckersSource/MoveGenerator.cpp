@@ -510,8 +510,6 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 
 void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
 {
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
 	UINT emptyFields = pieces.getEmptyFields();
 	UINT newPosition = position;
 	int iteration = 0;
@@ -567,7 +565,7 @@ void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, 
 		if (!(newPosition & emptyFields))
 			break;
 
-		moves.emplace_back(position, newPosition, 0);
+		moves.emplace_back(position, newPosition, 0, color);
 		iteration++;
 	}
 }

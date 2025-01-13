@@ -224,6 +224,24 @@ void MoveGenerationTest::testKingBasicMoves()
         Move(1ULL << 21, 1ULL << 7)
     };
     verifyMoveList("King basic moves", expected, moveGen.generateMoves(board, PieceColor::White));
+
+    setUp();
+    board.blackPawns = 1ULL << 21;
+    board.kings = 1ULL << 21;
+    MoveList expectedBlack = {
+        Move(1ULL << 21, 1ULL << 25, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 28, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 26, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 30, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 17, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 12, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 8, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 18, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 14, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 11, 0, PieceColor::Black),
+        Move(1ULL << 21, 1ULL << 7, 0, PieceColor::Black)
+    };
+    verifyMoveList("King basic moves (black)", expectedBlack, moveGen.generateMoves(board, PieceColor::Black));
 }
 
 void MoveGenerationTest::testKingCapturingMoves()
