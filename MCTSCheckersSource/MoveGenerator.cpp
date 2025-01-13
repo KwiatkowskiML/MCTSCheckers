@@ -285,10 +285,11 @@ void MoveGenerator::generateCapturingMovesInShift(const BitBoard& pieces, PieceC
 
 void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves, UINT captured)
 {
-	// TODO: Implement for black pieces
-	assert(color == PieceColor::White);
 	UINT emptyFields = pieces.getEmptyFields();
 	UINT newPosition = position;
+	UINT currentPieces = pieces.getPieces(color);
+	UINT enemyPieces = pieces.getPieces(getEnemyColor(color));
+
 	int iteration = 0;
 	UINT foundEnemyPiece = 0;
 
@@ -347,9 +348,9 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		if (newPosition == 0)
 			break;
 
-		// There must not be any white pieces on the way
-		assert((newPosition & pieces.whitePawns) == 0);
-		if (newPosition & pieces.whitePawns)
+		// There must not be any piece in the same color on the way
+		assert((newPosition & currentPieces) == 0);
+		if (newPosition & currentPieces)
 			break;
 
 		// If the newPosition contains empty field continue looking for enemy pieces
@@ -359,12 +360,12 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		// If the newPosition contains empty field and we have already found enemy piece, add the move
         if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
         {
-			singleCapturedPieces.emplace_back(Move(position, newPosition, foundEnemyPiece), shift);
+			singleCapturedPieces.emplace_back(Move(position, newPosition, foundEnemyPiece, color), shift);
 			continue;
         }
 
-		// Being here means the black piece is on the new position
-		assert((newPosition & pieces.blackPawns) > 0);
+		// Being here means the enemy piece is on the new position
+		assert((newPosition & enemyPieces) > 0);
 
 		// If we have already found enemy piece, we must not find another one
 		if (foundEnemyPiece > 0)
@@ -385,7 +386,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		std::queue<std::tuple<UINT, BitShift>> newJumpers;
 		for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 			BitShift nextShift = static_cast<BitShift>(i);
-			UINT jumpers = getJumpersInShift(newState, PieceColor::White, nextShift, captured | move.getCaptured());
+			UINT jumpers = getJumpersInShift(newState, color, nextShift, captured | move.getCaptured());
 
 			// Destination cannot move any further 
 			if ((jumpers & move.getDestination()) == 0)
@@ -403,12 +404,11 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 				std::tie(newJumper, nextShift) = newJumpers.front();
 				newJumpers.pop();
 				MoveList continuationMoves;
-				generateKingCaptures(newState, PieceColor::White, move.getDestination(), nextShift, continuationMoves, captured | move.getCaptured());
+				generateKingCaptures(newState, color, move.getDestination(), nextShift, continuationMoves, captured | move.getCaptured());
 
 				// Add all continuation moves
 				for (const Move& continuation : continuationMoves) {
 					Move combinedMove = move.getExtendedMove(continuation, continuation.getCaptured());
-					//printf("Combined move: %s\n", combinedMove.toString().c_str());
 					moves.push_back(combinedMove);
 				}
 			}
