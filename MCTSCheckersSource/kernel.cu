@@ -6,6 +6,7 @@
 #include "Board.h"
 #include "MoveGenerator.h"
 #include "CheckersTestSuite.h"
+#include "PlayerCPU.h"
 
 cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
 
@@ -18,6 +19,11 @@ __global__ void addKernel(int *c, const int *a, const int *b)
 int main()
 {
 	CheckersTestSuite::runAll();
+	PlayerCPU player(PieceColor::White, 0);
+
+	/*Board board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
+	int result = board.simulateGame(PieceColor::White);
+	printf("Result: %d\n", result);*/
 
     return 0;
 }

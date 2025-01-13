@@ -1,6 +1,9 @@
 #include "Board.h"
 #include <cassert>
 #include "MoveGenerator.h"
+#include <random>
+
+#define DEBUG
 
 //----------------------------------------------------------------
 // Move generation
@@ -12,40 +15,64 @@ MoveList Board::getAvailableMoves(PieceColor color) const
 
 Board Board::getBoardAfterMove(const Move& move) const
 {
-    // TODO: Implement for black pieces
-    assert(move.getColor() == PieceColor::White);
-	UINT source = move.getSource();
-	UINT destination = move.getDestination();
-	UINT captured = move.getCaptured();
-
-    // Deleting the initial position of the moved piece
-    UINT newWhitePawns = _pieces.whitePawns & ~source;
-	UINT newBlackPawns = _pieces.blackPawns;
-    UINT newKings = _pieces.kings;
-
-    // Deleting captured pieces
-	if (move.isCapture())
-	{
-		newBlackPawns = _pieces.blackPawns & ~captured;
-		newKings = _pieces.kings & ~captured;
-  	}
-
-    // Adding new piece position
-    newWhitePawns |= destination;
-
-    // Handing the case when the pawn becomes a king, or the king is moved
-    if (source & _pieces.kings)
-    {
-        newKings = _pieces.kings & ~source;
-        newKings |= destination;
-    }
-    else if (destination & WHITE_CROWNING)
-        newKings |= destination;
+	BitBoard newBitboard = move.getBitboardAfterMove(_pieces);
+	UINT newWhitePawns = newBitboard.getPieces(PieceColor::White);
+	UINT newBlackPawns = newBitboard.getPieces(PieceColor::Black);
+	UINT newKings = newBitboard.kings;
 
 	Board newBoard(newWhitePawns, newBlackPawns, newKings);
     return newBoard;
+}
 
-	// TODO: consider capturing continuation here
+//----------------------------------------------------------------
+// Simulation
+//----------------------------------------------------------------
+int Board::simulateGame(PieceColor color) const
+{
+    PieceColor currentMoveColor = color;
+	Board newBoard = *this;
+
+    int noCaptureMoves = 0;
+
+    while (true)
+    {
+        MoveList moves = newBoard.getAvailableMoves(currentMoveColor);
+
+        // No moves available - game is over
+        if (moves.empty()) {
+            return currentMoveColor == color ? LOOSE : WIN;
+        }
+
+		// Check if the no capture moves limit has beeen exceeded
+		if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
+			return DRAW;
+		}
+
+        // Random number generation
+        std::random_device rd; // Seed
+        std::mt19937 gen(rd()); // Mersenne Twister engine
+        std::uniform_int_distribution<> dist(0, moves.size() - 1);
+
+        // Select a random move
+        int randomIndex = dist(gen);
+        Move randomMove = moves[randomIndex];
+
+		// Check if the move is a capture
+		if (!randomMove.isCapture()) {
+			noCaptureMoves++;
+		}
+		else {
+			noCaptureMoves = 0;
+		}
+
+        newBoard = newBoard.getBoardAfterMove(randomMove);
+        currentMoveColor = getEnemyColor(currentMoveColor);
+
+#ifdef DEBUG
+        std::cout << "Chosen move: " << randomMove.toString() << std::endl;
+		newBoard.printBoard();
+#endif // DEBUG       
+    }
 }
 
 //----------------------------------------------------------------

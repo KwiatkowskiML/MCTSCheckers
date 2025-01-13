@@ -8,14 +8,20 @@
 
 class Board {
 private:
-    
-public:
     BitBoard _pieces;
+public:
     Board(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
+	Board() : _pieces(0, 0, 0) {};
+
+	// Getters
+	BitBoard getBitBoard() const { return _pieces; }
 
 	// Move generation
     MoveList getAvailableMoves(PieceColor color) const;
     Board getBoardAfterMove(const Move& move) const;
+
+    // Simulation
+	int simulateGame(PieceColor color) const;
 
     // Visualization
     void printBoard() const;

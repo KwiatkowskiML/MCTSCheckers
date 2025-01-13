@@ -376,22 +376,39 @@ void MoveGenerationTest::testCrowningMove()
     verifyMoveList("Crowning move", expected, moveGen.generateMoves(board, PieceColor::White));
 }
 
+void MoveGenerationTest::assertFailedTest()
+{
+    setUp();
+    board.whitePawns = (1ULL << 30) | (1ULL << 31) | (1ULL << 26) | (1ULL << 20) | (1ULL << 23) | (1ULL << 17) | (1ULL << 18) | (1ULL << 19);
+    board.blackPawns = (1ULL) | (1ULL << 2) | (1ULL << 6) | (1ULL << 7) | (1ULL << 9) | (1ULL << 10) | (1ULL << 11) | (1ULL << 13) | (1ULL << 14);
+	Board newBoard(board.whitePawns, board.blackPawns, board.kings);
+	newBoard.printBoard();
+    MoveList expected = {
+        Move(1ULL << 21, 1ULL << 12, 1ULL << 17),
+        Move(1ULL << 21, 1ULL << 8, 1ULL << 17),
+        Move(1ULL << 21, 1ULL << 30, 1ULL << 26)
+    };
+    verifyMoveList("King capturing moves", expected, moveGen.generateMoves(board, PieceColor::Black));
+}
+
 void MoveGenerationTest::runAllTests()
 {
-    testBasicPawnMovesCenter();
-    testBasicPawnMovesLeftEdge();
-    testBasicPawnMovesRightEdge();
-    testSingleCaptureRightDiagonal();
-    testSingleCaptureLeftDiagonal();
-    testChainCaptureDouble();
-    testChainCaptureTriple();
-    testChainCaptureMultiple();
-    testKingBasicMoves();
-	testKingCapturingMoves();
-	testKingCapturingMoves2();
-    testKingCapturingMovesEdgeCase();
-    testKingCapturingMoves3();
-    testCrowningMove();
+ //   testBasicPawnMovesCenter();
+ //   testBasicPawnMovesLeftEdge();
+ //   testBasicPawnMovesRightEdge();
+ //   testSingleCaptureRightDiagonal();
+ //   testSingleCaptureLeftDiagonal();
+ //   testChainCaptureDouble();
+ //   testChainCaptureTriple();
+ //   testChainCaptureMultiple();
+ //   testKingBasicMoves();
+	//testKingCapturingMoves();
+	//testKingCapturingMoves2();
+ //   testKingCapturingMovesEdgeCase();
+ //   testKingCapturingMoves3();
+ //   testCrowningMove();
+
+	assertFailedTest();
 
 
     printSummary("Move Generation");

@@ -19,7 +19,7 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard) const
     UINT source = getSource();
 	UINT destination = getDestination();
 	UINT currentPieces = sourceBitboard.getPieces(color);
-	UINT enemyPieces = sourceBitboard.getPieces(MoveGenerator::getEnemyColor(color));
+	UINT enemyPieces = sourceBitboard.getPieces(getEnemyColor(color));
 
     // Deleting the initial position of the moved piece
     UINT newCurrentPieces = currentPieces & ~source;

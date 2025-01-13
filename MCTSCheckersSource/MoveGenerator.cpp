@@ -322,8 +322,8 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		if (newPosition == 0)
 			break;
 
-		// There must not be any piece in the same color on the way
-		assert((newPosition & currentPieces) == 0);
+		// There must not be any piece in the same color on the way if the captured pawn has not been found yet
+		assert((newPosition & currentPieces) == 0 || foundEnemyPiece);
 		if (newPosition & currentPieces)
 			break;
 
@@ -405,6 +405,13 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 	UINT newPosition = 0;
 
 	// There must be a captured piece
+	if ((captured & enemyPieces) == 0)
+	{
+		Board::printBitboard(currentPieces);
+		Board::printBitboard(enemyPieces);
+		Board::printBitboard(captured);
+		printf("gotit\n");
+	}
 	assert((captured & enemyPieces) != 0);
 
 	// Capturing pieces below the pawn
@@ -509,13 +516,3 @@ void MoveGenerator::generatePawnMovesInShift(const BitBoard& pieces, PieceColor 
 	UINT newPosition = ShiftMap::shift(position, shift);
 	moves.emplace_back(position, newPosition, 0, color);
 }
-
-//----------------------------------------------------------------
-// Getting enemy color
-//----------------------------------------------------------------
-
-PieceColor MoveGenerator::getEnemyColor(PieceColor color)
-{
-	return color == PieceColor::White ? PieceColor::Black : PieceColor::White;
-}
-
