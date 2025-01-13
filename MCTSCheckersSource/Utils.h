@@ -25,4 +25,4 @@
 #define DRAW 0
 #define WIN 1
 
-#define MAX_NO_CAPTURE_MOVES 40
+#define MAX_NO_CAPTURE_MOVES 10

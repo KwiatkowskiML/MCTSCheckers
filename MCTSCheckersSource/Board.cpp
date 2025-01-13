@@ -3,6 +3,8 @@
 #include "MoveGenerator.h"
 #include <random>
 
+#define DEBUG
+
 //----------------------------------------------------------------
 // Move generation
 //----------------------------------------------------------------
@@ -56,7 +58,7 @@ int Board::simulateGame(PieceColor color) const
         Move randomMove = moves[randomIndex];
 
 		// Check if the move is a capture
-		if (!randomMove.isCapture()) {
+		if (!randomMove.isCapture() && (randomMove.getSource() & newBoard.getKings()) > 0) {
 			noCaptureMoves++;
 		}
 		else {

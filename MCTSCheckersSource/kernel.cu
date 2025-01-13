@@ -21,7 +21,7 @@ int main()
 	// CheckersTestSuite::runAll();
 	PlayerCPU player(PieceColor::White, 0);
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1; i++)
     {
         Board board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
         int result = board.simulateGame(PieceColor::White);

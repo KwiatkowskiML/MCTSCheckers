@@ -15,6 +15,7 @@ public:
 
 	// Getters
 	BitBoard getBitBoard() const { return _pieces; }
+	UINT getKings() const { return _pieces.kings; }
 
 	// Move generation
     MoveList getAvailableMoves(PieceColor color) const;
