@@ -7,5 +7,6 @@ enum class BitShift {
 	BIT_SHIFT_R3,
 	BIT_SHIFT_R4,
 	BIT_SHIFT_R5,
-	COUNT
+	COUNT,
+	BIT_SHIFT_NONE
 };

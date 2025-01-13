@@ -132,44 +132,9 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 			// Move the kings untill capturable enemy pawn is found
 			while (movedCurrentKing)
 			{
-				BitShift nextShift = shift;
-				if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
-				{
-					if (iteration & 1)
-						nextShift = BitShift::BIT_SHIFT_L4;
-				}
-
-				if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
-				{
-					if (iteration & 1)
-						nextShift = BitShift::BIT_SHIFT_R4;
-				}
-
-				if (shift == BitShift::BIT_SHIFT_L4)
-				{
-					if (iteration & 1)
-					{
-						if (movedCurrentKing & MASK_L3)
-							nextShift = BitShift::BIT_SHIFT_L3;
-						else if (movedCurrentKing & MASK_L5)
-							nextShift = BitShift::BIT_SHIFT_L5;
-						else
-							break;
-					}
-				}
-
-				if (shift == BitShift::BIT_SHIFT_R4)
-				{
-					if (iteration & 1)
-					{
-						if (movedCurrentKing & MASK_R3)
-							nextShift = BitShift::BIT_SHIFT_R3;
-						else if (movedCurrentKing & MASK_R5)
-							nextShift = BitShift::BIT_SHIFT_R5;
-						else
-							break;
-					}
-				}
+				BitShift nextShift = getNextShift(shift, iteration, movedCurrentKing);
+				if (nextShift == BitShift::BIT_SHIFT_NONE)
+					break;
 
 				movedCurrentKing = ShiftMap::shift(movedCurrentKing, nextShift);
 				iteration++;
@@ -208,6 +173,50 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor color, 
 	}
 
 	return jumpers;
+}
+
+BitShift MoveGenerator::getNextShift(BitShift shift, int iteration, UINT position)
+{
+	BitShift nextShift = shift;
+	if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
+	{
+		if (iteration & 1)
+			nextShift = BitShift::BIT_SHIFT_L4;
+	}
+
+	if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
+	{
+		if (iteration & 1)
+			nextShift = BitShift::BIT_SHIFT_R4;
+	}
+
+	if (shift == BitShift::BIT_SHIFT_L4)
+	{
+		if (iteration & 1)
+		{
+			if (position & MASK_L3)
+				nextShift = BitShift::BIT_SHIFT_L3;
+			else if (position & MASK_L5)
+				nextShift = BitShift::BIT_SHIFT_L5;
+			else
+				return BitShift::BIT_SHIFT_NONE;
+		}
+	}
+
+	if (shift == BitShift::BIT_SHIFT_R4)
+	{
+		if (iteration & 1)
+		{
+			if (position & MASK_R3)
+				nextShift = BitShift::BIT_SHIFT_R3;
+			else if (position & MASK_R5)
+				nextShift = BitShift::BIT_SHIFT_R5;
+			else
+				return BitShift::BIT_SHIFT_NONE;
+		}
+	}
+
+	return nextShift;
 }
 
 UINT MoveGenerator::getMoversInShift(const BitBoard& pieces, PieceColor color, BitShift shift)
@@ -297,44 +306,9 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
 	while (newPosition)
 	{
-		BitShift nextShift = shift;
-		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
-		{
-			if (iteration & 1)
-				nextShift = BitShift::BIT_SHIFT_L4;
-		}
-
-		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
-		{
-			if (iteration & 1)
-				nextShift = BitShift::BIT_SHIFT_R4;
-		}
-
-		if (shift == BitShift::BIT_SHIFT_L4)
-		{
-			if (iteration & 1)
-			{
-				if (newPosition & MASK_L3)
-					nextShift = BitShift::BIT_SHIFT_L3;
-				else if (newPosition & MASK_L5)
-					nextShift = BitShift::BIT_SHIFT_L5;
-				else
-					break;
-			}
-		}
-
-		if (shift == BitShift::BIT_SHIFT_R4)
-		{
-			if (iteration & 1)
-			{
-				if (newPosition & MASK_R3)
-					nextShift = BitShift::BIT_SHIFT_R3;
-				else if (newPosition & MASK_R5)
-					nextShift = BitShift::BIT_SHIFT_R5;
-				else
-					break;
-			}
-		}
+		BitShift nextShift = getNextShift(shift, iteration, newPosition);
+		if (nextShift == BitShift::BIT_SHIFT_NONE)
+			break;
 
 		// Make the shift
 		newPosition = ShiftMap::shift(newPosition, nextShift);
@@ -358,11 +332,11 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 			continue;
 
 		// If the newPosition contains empty field and we have already found enemy piece, add the move
-        if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
-        {
+		if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
+		{
 			singleCapturedPieces.emplace_back(Move(position, newPosition, foundEnemyPiece, color), shift);
 			continue;
-        }
+		}
 
 		// Being here means the enemy piece is on the new position
 		assert((newPosition & enemyPieces) > 0);
@@ -374,8 +348,8 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		foundEnemyPiece = newPosition;
 	}
 
-    for (const auto& moveTuple : singleCapturedPieces)
-    {
+	for (const auto& moveTuple : singleCapturedPieces)
+	{
 		const Move& move = std::get<0>(moveTuple);
 		const BitShift& nextShift = std::get<1>(moveTuple);
 
@@ -417,7 +391,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 			// No continuations possible, add the single capture
 			moves.push_back(move);
 		}
-    }
+	}
 }
 
 void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
@@ -516,51 +490,11 @@ void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor color, 
 
 	while (newPosition)
 	{
-		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
-		{
-			if (iteration & 1)
-				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L4);
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
+		BitShift nextShift = getNextShift(shift, iteration, newPosition);
+		if (shift == BitShift::BIT_SHIFT_NONE)
+			break;
 
-		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
-		{
-			if (iteration & 1)
-				newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R4);
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
-
-		if (shift == BitShift::BIT_SHIFT_L4)
-		{
-			if (iteration & 1)
-			{
-				if (newPosition & MASK_L3)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L3);
-				else if (newPosition & MASK_L5)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_L5);
-				else
-					break;
-			}
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
-
-		if (shift == BitShift::BIT_SHIFT_R4)
-		{
-			if (iteration & 1)
-			{
-				if (newPosition & MASK_R3)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R3);
-				else if (newPosition & MASK_R5)
-					newPosition = ShiftMap::shift(newPosition, BitShift::BIT_SHIFT_R5);
-				else
-					break;
-			}
-			else
-				newPosition = ShiftMap::shift(newPosition, shift);
-		}
+		newPosition = ShiftMap::shift(newPosition, nextShift);
 
 		if (!(newPosition & emptyFields))
 			break;

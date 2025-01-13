@@ -6,7 +6,7 @@
 
 class MoveGenerator {
 private:
-	
+	static BitShift getNextShift(BitShift shift, int iteration, UINT position);
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
     static PieceColor getEnemyColor(PieceColor color);
