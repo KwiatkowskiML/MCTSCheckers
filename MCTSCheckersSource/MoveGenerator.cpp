@@ -452,7 +452,7 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 	Move singleCapture = Move(position, newPosition, captured, color);
 
 	// Create new board state after capture
-	BitBoard newState = singleCapture.getBitboardAfterMove(pieces);
+	BitBoard newState = singleCapture.getBitboardAfterMove(pieces, false);
 
 	// Generate all possible continuations
 	std::queue<std::tuple<UINT, BitShift>> newJumpers;

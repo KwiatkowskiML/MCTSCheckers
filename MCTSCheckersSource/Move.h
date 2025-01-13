@@ -25,7 +25,7 @@ public:
         : steps(steps), captured(capt), color(col) { }
 
     Move getExtendedMove(Move continuation, UINT capt) const;
-    BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard) const;
+    BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation = true) const;
     const std::vector<UINT>& getSteps() const;
 
     UINT getDestination() const;

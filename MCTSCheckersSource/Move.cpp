@@ -14,7 +14,7 @@ Move Move::getExtendedMove(Move continuation, UINT capt) const
 	return Move(newSteps, newCaptured, color);
 }
 
-BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard) const
+BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation) const
 {
     UINT source = getSource();
 	UINT destination = getDestination();
@@ -44,10 +44,16 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard) const
     }
 
     // Handling the case when the pawn is crowned
-    if (color == PieceColor::White && (destination & WHITE_CROWNING))
-        newKings |= destination;
-	if (color == PieceColor::Black && (destination & BLACK_CROWNING))
-		newKings |= destination;
+    if (includeCoronation)
+    {
+		for (UINT step : steps)
+		{
+			if (color == PieceColor::White && (step & WHITE_CROWNING))
+				newKings |= destination;
+			if (color == PieceColor::Black && (step & BLACK_CROWNING))
+				newKings |= destination;
+		}
+    }
 
 	UINT newWhitePawns = color == PieceColor::White ? newCurrentPieces : newEnemyPieces;
 	UINT newBlackPawns = color == PieceColor::Black ? newCurrentPieces : newEnemyPieces;

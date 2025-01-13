@@ -393,20 +393,20 @@ void MoveGenerationTest::assertFailedTest()
 
 void MoveGenerationTest::runAllTests()
 {
- //   testBasicPawnMovesCenter();
- //   testBasicPawnMovesLeftEdge();
- //   testBasicPawnMovesRightEdge();
- //   testSingleCaptureRightDiagonal();
- //   testSingleCaptureLeftDiagonal();
- //   testChainCaptureDouble();
- //   testChainCaptureTriple();
- //   testChainCaptureMultiple();
- //   testKingBasicMoves();
-	//testKingCapturingMoves();
-	//testKingCapturingMoves2();
- //   testKingCapturingMovesEdgeCase();
- //   testKingCapturingMoves3();
- //   testCrowningMove();
+    testBasicPawnMovesCenter();
+    testBasicPawnMovesLeftEdge();
+    testBasicPawnMovesRightEdge();
+    testSingleCaptureRightDiagonal();
+    testSingleCaptureLeftDiagonal();
+    testChainCaptureDouble();
+    testChainCaptureTriple();
+    testChainCaptureMultiple();
+    testKingBasicMoves();
+	testKingCapturingMoves();
+	testKingCapturingMoves2();
+    testKingCapturingMovesEdgeCase();
+    testKingCapturingMoves3();
+    testCrowningMove();
 
 	assertFailedTest();
 

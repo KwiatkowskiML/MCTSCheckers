@@ -18,12 +18,15 @@ __global__ void addKernel(int *c, const int *a, const int *b)
 
 int main()
 {
-	CheckersTestSuite::runAll();
+	// CheckersTestSuite::runAll();
 	PlayerCPU player(PieceColor::White, 0);
 
-	/*Board board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
-	int result = board.simulateGame(PieceColor::White);
-	printf("Result: %d\n", result);*/
+    for (int i = 0; i < 100; i++)
+    {
+        Board board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
+        int result = board.simulateGame(PieceColor::White);
+        printf("Result: %d\n", result);
+    }
 
     return 0;
 }
