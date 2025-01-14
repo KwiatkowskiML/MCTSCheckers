@@ -299,10 +299,13 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 	UINT currentPieces = pieces.getPieces(color);
 	UINT enemyPieces = pieces.getPieces(getEnemyColor(color));
 
+	assert(position & pieces.kings & currentPieces);
+	assert((currentPieces & enemyPieces) == 0);
+
 	int iteration = 0;
 	UINT foundEnemyPiece = 0;
 
-	std::list<std::tuple<Move, BitShift>> singleCapturedPieces;
+	std::list<std::tuple<Move, BitShift>> singleCaptureMoves;
 
 	while (newPosition)
 	{
@@ -334,7 +337,7 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		// If the newPosition contains empty field and we have already found enemy piece, add the move
 		if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
 		{
-			singleCapturedPieces.emplace_back(Move(position, newPosition, foundEnemyPiece, color), shift);
+			singleCaptureMoves.emplace_back(Move(position, newPosition, foundEnemyPiece, color), shift);
 			continue;
 		}
 
@@ -348,10 +351,10 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 		foundEnemyPiece = newPosition;
 	}
 
-	for (const auto& moveTuple : singleCapturedPieces)
+	for (const auto& moveTuple : singleCaptureMoves)
 	{
 		const Move& move = std::get<0>(moveTuple);
-		const BitShift& nextShift = std::get<1>(moveTuple);
+		// const BitShift& nextShift = std::get<1>(moveTuple);
 
 		// Create new board state after capture
 		BitBoard newState = move.getBitboardAfterMove(pieces);
@@ -396,13 +399,26 @@ void MoveGenerator::generateKingCaptures(const BitBoard& pieces, PieceColor colo
 
 void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceColor color, UINT position, BitShift shift, MoveList& moves)
 {
-	// TODO: Add validation for the shift
-
 	UINT emptyFields = pieces.getEmptyFields();
 	UINT captured = ShiftMap::shift(position, shift);
 	UINT currentPieces = pieces.getPieces(color);
 	UINT enemyPieces = pieces.getPieces(getEnemyColor(color));
 	UINT newPosition = 0;
+
+	// Make sure the position is right color
+	assert(position & currentPieces);
+
+	// Make sure the captured piece is enemy piece
+	assert(captured & enemyPieces);
+
+	// Make sure the captured piece is not the same as the position
+	assert((captured & currentPieces) == 0);
+
+	// Make sure the captured piece is not empty field
+	assert((captured & emptyFields) == 0);
+
+	// Make sure the pieces are marked correctly
+	assert((enemyPieces & currentPieces) == 0);
 
 	// There must be a captured piece
 	if ((captured & enemyPieces) == 0)
