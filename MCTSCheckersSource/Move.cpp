@@ -30,7 +30,7 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool include
     if (isCapture())
     {
         newEnemyPieces = enemyPieces & ~captured;
-        newKings = sourceBitboard.kings & ~captured;
+        newKings = newKings & ~captured;
     }
 
     // Adding new piece position
@@ -39,7 +39,7 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool include
     // Handing the case when the king is moved
     if (source & sourceBitboard.kings)
     {
-        newKings = sourceBitboard.kings & ~source;
+        newKings = newKings & ~source;
         newKings |= destination;
     }
 

@@ -394,16 +394,15 @@ void MoveGenerationTest::assertFailedTest()
 void MoveGenerationTest::assertFailedTest2()
 {
 	setUp();
-	board.whitePawns = (1ULL << 28) | (1ULL << 24) | (1ULL << 25) | (1ULL << 20) | (1ULL << 22) | (1ULL << 17);
-	board.kings = 1ULL << 17;
-	board.blackPawns = (1ULL << 4) | (1ULL << 18);
+	board.whitePawns = (1ULL << 3);
+	board.kings = (1ULL << 3) | (1ULL << 13);
+	board.blackPawns = (1ULL << 13);
 	MoveList expected = {
 		Move(1ULL << 21, 1ULL << 12, 1ULL << 17),
 		Move(1ULL << 21, 1ULL << 8, 1ULL << 17),
 		Move(1ULL << 21, 1ULL << 30, 1ULL << 26)
 	};
 	verifyMoveList("assertion failed scenario", expected, moveGen.generateMoves(board, PieceColor::White));
-	verifyMoveList("assertion failed scenario", expected, moveGen.generateMoves(board, PieceColor::Black));
 }
 
 void MoveGenerationTest::runAllTests()

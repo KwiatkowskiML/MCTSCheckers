@@ -77,6 +77,7 @@ int Board::simulateGame(PieceColor color) const
 #ifdef DEBUG
         debugLog << "Chosen move: " << randomMove.toString() << std::endl;
         debugLog << "Updated board state:\n" << newBoard.toString() << std::endl;
+        debugLog << "Kings: \n" << std::hex << newBoard.getKings() << std::endl;
 #endif // DEBUG       
     }
 }

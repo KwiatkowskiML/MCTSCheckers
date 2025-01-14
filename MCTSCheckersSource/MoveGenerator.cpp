@@ -505,6 +505,8 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 			std::tie(newJumper, nextShift) = newJumpers.front();
 			newJumpers.pop();
 			MoveList continuationMoves;
+			
+			// debug log
 			generatePawnCapturesInShift(newState, color, singleCapture.getDestination(), nextShift, continuationMoves);
 
 			// Add all continuation moves

@@ -37,8 +37,6 @@ int main()
 	delete blackPlayer;
 
     return 0;
-
-	//CheckersTestSuite::runAll();
 }
 
 // Helper function for using CUDA to add vectors in parallel.
