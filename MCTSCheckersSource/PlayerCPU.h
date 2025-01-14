@@ -5,6 +5,6 @@ class PlayerCPU : public Player
 {
 public:
 	PlayerCPU(PieceColor color, int timeLimit) : Player(color, timeLimit) {};
-	void Simulate(Node* node) override;
+	int Simulate(Node* node) override;
 };
 

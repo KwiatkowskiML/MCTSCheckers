@@ -26,3 +26,4 @@
 #define WIN 1
 
 #define MAX_NO_CAPTURE_MOVES 10
+#define C 2
