@@ -27,7 +27,7 @@ public:
 	virtual int Simulate(Node* node) = 0;
 	void BackPropagate(Node* node, int score);
 	bool ExpandNode(Node* node);
-	Move GetBestMove();
+	Move* GetBestMove();
 	Node* SelectNode();
 	
 	~Player() 

@@ -18,7 +18,7 @@ struct Node
 		float result;
 
 		if (gamesPlayed == 0)
-			result = FLT_MAX;
+			return FLT_MAX;
 
 		// If colorToPlay is the color of the player, it means that the move has been done by the enemy
 		float k = colorToPlay == color ? -1.0f : 1.0f;

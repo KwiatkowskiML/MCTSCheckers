@@ -19,14 +19,19 @@ __global__ void addKernel(int *c, const int *a, const int *b)
 int main()
 {
 	// CheckersTestSuite::runAll();
-	PlayerCPU player(PieceColor::White, 0);
-
-    for (int i = 0; i < 1; i++)
+   /* for (int i = 0; i < 1; i++)
     {
         Board board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
         int result = board.simulateGame(PieceColor::White);
         printf("Result: %d\n", result);
-    }
+    }*/
+
+	PlayerCPU* player = new PlayerCPU(PieceColor::White, 0);
+	Move* bestMove = player->GetBestMove();
+
+	std::cout << "Best move: " << bestMove->toString() << std::endl;
+
+	delete player;
 
     return 0;
 }

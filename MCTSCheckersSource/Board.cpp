@@ -3,7 +3,7 @@
 #include "MoveGenerator.h"
 #include <random>
 
-#define DEBUG
+// #define DEBUG
 
 //----------------------------------------------------------------
 // Move generation
