@@ -22,6 +22,7 @@ private:
     void testKingCapturingMovesEdgeCase();
     void testCrowningMove();
     void assertFailedTest();
+    void assertFailedTest2();
 
 public:
     void runAllTests() override;

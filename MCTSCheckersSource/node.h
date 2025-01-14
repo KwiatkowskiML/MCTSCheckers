@@ -1,8 +1,9 @@
 #pragma once
 #include "Board.h"
 
-struct Node
+class Node
 {
+public:
 	Board board;
 	Node* parent;
 	std::vector<Node*> children;
@@ -30,17 +31,25 @@ struct Node
 	}
 
 	Node(Board board, Node* parent, PieceColor colorToPlay, Move* prevMove = nullptr) : board(board), parent(parent), colorToPlay(colorToPlay), prevMove(prevMove) {};
+
+	static void DeleteTree(Node* node)
+	{
+		if (node)
+		{
+			for (Node* child : node->children)
+			{
+				DeleteTree(child);
+			}
+			delete node;
+		}
+	}
 	
 	~Node()
 	{
 		for (Node* child : children)
 		{
-			if (child)
-			{
-				delete child;
-			}
+			delete child;
 		}
-		children.clear();
 
 		if (prevMove)
 			delete prevMove;

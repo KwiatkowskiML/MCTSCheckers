@@ -25,7 +25,7 @@ public:
 	int simulateGame(PieceColor color) const;
 
     // Visualization
-    void printBoard() const;
+    std::string toString() const;
     static void printBitboard(UINT bitboard);
 
     // Field positioning

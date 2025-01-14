@@ -2,8 +2,10 @@
 #include <cassert>
 #include "MoveGenerator.h"
 #include <random>
+#include <fstream>
+#include <sstream>
 
-// #define DEBUG
+#define DEBUG
 
 //----------------------------------------------------------------
 // Move generation
@@ -33,6 +35,10 @@ int Board::simulateGame(PieceColor color) const
 	Board newBoard = *this;
 
     int noCaptureMoves = 0;
+    std::ofstream debugLog(SIMULATION_LOG);
+    if (!debugLog.is_open()) {
+        throw std::runtime_error("Failed to open log file for writing.");
+    }
 
     while (true)
     {
@@ -69,8 +75,8 @@ int Board::simulateGame(PieceColor color) const
         currentMoveColor = getEnemyColor(currentMoveColor);
 
 #ifdef DEBUG
-        std::cout << "Chosen move: " << randomMove.toString() << std::endl;
-		newBoard.printBoard();
+        debugLog << "Chosen move: " << randomMove.toString() << std::endl;
+        debugLog << "Updated board state:\n" << newBoard.toString() << std::endl;
 #endif // DEBUG       
     }
 }
@@ -79,38 +85,44 @@ int Board::simulateGame(PieceColor color) const
 // Visualization
 //----------------------------------------------------------------
 
-void Board::printBoard() const
+std::string Board::toString() const
 {
-    std::cout << "     A   B   C   D   E   F   G   H\n";
-    std::cout << "   +---+---+---+---+---+---+---+---+\n";
+    std::ostringstream boardString;
+
+    boardString << "     A   B   C   D   E   F   G   H\n";
+    boardString << "   +---+---+---+---+---+---+---+---+\n";
+
     for (int row = 0; row < 8; row++) {
-        std::cout << " " << 8 - row << " |";
+        boardString << " " << 8 - row << " |";
         for (int col = 0; col < 8; col++) {
             // Only dark squares can have pieces
             bool isDarkSquare = (row + col) % 2 != 0;
             if (!isDarkSquare) {
-                std::cout << "   |";  // Light square - always empty with no vertical line
+                boardString << "   |";  // Light square - always empty with no vertical line
             }
             else {
                 // Calculate bit position for dark squares (bottom to top, left to right)
                 int darkSquareNumber = (7 - row) * 4 + (col / 2);
                 UINT mask = 1U << darkSquareNumber;
+
                 // Check if square has a piece
                 if (_pieces.whitePawns & mask) {
-                    std::cout << " " << (_pieces.kings & mask ? 'W' : 'w') << " |";
+                    boardString << " " << (_pieces.kings & mask ? 'W' : 'w') << " |";
                 }
                 else if (_pieces.blackPawns & mask) {
-                    std::cout << " " << (_pieces.kings & mask ? 'B' : 'b') << " |";
+                    boardString << " " << (_pieces.kings & mask ? 'B' : 'b') << " |";
                 }
                 else {
-                    std::cout << "   |";  // Empty dark square
+                    boardString << "   |";  // Empty dark square
                 }
             }
         }
-        std::cout << " " << 8 - row << '\n';
-        std::cout << "   +---+---+---+---+---+---+---+---+\n";  // Horizontal separator after each row
+        boardString << " " << 8 - row << '\n';
+        boardString << "   +---+---+---+---+---+---+---+---+\n";  // Horizontal separator after each row
     }
-    std::cout << "     A   B   C   D   E   F   G   H\n\n";
+    boardString << "     A   B   C   D   E   F   G   H\n\n";
+
+    return boardString.str();
 }
 
 void Board::printBitboard(UINT bitboard)

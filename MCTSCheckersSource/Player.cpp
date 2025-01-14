@@ -1,4 +1,8 @@
 #include "Player.h"
+#include <fstream>
+#include <string>
+#include <functional>
+#include <chrono>
 
 // Selection phase
 Node* Player::SelectNode()
@@ -45,6 +49,26 @@ bool Player::ExpandNode(Node* node)
 	return true;
 }
 
+// Set players board
+void Player::SetBoard(Board board)
+{
+	// Clear the tree
+	if (root)
+		delete root;
+
+	// Initialize the root node
+	root = new Node(board, nullptr, color);
+	
+	// Roots children initialization with saving each move
+	MoveList moves = root->board.getAvailableMoves(color);
+	for (Move move : moves)
+	{
+		Board newBoard = root->board.getBoardAfterMove(move);
+		Node* newNode = new Node(newBoard, root, color == PieceColor::White ? PieceColor::Black : PieceColor::White, new Move(move));
+		root->children.push_back(newNode);
+	}
+}
+
 // This function is called when a simulation is done. It backpropagates the score from the simulation node to the root node.
 void Player::BackPropagate(Node* node, int score)
 {
@@ -63,9 +87,10 @@ Move* Player::GetBestMove()
 	// Building the tree
 	// ----------------------------------------------
 
-	// Selection phase
+	// Start the timer
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-	for (int i = 0; i < 10; i++)
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
 	{ 
 		Node* selectedNode = SelectNode();
 		assert(selectedNode != nullptr);
@@ -118,4 +143,52 @@ Move* Player::GetBestMove()
 		bestMove = bestNode->prevMove;
 
 	return bestMove;
+}
+
+//----------------------------------------------
+// Generate a dot file to visualize the tree
+//----------------------------------------------
+void Player::GenerateDotFile(const std::string& filename)
+{
+	std::ofstream dotFile(filename);
+	if (!dotFile.is_open())
+	{
+		throw std::runtime_error("Unable to open file: " + filename);
+	}
+
+	// Start the DOT graph definition
+	dotFile << "digraph Tree {\n";
+	dotFile << "    node [shape=box, fontname=\"Arial\"];\n";
+
+	// Helper function to traverse and generate nodes
+	std::function<void(const Node*, int&)> writeNode;
+	writeNode = [&dotFile, &writeNode](const Node* node, int& nodeId) -> void {
+		if (!node)
+			return;
+
+		int currentNodeId = nodeId++;
+		// Write the current node with gamesPlayed and score
+		dotFile << "    node" << currentNodeId << " [label=\"Games Played: "
+			<< node->gamesPlayed << "\\nScore: " << node->score << "\"];\n";
+
+		for (const Node* child : node->children)
+		{
+			if (child)
+			{
+				int childNodeId = nodeId;
+				writeNode(child, nodeId); // Recursively write child nodes
+
+				// Connect current node to child node
+				dotFile << "    node" << currentNodeId << " -> node" << childNodeId << ";\n";
+			}
+		}
+		};
+
+	int nodeId = 0;
+	writeNode(root, nodeId);
+
+	// End the DOT graph definition
+	dotFile << "}\n";
+
+	dotFile.close();
 }

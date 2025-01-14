@@ -7,6 +7,7 @@
 #include "MoveGenerator.h"
 #include "CheckersTestSuite.h"
 #include "PlayerCPU.h"
+#include "Game.h"
 
 cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
 
@@ -18,22 +19,26 @@ __global__ void addKernel(int *c, const int *a, const int *b)
 
 int main()
 {
-	// CheckersTestSuite::runAll();
-   /* for (int i = 0; i < 1; i++)
-    {
-        Board board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
-        int result = board.simulateGame(PieceColor::White);
-        printf("Result: %d\n", result);
-    }*/
-
-	PlayerCPU* player = new PlayerCPU(PieceColor::White, 0);
+	/*PlayerCPU* player = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
 	Move* bestMove = player->GetBestMove();
+    player->GenerateDotFile(TREE_VISUALIZATION_FILE);
 
 	std::cout << "Best move: " << bestMove->toString() << std::endl;
 
-	delete player;
+	delete player;*/
+
+    Player* whitePlayer;
+	Player* blackPlayer;
+	Game::GetGameSetup(whitePlayer, blackPlayer);
+	Game game(whitePlayer, blackPlayer);
+	game.PlayGame();
+
+    delete whitePlayer;
+	delete blackPlayer;
 
     return 0;
+
+	//CheckersTestSuite::runAll();
 }
 
 // Helper function for using CUDA to add vectors in parallel.

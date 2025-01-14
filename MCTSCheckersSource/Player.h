@@ -7,29 +7,36 @@ class Player
 public:
 	int timeLimit;
 	const PieceColor color;
-	Node* root;
+	Node* root = nullptr;
 
+	// Constructor to initialize the player and the root of the decision tree
 	Player(PieceColor color, int timeLimit) : color(color), timeLimit(timeLimit) 
 	{
-		root = new Node(Board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0), nullptr, color);
-		root->colorToPlay = color;
-
-		// Roots children initialization with saving each move
-		MoveList moves = root->board.getAvailableMoves(color);
-		for (Move move : moves)
-		{
-			Board newBoard = root->board.getBoardAfterMove(move);
-			Node* newNode = new Node(newBoard, root, color == PieceColor::White ? PieceColor::Black : PieceColor::White, new Move(move));
-			root->children.push_back(newNode);
-		}
+		SetBoard(Board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0));
 	};
 
+	// Reset the tree with a new board
+	void SetBoard(Board board);
+
+	// This must be implemented by derived classes
 	virtual int Simulate(Node* node) = 0;
+
+	// Backpropagate the result of a simulation up the tree
 	void BackPropagate(Node* node, int score);
+
+	// Expand the tree by generating children for the given node
 	bool ExpandNode(Node* node);
+
+	// Get the best move based on the results of simulations
 	Move* GetBestMove();
+
+	// Select the most promising node 
 	Node* SelectNode();
+
+	// Generate a DOT file for visualizing the decision tree using Graphviz
+	void GenerateDotFile(const std::string& filename);
 	
+	// Destructor to clean up the decision tree
 	~Player() 
 	{
 		delete root;

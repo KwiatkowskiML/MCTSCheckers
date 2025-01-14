@@ -407,9 +407,41 @@ void MoveGenerator::generatePawnCapturesInShift(const BitBoard& pieces, PieceCol
 	// There must be a captured piece
 	if ((captured & enemyPieces) == 0)
 	{
+		printf("position:\n");
+		Board::printBitboard(position);
+		printf("currentPieces:\n");
 		Board::printBitboard(currentPieces);
+		printf("enemyPieces:\n");
 		Board::printBitboard(enemyPieces);
+		printf("kings:\n");
+		Board::printBitboard(pieces.kings);
+		printf("captured:\n");
 		Board::printBitboard(captured);
+		printf("shift:\n");
+		switch (shift)
+		{
+		case BitShift::BIT_SHIFT_L3:
+			printf("L3\n");
+			break;
+		case BitShift::BIT_SHIFT_L4:
+			printf("L4\n");
+			break;
+		case BitShift::BIT_SHIFT_L5:
+			printf("L5\n");
+			break;
+		case BitShift::BIT_SHIFT_R3:
+			printf("R3\n");
+			break;
+		case BitShift::BIT_SHIFT_R4:
+			printf("R4\n");
+			break;
+		case BitShift::BIT_SHIFT_R5:
+			printf("R5\n");
+			break;
+		default:
+			break;
+		}
+
 		printf("gotit\n");
 	}
 	assert((captured & enemyPieces) != 0);
