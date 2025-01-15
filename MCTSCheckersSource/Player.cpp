@@ -43,7 +43,7 @@ bool Player::ExpandNode(Node* node)
 	for (Move move : moves)
 	{
 		Board newBoard = node->board.getBoardAfterMove(move);
-		Node* newNode = new Node(newBoard, node, node->colorToPlay == PieceColor::White ? PieceColor::Black : PieceColor::Black);
+		Node* newNode = new Node(newBoard, node, getEnemyColor(node->colorToPlay));
 		node->children.push_back(newNode);
 	}
 
@@ -102,7 +102,7 @@ Move* Player::GetBestMove()
 	//std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	//while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 20; i++)
 	{ 
 		Node* selectedNode = SelectNode();
 		assert(selectedNode != nullptr);
@@ -209,6 +209,9 @@ std::string Player::GenerateTreeString()
 		// Write the previous move if exists
 		if (node->prevMove != nullptr)
 			treeString << "\\nMove: " << node->prevMove->toString();
+
+		// color to play
+		treeString << "\nNext move color: " << (node->colorToPlay == PieceColor::White ? "White" : "Black");
 
 		treeString << "\"];\n";
 

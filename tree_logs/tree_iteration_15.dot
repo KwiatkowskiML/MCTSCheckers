@@ -1,8 +1,8 @@
 digraph Tree {
     node [shape=box, fontname="Arial"];
-    node0 [label="Games Played: 20\nScore: 10
+    node0 [label="Games Played: 16\nScore: 8
 Next move color: Black"];
-    node1 [label="Games Played: 4\nScore: 2\nUCT: 3.73082\nMove: a3-b4
+    node1 [label="Games Played: 4\nScore: 2\nUCT: 3.66511\nMove: a3-b4
 Next move color: White"];
     node2 [label="Games Played: 3\nScore: 1\nUCT: 2.35956
 Next move color: Black"];
@@ -26,7 +26,7 @@ Next move color: Black"];
     node2 -> node3;
     node1 -> node2;
     node0 -> node1;
-    node9 [label="Games Played: 3\nScore: 1\nUCT: 2.99858\nMove: f4-e5
+    node9 [label="Games Played: 3\nScore: 1\nUCT: 2.9227\nMove: f4-e5
 Next move color: White"];
     node10 [label="Games Played: 2\nScore: 0\nUCT: 1.4823
 Next move color: Black"];
@@ -50,43 +50,40 @@ Next move color: White"];
     node10 -> node16;
     node9 -> node10;
     node0 -> node9;
-    node17 [label="Games Played: 1\nScore: -1\nUCT: 2.46164\nMove: h4-g5
+    node17 [label="Games Played: 1\nScore: -1\nUCT: 2.33022\nMove: h4-g5
 Next move color: White"];
     node0 -> node17;
-    node18 [label="Games Played: 9\nScore: 7\nUCT: 8.15388\nMove: a5-b6
+    node18 [label="Games Played: 5\nScore: 5\nUCT: 6.48932\nMove: a5-b6
 Next move color: White"];
-    node19 [label="Games Played: 2\nScore: 2\nUCT: 4.09629
+    node19 [label="Games Played: 1\nScore: 1\nUCT: 3.53727
 Next move color: Black"];
-    node20 [label="Games Played: 1\nScore: 1\nUCT: 2.66511
-Next move color: White"];
-    node19 -> node20;
     node18 -> node19;
-    node21 [label="Games Played: 1\nScore: 1\nUCT: 3.96461
+    node20 [label="Games Played: 1\nScore: 1\nUCT: 3.53727
+Next move color: Black"];
+    node18 -> node20;
+    node21 [label="Games Played: 1\nScore: 1\nUCT: 3.53727
 Next move color: Black"];
     node18 -> node21;
-    node22 [label="Games Played: 1\nScore: 1\nUCT: 3.96461
+    node22 [label="Games Played: 1\nScore: 1\nUCT: 3.53727
 Next move color: Black"];
     node18 -> node22;
-    node23 [label="Games Played: 1\nScore: 1\nUCT: 3.96461
+    node23 [label="Games Played: 0\nScore: 0\nUCT: 3.40282e+38
 Next move color: Black"];
     node18 -> node23;
-    node24 [label="Games Played: 1\nScore: -1\nUCT: 1.96461
+    node24 [label="Games Played: 0\nScore: 0\nUCT: 3.40282e+38
 Next move color: Black"];
     node18 -> node24;
-    node25 [label="Games Played: 1\nScore: 1\nUCT: 3.96461
+    node25 [label="Games Played: 0\nScore: 0\nUCT: 3.40282e+38
 Next move color: Black"];
     node18 -> node25;
-    node26 [label="Games Played: 1\nScore: 1\nUCT: 3.96461
-Next move color: Black"];
-    node18 -> node26;
     node0 -> node18;
-    node27 [label="Games Played: 1\nScore: 1\nUCT: 4.46164\nMove: b2-c3
+    node26 [label="Games Played: 1\nScore: 1\nUCT: 4.33022\nMove: b2-c3
+Next move color: White"];
+    node0 -> node26;
+    node27 [label="Games Played: 1\nScore: 1\nUCT: 4.33022\nMove: f2-g3
 Next move color: White"];
     node0 -> node27;
-    node28 [label="Games Played: 1\nScore: 1\nUCT: 4.46164\nMove: f2-g3
+    node28 [label="Games Played: 1\nScore: -1\nUCT: 2.33022\nMove: f4-g5
 Next move color: White"];
     node0 -> node28;
-    node29 [label="Games Played: 1\nScore: -1\nUCT: 2.46164\nMove: f4-g5
-Next move color: White"];
-    node0 -> node29;
 }
