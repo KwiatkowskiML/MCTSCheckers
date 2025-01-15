@@ -34,3 +34,4 @@
 #define GAME_LOG_FILE "game.log"
 #define SIMULATION_LOG "simulation.log"
 #define TREE_VISUALIZATION_FILE "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree.dot"
+#define TREE_VISUALIZATION_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_logs\\tree_iteration_"

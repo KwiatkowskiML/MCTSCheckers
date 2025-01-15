@@ -35,6 +35,7 @@ public:
 
 	// Generate a DOT file for visualizing the decision tree using Graphviz
 	void GenerateDotFile(const std::string& filename);
+	std::string GenerateTreeString();
 	
 	// Destructor to clean up the decision tree
 	~Player() 
