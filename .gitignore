@@ -60,3 +60,8 @@ Makefile
 *.lastbuildstate
 *.vcxproj
 *.vcxproj.filters
+
+# grphviz
+*.dot
+game_logs
+tree_logs.pdf

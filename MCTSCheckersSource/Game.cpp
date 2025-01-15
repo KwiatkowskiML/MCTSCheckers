@@ -2,6 +2,8 @@
 #include "PlayerCPU.h"
 #include <fstream>
 
+#define LOG_GAME_TREE
+
 void Game::PlayGame()
 {
 	Board newBoard;
@@ -25,7 +27,7 @@ void Game::PlayGame()
 		}
 		newBoard = _whitePlayer->root->board.getBoardAfterMove(*whiteMove);
 
-		logFile << "White player move: " << whiteMove->toString() << std::endl;
+		logFile << i << ". White player move: " << whiteMove->toString() << std::endl;
 		logFile << newBoard.toString() << std::endl;
 
 		// Update black players board
@@ -98,11 +100,13 @@ void Game::PlayGameAsWhite()
 			}
 		} while (askAgain);
 
-		logFile << "White player move: " << whiteMove.toString() << std::endl;
-		logFile << newBoard.toString() << std::endl;
-
 		// update board
 		newBoard = newBoard.getBoardAfterMove(whiteMove);
+
+		// Logging white move
+		logFile << "White player move: " << whiteMove.toString() << std::endl;
+		logFile << newBoard.toString() << std::endl;
+		std::cout << newBoard.toString() << std::endl;
 
 		// Update black players board
 		_blackPlayer->SetBoard(newBoard);
@@ -116,8 +120,16 @@ void Game::PlayGameAsWhite()
 		}
 		newBoard = _blackPlayer->root->board.getBoardAfterMove(*blackMove);
 
+#ifdef LOG_GAME_TREE
+		std::string filename = TREE_GAME_LOG_PREFIX + std::to_string(i) + ".dot";
+		_blackPlayer->GenerateDotFile(filename);
+#endif // LOG_GAME_TREE
+
+		// logging into file
 		logFile << "Black player move: " << blackMove->toString() << std::endl;
 		logFile << newBoard.toString() << std::endl;
+
+		std::cout << "Black player move: " << blackMove->toString() << std::endl;
 	}
 }
 

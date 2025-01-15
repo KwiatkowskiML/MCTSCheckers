@@ -26,7 +26,7 @@
 #define WIN 1
 
 #define MAX_NO_CAPTURE_MOVES 10
-#define DEFAULT_TIME_LIMIT 1000 // in miliseconds
+#define DEFAULT_TIME_LIMIT 3000 // in miliseconds
 
 #define C 2 // Exploration parameter
 
@@ -35,3 +35,4 @@
 #define SIMULATION_LOG "simulation.log"
 #define TREE_VISUALIZATION_FILE "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree.dot"
 #define TREE_VISUALIZATION_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_logs\\tree_iteration_"
+#define TREE_GAME_LOG_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\game_logs\\tree_iteration_"

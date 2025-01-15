@@ -5,6 +5,8 @@
 #include <chrono>
 #include <sstream>
 
+// #define TREE_BUILD_DEBUG
+
 // Selection phase
 Node* Player::SelectNode()
 {
@@ -35,7 +37,7 @@ bool Player::ExpandNode(Node* node)
 		return false;
 
 	// Get all available moves
-	MoveList moves = node->board.getAvailableMoves(node->colorToPlay);
+	MoveList moves = node->board.getAvailableMoves(node->simulationColor);
 	if (moves.empty())
 		return false;
 
@@ -43,7 +45,7 @@ bool Player::ExpandNode(Node* node)
 	for (Move move : moves)
 	{
 		Board newBoard = node->board.getBoardAfterMove(move);
-		Node* newNode = new Node(newBoard, node, getEnemyColor(node->colorToPlay));
+		Node* newNode = new Node(newBoard, node, getEnemyColor(node->simulationColor));
 		node->children.push_back(newNode);
 	}
 
@@ -65,7 +67,7 @@ void Player::SetBoard(Board board)
 	for (Move move : moves)
 	{
 		Board newBoard = root->board.getBoardAfterMove(move);
-		Node* newNode = new Node(newBoard, root, color == PieceColor::White ? PieceColor::Black : PieceColor::White, new Move(move));
+		Node* newNode = new Node(newBoard, root, getEnemyColor(color), new Move(move));
 		root->children.push_back(newNode);
 	}
 }
@@ -76,7 +78,7 @@ void Player::BackPropagate(Node* node, int score)
 	Node* currentNode = node;
 
 	// if the node was simulating the enemy color, invert the score
-	if (currentNode->colorToPlay != color)
+	if (currentNode->simulationColor != color)
 		score = -score;
 
 	// Update current node score
@@ -99,11 +101,11 @@ Move* Player::GetBestMove()
 	// ----------------------------------------------
 
 	// Start the timer
-	//std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-	//while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
-	for (int i = 0; i < 20; i++)
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
 	{ 
+
 		Node* selectedNode = SelectNode();
 		assert(selectedNode != nullptr);
 		assert(selectedNode->isLeaf());
@@ -134,8 +136,10 @@ Move* Player::GetBestMove()
 			}
 		}
 
+#ifdef TREE_BUILD_DEBUG
 		std::string filename = TREE_VISUALIZATION_PREFIX + std::to_string(i) + ".dot";
 		GenerateDotFile(filename);
+#endif // TREE_BUILD_DEBUG		
 	}
 
 	// ----------------------------------------------
@@ -211,7 +215,7 @@ std::string Player::GenerateTreeString()
 			treeString << "\\nMove: " << node->prevMove->toString();
 
 		// color to play
-		treeString << "\nNext move color: " << (node->colorToPlay == PieceColor::White ? "White" : "Black");
+		treeString << "\nTurn: " << (node->simulationColor == PieceColor::White ? "White" : "Black");
 
 		treeString << "\"];\n";
 
