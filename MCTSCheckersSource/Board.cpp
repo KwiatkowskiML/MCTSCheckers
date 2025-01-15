@@ -11,9 +11,9 @@
 //----------------------------------------------------------------
 // Move generation
 //----------------------------------------------------------------
-MoveList Board::getAvailableMoves(PieceColor color) const
+MoveList Board::getAvailableMoves(PieceColor playerColor) const
 {
-    return MoveGenerator::generateMoves(_pieces, color);
+    return MoveGenerator::generateMoves(_pieces, playerColor);
 }
 
 Board Board::getBoardAfterMove(const Move& move) const
@@ -71,9 +71,9 @@ UINT Board::getAllFieldsBetween(UINT start, UINT end)
 //----------------------------------------------------------------
 // Simulation
 //----------------------------------------------------------------
-int Board::simulateGame(PieceColor color) const
+int Board::simulateGame(PieceColor playerColor) const
 {
-    PieceColor currentMoveColor = color;
+    PieceColor currentMoveColor = playerColor;
 	Board newBoard = *this;
 
     int noCaptureMoves = 0;
@@ -88,7 +88,7 @@ int Board::simulateGame(PieceColor color) const
 
         // No moves available - game is over
         if (moves.empty()) {
-            return currentMoveColor == color ? LOOSE : WIN;
+            return currentMoveColor == PieceColor::White ? BLACK_WIN : WHITE_WIN;
         }
 
 		// Check if the no capture moves limit has beeen exceeded

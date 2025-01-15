@@ -58,11 +58,11 @@ int main()
         UINT whitePieces2 = (1ULL << 24) | (1ULL << 22) | (1ULL << 19);
         UINT blackPieces2 = (1ULL << 17) | (1ULL << 11) | (1ULL << 4);
 
-        Board board(whitePieces2, blackPieces2, 0);
-        std::cout << board.toString() << std::endl;
+        Board boardAfterMove(whitePieces2, blackPieces2, 0);
+        std::cout << boardAfterMove.toString() << std::endl;
 
         Player* blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
-        blackPlayer->SetBoard(board);
+        blackPlayer->SetBoard(boardAfterMove);
         Move* bestMove = blackPlayer->GetBestMove();
         std::cout << "Best move: " << bestMove->toString() << std::endl;
 

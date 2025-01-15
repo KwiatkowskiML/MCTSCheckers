@@ -2,6 +2,6 @@
 
 int PlayerCPU::Simulate(Node* node)
 {
-	int result = node->board.simulateGame(node->simulationColor);
+	int result = node->boardAfterMove.simulateGame(getEnemyColor(node->moveColor));
 	return result;
 }

@@ -18,12 +18,12 @@ public:
 	UINT getKings() const { return _pieces.kings; }
 
 	// Move generation
-	MoveList getAvailableMoves(PieceColor color) const;
+	MoveList getAvailableMoves(PieceColor playerColor) const;
 	Board getBoardAfterMove(const Move& move) const;
 	static UINT getAllFieldsBetween(UINT start, UINT end);
 
 	// Simulation
-	int simulateGame(PieceColor color) const;
+	int simulateGame(PieceColor playerColor) const;
 
 	// Visualization
 	std::string toString() const;

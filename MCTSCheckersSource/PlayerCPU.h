@@ -4,7 +4,7 @@
 class PlayerCPU : public Player
 {
 public:
-	PlayerCPU(PieceColor color, int timeLimit) : Player(color, timeLimit) {};
+	PlayerCPU(PieceColor playerColor, int timeLimit) : Player(playerColor, timeLimit) {};
 	int Simulate(Node* node) override;
 };
 

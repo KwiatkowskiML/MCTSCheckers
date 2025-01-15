@@ -5,7 +5,7 @@ enum class PieceColor {
     Black
 };
 
-constexpr PieceColor getEnemyColor(PieceColor color)
+constexpr PieceColor getEnemyColor(PieceColor playerColor)
 {
-    return color == PieceColor::White ? PieceColor::Black : PieceColor::White;
+    return playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White;
 }

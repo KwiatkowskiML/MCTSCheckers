@@ -6,17 +6,17 @@ class Player
 {
 public:
 	int timeLimit;
-	const PieceColor color;
+	const PieceColor playerColor;
 	Node* root = nullptr;
 
 	// Constructor to initialize the player and the root of the decision tree
-	Player(PieceColor color, int timeLimit) : color(color), timeLimit(timeLimit) 
+	Player(PieceColor playerColor, int timeLimit) : playerColor(playerColor), timeLimit(timeLimit) 
 	{
 		SetBoard(Board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0));
 	};
 
 	// Reset the tree with a new board
-	void SetBoard(Board board);
+	void SetBoard(Board boardAfterMove);
 
 	// This must be implemented by derived classes
 	virtual int Simulate(Node* node) = 0;

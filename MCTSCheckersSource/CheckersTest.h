@@ -4,7 +4,7 @@
 
 class CheckersTest {
 protected:
-    BitBoard board;
+    BitBoard boardAfterMove;
     MoveGenerator moveGen;
     int passedTests = 0;
     int totalTests = 0;

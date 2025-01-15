@@ -2,7 +2,7 @@
 #include "Board.h"
 #include "MoveGenerator.h"
 
-Move::Move(const std::string& moveStr, PieceColor col) : color(col) {
+Move::Move(const std::string& moveStr, PieceColor col) : playerColor(col) {
 	try {
 		// Initialize captured to 0
 		captured = 0;
@@ -60,15 +60,15 @@ Move Move::getExtendedMove(Move continuation, UINT capt) const
 	}
 
 	UINT newCaptured = captured | capt;
-	return Move(newSteps, newCaptured, color);
+	return Move(newSteps, newCaptured, playerColor);
 }
 
 BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation) const
 {
 	UINT source = getSource();
 	UINT destination = getDestination();
-	UINT currentPieces = sourceBitboard.getPieces(color);
-	UINT enemyPieces = sourceBitboard.getPieces(getEnemyColor(color));
+	UINT currentPieces = sourceBitboard.getPieces(playerColor);
+	UINT enemyPieces = sourceBitboard.getPieces(getEnemyColor(playerColor));
 
 	// Deleting the initial position of the moved piece
 	UINT newCurrentPieces = currentPieces & ~source;
@@ -97,15 +97,15 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool include
 	{
 		for (UINT step : steps)
 		{
-			if (color == PieceColor::White && (step & WHITE_CROWNING))
+			if (playerColor == PieceColor::White && (step & WHITE_CROWNING))
 				newKings |= destination;
-			if (color == PieceColor::Black && (step & BLACK_CROWNING))
+			if (playerColor == PieceColor::Black && (step & BLACK_CROWNING))
 				newKings |= destination;
 		}
 	}
 
-	UINT newWhitePawns = color == PieceColor::White ? newCurrentPieces : newEnemyPieces;
-	UINT newBlackPawns = color == PieceColor::Black ? newCurrentPieces : newEnemyPieces;
+	UINT newWhitePawns = playerColor == PieceColor::White ? newCurrentPieces : newEnemyPieces;
+	UINT newBlackPawns = playerColor == PieceColor::Black ? newCurrentPieces : newEnemyPieces;
 
 	BitBoard newbitBoard(newWhitePawns, newBlackPawns, newKings);
 	return newbitBoard;

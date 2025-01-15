@@ -25,7 +25,7 @@ void Game::PlayGame()
 			logFile << "White player has no moves left. Black player wins!" << std::endl;
 			break;
 		}
-		newBoard = _whitePlayer->root->board.getBoardAfterMove(*whiteMove);
+		newBoard = _whitePlayer->root->boardAfterMove.getBoardAfterMove(*whiteMove);
 
 		logFile << i << ". White player move: " << whiteMove->toString() << std::endl;
 		logFile << newBoard.toString() << std::endl;
@@ -40,7 +40,7 @@ void Game::PlayGame()
 			logFile << "Black player has no moves left. White player wins!" << std::endl;
 			break;
 		}
-		newBoard = _blackPlayer->root->board.getBoardAfterMove(*blackMove);
+		newBoard = _blackPlayer->root->boardAfterMove.getBoardAfterMove(*blackMove);
 
 		logFile << "Black player move: " << blackMove->toString() << std::endl;
 		logFile << newBoard.toString() << std::endl;
@@ -118,7 +118,7 @@ void Game::PlayGameAsWhite()
 			logFile << "Black player has no moves left. White player wins!" << std::endl;
 			break;
 		}
-		newBoard = _blackPlayer->root->board.getBoardAfterMove(*blackMove);
+		newBoard = _blackPlayer->root->boardAfterMove.getBoardAfterMove(*blackMove);
 
 #ifdef LOG_GAME_TREE
 		std::string filename = TREE_GAME_LOG_PREFIX + std::to_string(i) + ".dot";

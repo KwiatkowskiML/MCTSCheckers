@@ -5,7 +5,7 @@
 
 class JumpersTest : public CheckersTest {
 private:
-    bool testJumper(const char* testName, UINT expectedJumpers, PieceColor color = PieceColor::White);
+    bool testJumper(const char* testName, UINT expectedJumpers, PieceColor playerColor = PieceColor::White);
 
 public:
     void runAllTests() override;

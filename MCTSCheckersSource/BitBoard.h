@@ -14,6 +14,6 @@ struct BitBoard {
 	// Getters
     UINT getAllPieces() const { return whitePawns | blackPawns; }
     UINT getEmptyFields() const { return ~getAllPieces(); }
-	UINT getEnemyPieces(PieceColor color) const { return color == PieceColor::White ? blackPawns : whitePawns; }
-	UINT getPieces(PieceColor color) const { return color == PieceColor::White ? whitePawns : blackPawns; }
+	UINT getEnemyPieces(PieceColor playerColor) const { return playerColor == PieceColor::White ? blackPawns : whitePawns; }
+	UINT getPieces(PieceColor playerColor) const { return playerColor == PieceColor::White ? whitePawns : blackPawns; }
 };

@@ -13,20 +13,20 @@ class Move {
 private:
 	std::vector<UINT> steps{};
 	UINT captured;
-	PieceColor color;
-
 public:
+	PieceColor playerColor;
+
 	Move(UINT src, UINT dst, UINT capt = 0, PieceColor col = PieceColor::White)
-		: captured(capt), color(col)
+		: captured(capt), playerColor(col)
 	{
 		steps.push_back(src);
 		steps.push_back(dst);
 	}
 	Move(std::vector<UINT> steps, UINT capt = 0, PieceColor col = PieceColor::White)
-		: steps(steps), captured(capt), color(col) {
+		: steps(steps), captured(capt), playerColor(col) {
 	}
 	Move(const std::string& moveString, PieceColor col = PieceColor::White);
-	Move(const Move& other) : steps(other.steps), captured(other.captured), color(other.color) {}
+	Move(const Move& other) : steps(other.steps), captured(other.captured), playerColor(other.playerColor) {}
 
 	Move getExtendedMove(Move continuation, UINT capt) const;
 	BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation = true) const;
@@ -41,10 +41,10 @@ public:
 	UINT getCaptured() const { return captured; }
 	bool isCapture() const;
 	std::string toString() const;
-	PieceColor getColor() const { return color; }
+	PieceColor getColor() const { return playerColor; }
 
 	bool operator==(const Move& other) const {
-		return steps == other.steps && captured == other.captured && color == other.color;
+		return steps == other.steps && captured == other.captured && playerColor == other.playerColor;
 	}
 };
 

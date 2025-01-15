@@ -7,6 +7,26 @@
 
 // #define TREE_BUILD_DEBUG
 
+// Set players board
+void Player::SetBoard(Board board)
+{
+	// Clear the tree
+	if (root)
+		delete root;
+
+	// Initialize the root node
+	root = new Node(board, nullptr, playerColor);
+
+	// Roots children initialization with saving each move
+	MoveList moves = root->boardAfterMove.getAvailableMoves(playerColor);
+	for (Move move : moves)
+	{
+		Board newBoard = root->boardAfterMove.getBoardAfterMove(move);
+		Node* newNode = new Node(newBoard, root, playerColor, new Move(move));
+		root->children.push_back(newNode);
+	}
+}
+
 // Selection phase
 Node* Player::SelectNode()
 {
@@ -18,7 +38,7 @@ Node* Player::SelectNode()
 		Node* bestNode = nullptr;
 		for (Node* child : currentNode->children)
 		{
-			float uct = child->calculateUCT(color);
+			float uct = child->calculateUCT(playerColor);
 			if (uct > maxUCT)
 			{
 				maxUCT = uct;
@@ -36,50 +56,26 @@ bool Player::ExpandNode(Node* node)
 	if (!node->isLeaf())
 		return false;
 
-	// Get all available moves
-	MoveList moves = node->board.getAvailableMoves(node->simulationColor);
+	// Get all available enemy moves
+	MoveList moves = node->boardAfterMove.getAvailableMoves(getEnemyColor(node->moveColor));
 	if (moves.empty())
 		return false;
 
 	// Create a new node for each move
 	for (Move move : moves)
 	{
-		Board newBoard = node->board.getBoardAfterMove(move);
-		Node* newNode = new Node(newBoard, node, getEnemyColor(node->simulationColor));
+		Board newBoard = node->boardAfterMove.getBoardAfterMove(move);
+		Node* newNode = new Node(newBoard, node, getEnemyColor(node->moveColor), new Move(move));
 		node->children.push_back(newNode);
 	}
 
 	return true;
 }
 
-// Set players board
-void Player::SetBoard(Board board)
-{
-	// Clear the tree
-	if (root)
-		delete root;
-
-	// Initialize the root node
-	root = new Node(board, nullptr, color);
-	
-	// Roots children initialization with saving each move
-	MoveList moves = root->board.getAvailableMoves(color);
-	for (Move move : moves)
-	{
-		Board newBoard = root->board.getBoardAfterMove(move);
-		Node* newNode = new Node(newBoard, root, getEnemyColor(color), new Move(move));
-		root->children.push_back(newNode);
-	}
-}
-
 // This function is called when a simulation is done. It backpropagates the score from the simulation node to the root node.
 void Player::BackPropagate(Node* node, int score)
 {
 	Node* currentNode = node;
-
-	// if the node was simulating the enemy color, invert the score
-	if (currentNode->simulationColor != color)
-		score = -score;
 
 	// Update current node score
 	currentNode->gamesPlayed++;
@@ -101,9 +97,10 @@ Move* Player::GetBestMove()
 	// ----------------------------------------------
 
 	// Start the timer
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	//std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-	while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
+	//while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
+	for (int i = 0; i < 1000; i++)
 	{ 
 
 		Node* selectedNode = SelectNode();
@@ -116,7 +113,19 @@ Move* Player::GetBestMove()
 		if (selectedNode->gamesPlayed == 0)
 		{
 			simulationResult = Simulate(selectedNode);
-			BackPropagate(selectedNode, simulationResult);
+
+			int simulationScore;
+
+			if (simulationResult == WHITE_WIN && playerColor == PieceColor::White)
+				simulationScore = WIN;
+			else if (simulationResult == BLACK_WIN && playerColor == PieceColor::Black)
+				simulationScore = WIN;
+			else if (simulationResult == DRAW)
+				simulationScore = DRAW;
+			else
+				simulationScore = LOOSE;
+
+			BackPropagate(selectedNode, simulationScore);
 		}
 		else
 		{
@@ -127,7 +136,19 @@ Move* Player::GetBestMove()
 			{
 				// Simulation phase
 				simulationResult = Simulate(selectedNode->children[0]);
-				BackPropagate(selectedNode->children[0], simulationResult);
+
+				int simulationScore;
+
+				if (simulationResult == WHITE_WIN && playerColor == PieceColor::White)
+					simulationScore = WIN;
+				else if (simulationResult == BLACK_WIN && playerColor == PieceColor::Black)
+					simulationScore = WIN;
+				else if (simulationResult == DRAW)
+					simulationScore = DRAW;
+				else
+					simulationScore = LOOSE;
+
+				BackPropagate(selectedNode->children[0], simulationScore);
 			}
 			else
 			{
@@ -145,15 +166,15 @@ Move* Player::GetBestMove()
 	// ----------------------------------------------
 	// Select the best move
 	// ----------------------------------------------
-	float maxUCT = -FLT_MAX;
+	float bestAverage = -FLT_MAX;
 	Node* bestNode = nullptr;
 	Move* bestMove = nullptr;
 	for (Node* child : root->children)
 	{
-		float uct = child->calculateUCT(color);
-		if (uct > maxUCT)
+		float average = (float)child->score / (float)child->gamesPlayed;
+		if (average > bestAverage)
 		{
-			maxUCT = uct;
+			bestAverage = average;
 			bestNode = child;
 		}
 	}
@@ -208,14 +229,14 @@ std::string Player::GenerateTreeString()
 
 		// Write the UCT score if parent exists
 		if (node->parent != nullptr)
-			treeString << "\\nUCT: " << node->calculateUCT(color);
+			treeString << "\\nUCT: " << node->calculateUCT(playerColor);
 
 		// Write the previous move if exists
 		if (node->prevMove != nullptr)
 			treeString << "\\nMove: " << node->prevMove->toString();
 
 		// color to play
-		treeString << "\nTurn: " << (node->simulationColor == PieceColor::White ? "White" : "Black");
+		treeString << "\nTurn: " << (node->moveColor == PieceColor::White ? "White" : "Black");
 
 		treeString << "\"];\n";
 

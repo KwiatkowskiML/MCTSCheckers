@@ -4,16 +4,25 @@
 class Node
 {
 public:
-	Board board;
+	// Neighbors nodes
 	Node* parent;
 	std::vector<Node*> children;
-	PieceColor simulationColor;
+
+	// Move information
+	Board boardAfterMove;
+	PieceColor moveColor;
 	Move* prevMove;
 
+	// UCT parameters
 	int gamesPlayed = 0;
 	int score = 0;
 
+	Node(Board boardAfterMove, Node* parent, PieceColor moveColor, Move* prevMove = nullptr) : boardAfterMove(boardAfterMove), parent(parent), moveColor(moveColor), prevMove(prevMove) {};
+
+	// Checking whether the node is a leaf
 	bool isLeaf() const { return children.empty(); }
+
+	// UCT formula calculation
 	float calculateUCT(PieceColor playerColor) const 
 	{ 
 		float result;
@@ -22,15 +31,13 @@ public:
 			return FLT_MAX;
 
 		// If colorToPlay is the color of the player, it means that the move has been done by the enemy
-		float k = simulationColor == playerColor ? -1.0f : 1.0f;
+		float k = moveColor != playerColor ? -1.0f : 1.0f;
 
 		// Calculating the formula
 		result = k * ((float)score) + C * sqrt(log((float)parent->gamesPlayed) / (float)gamesPlayed);
 
 		return result;
 	}
-
-	Node(Board board, Node* parent, PieceColor simulationColor, Move* prevMove = nullptr) : board(board), parent(parent), simulationColor(simulationColor), prevMove(prevMove) {};
 
 	static void DeleteTree(Node* node)
 	{
