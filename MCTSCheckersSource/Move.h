@@ -7,6 +7,8 @@
 #include "BitBoard.h"
 #include <string>
 
+
+
 class Move {
 private:
 	std::vector<UINT> steps{};
@@ -20,16 +22,19 @@ public:
 		steps.push_back(src);
 		steps.push_back(dst);
 	}
-
 	Move(std::vector<UINT> steps, UINT capt = 0, PieceColor col = PieceColor::White)
 		: steps(steps), captured(capt), color(col) {
 	}
-
+	Move(const std::string& moveString, PieceColor col = PieceColor::White);
 	Move(const Move& other) : steps(other.steps), captured(other.captured), color(other.color) {}
 
 	Move getExtendedMove(Move continuation, UINT capt) const;
 	BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation = true) const;
 	const std::vector<UINT>& getSteps() const;
+
+	static bool containsMove(const std::vector<Move>& moveList, const Move& move) {
+		return std::find(moveList.begin(), moveList.end(), move) != moveList.end();
+	}
 
 	UINT getDestination() const;
 	UINT getSource() const;
@@ -44,3 +49,4 @@ public:
 };
 
 using MoveList = std::vector<Move>;
+

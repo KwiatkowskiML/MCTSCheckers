@@ -42,13 +42,90 @@ void Game::PlayGame()
 
 		logFile << "Black player move: " << blackMove->toString() << std::endl;
 		logFile << newBoard.toString() << std::endl;
+
+		// Set up white players board
+		_whitePlayer->SetBoard(newBoard);
 	}
 }
 
-void Game::GetGameSetup(Player*& whitePlayer, Player*& blackPlayer)
+void Game::PlayGameAsWhite()
+{
+	Board newBoard(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
+	bool gameEnded = false;
+	std::ofstream logFile(GAME_LOG_FILE);
+
+	if (!logFile) {
+		std::cerr << "Error opening log file!" << std::endl;
+		return;
+	}
+
+	for (int i = 0; i < 100; i++)
+	{
+		// White player move
+		std::cout << newBoard.toString() << std::endl;
+
+		// get white player move
+		std::string move;
+		Move whiteMove(0,0);
+		MoveList possibleWhiteMoves = newBoard.getAvailableMoves(PieceColor::White);
+
+		// Cehck if player input move is correct
+		bool askAgain = false;
+		do {
+			std::cout << "Enter your move: ";
+			std::cin >> move;
+			try
+			{
+				whiteMove = Move(move, PieceColor::White); 
+				if (!Move::containsMove(possibleWhiteMoves, whiteMove))
+				{
+					std::cout << "Invalid move!" << std::endl << "Possible moves:" << std::endl;
+					for (const Move& m : possibleWhiteMoves)
+					{
+						std::cout << m.toString() << std::endl;
+					}
+					askAgain = true;
+				}
+				else
+				{
+					askAgain = false;
+				}
+			}
+			catch (const std::exception&)
+			{
+				std::cout << "Invalid input!" << std::endl;
+				askAgain = true;
+			}
+		} while (askAgain);
+
+		logFile << "White player move: " << whiteMove.toString() << std::endl;
+		logFile << newBoard.toString() << std::endl;
+
+		// update board
+		newBoard = newBoard.getBoardAfterMove(whiteMove);
+
+		// Update black players board
+		_blackPlayer->SetBoard(newBoard);
+
+		// Black player move
+		Move* blackMove = _blackPlayer->GetBestMove();
+		if (blackMove == nullptr)
+		{
+			logFile << "Black player has no moves left. White player wins!" << std::endl;
+			break;
+		}
+		newBoard = _blackPlayer->root->board.getBoardAfterMove(*blackMove);
+
+		logFile << "Black player move: " << blackMove->toString() << std::endl;
+		logFile << newBoard.toString() << std::endl;
+	}
+}
+
+int Game::GetGameSetup(Player*& whitePlayer, Player*& blackPlayer)
 {
 	std::string input;
 	bool shouldAskAgain;
+	int result = 0;
 
 	// Get the white player type
 	std::cout << "White:" << std::endl;
@@ -61,7 +138,7 @@ void Game::GetGameSetup(Player*& whitePlayer, Player*& blackPlayer)
 		switch (stoi(input))
 		{
 		case 1:
-			std::cout << "Not implemented yet" << std::endl;
+			result = 1;
 			break;
 		case 2:
 			whitePlayer = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
@@ -95,4 +172,6 @@ void Game::GetGameSetup(Player*& whitePlayer, Player*& blackPlayer)
 			break;
 		}
 	} while (shouldAskAgain);
+
+	return result;
 }

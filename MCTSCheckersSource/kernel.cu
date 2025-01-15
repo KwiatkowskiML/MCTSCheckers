@@ -27,14 +27,27 @@ int main()
 
 	delete player;*/
 
-    Player* whitePlayer;
-	Player* blackPlayer;
-	Game::GetGameSetup(whitePlayer, blackPlayer);
-	Game game(whitePlayer, blackPlayer);
-	game.PlayGame();
+    Player* whitePlayer = nullptr;
+	Player* blackPlayer = nullptr;
+	int setup = Game::GetGameSetup(whitePlayer, blackPlayer);
 
-    delete whitePlayer;
-	delete blackPlayer;
+    Game game(whitePlayer, blackPlayer);
+
+    switch (setup)
+    {
+	case 1:
+        game.PlayGameAsWhite();
+		break;
+    default:
+		game.PlayGame();
+        break;
+    }
+
+	if (whitePlayer != nullptr)
+        delete whitePlayer;
+	
+	if (blackPlayer != nullptr)
+        delete blackPlayer;
 
     return 0;
 }

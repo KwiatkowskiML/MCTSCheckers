@@ -6,9 +6,10 @@
 
 class MoveGenerator {
 private:
-	static BitShift getNextShift(BitShift shift, int iteration, UINT position);
+	
 public:
     static MoveList generateMoves(const BitBoard& pieces, PieceColor color);
+    static BitShift getNextShift(BitShift shift, int iteration, UINT position);
 
 	// Getting moveable pieces
 	static UINT getAllMovers(const BitBoard& pieces, PieceColor color);

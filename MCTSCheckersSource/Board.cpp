@@ -4,6 +4,7 @@
 #include <random>
 #include <fstream>
 #include <sstream>
+#include "ShiftMap.h"
 
 #define DEBUG
 
@@ -24,6 +25,47 @@ Board Board::getBoardAfterMove(const Move& move) const
 
 	Board newBoard(newWhitePawns, newBlackPawns, newKings);
     return newBoard;
+}
+
+UINT Board::getAllFieldsBetween(UINT start, UINT end)
+{
+    BitShift shift;
+    UINT captured = 0;
+
+    for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
+        shift = static_cast<BitShift>(i);
+        
+		UINT tempPosition = start;
+        BitShift nextShift = shift;
+        int iteration = 1;
+		while (tempPosition && tempPosition != end) {
+			tempPosition = ShiftMap::shift(tempPosition, nextShift);
+			nextShift = MoveGenerator::getNextShift(shift, iteration, tempPosition);
+			iteration++;
+
+			if (tempPosition == end) {
+                break;
+			}
+		}
+		if (tempPosition == end) {
+            break;
+		}
+    }
+
+    UINT tempPosition = start;
+    BitShift nextShift = shift;
+    int iteration = 1;
+    while (tempPosition && tempPosition != end) {
+        tempPosition = ShiftMap::shift(tempPosition, nextShift);
+        nextShift = MoveGenerator::getNextShift(shift, iteration, tempPosition);
+        iteration++;
+
+        if (tempPosition != end) {
+			captured |= tempPosition;
+        }
+    }
+
+	return captured;
 }
 
 //----------------------------------------------------------------
@@ -163,7 +205,7 @@ void Board::printBitboard(UINT bitboard)
 // Field positioning
 //----------------------------------------------------------------
 
-const std::unordered_map<UINT, std::string> Board::fieldMapping = {
+const std::unordered_map<UINT, std::string> Board::fieldToStringMapping = {
     {1u, "a1"}, {1u << 1, "c1"}, {1u << 2, "e1"}, {1u << 3, "g1"},
     {1u << 4, "b2"}, {1u << 5, "d2"}, {1u << 6, "f2"}, {1u << 7, "h2"},
     {1u << 8, "a3"}, {1u << 9, "c3"}, {1u << 10, "e3"}, {1u << 11, "g3"},
@@ -173,3 +215,11 @@ const std::unordered_map<UINT, std::string> Board::fieldMapping = {
     {1u << 24, "a7"}, {1u << 25, "c7"}, {1u << 26, "e7"}, {1u << 27, "g7"},
     {1u << 28, "b8"}, {1u << 29, "d8"}, {1u << 30, "f8"}, {1u << 31, "h8"}
 };
+
+const std::unordered_map<std::string, UINT> Board::stringToFieldMapping = [] {
+    std::unordered_map<std::string, UINT> map;
+    for (const auto& pair : Board::fieldToStringMapping) {
+        map[pair.second] = pair.first;
+    }
+    return map;
+    }();

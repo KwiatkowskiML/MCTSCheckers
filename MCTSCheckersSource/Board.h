@@ -8,9 +8,9 @@
 
 class Board {
 private:
-    BitBoard _pieces;
+	BitBoard _pieces;
 public:
-    Board(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
+	Board(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
 	Board() : _pieces(0, 0, 0) {};
 
 	// Getters
@@ -18,16 +18,18 @@ public:
 	UINT getKings() const { return _pieces.kings; }
 
 	// Move generation
-    MoveList getAvailableMoves(PieceColor color) const;
-    Board getBoardAfterMove(const Move& move) const;
+	MoveList getAvailableMoves(PieceColor color) const;
+	Board getBoardAfterMove(const Move& move) const;
+	static UINT getAllFieldsBetween(UINT start, UINT end);
 
-    // Simulation
+	// Simulation
 	int simulateGame(PieceColor color) const;
 
-    // Visualization
-    std::string toString() const;
-    static void printBitboard(UINT bitboard);
+	// Visualization
+	std::string toString() const;
+	static void printBitboard(UINT bitboard);
 
-    // Field positioning
-    const static std::unordered_map<UINT, std::string> fieldMapping;
+	// Field positioning
+	const static std::unordered_map<UINT, std::string> fieldToStringMapping;
+	const static std::unordered_map<std::string, UINT> stringToFieldMapping;
 };

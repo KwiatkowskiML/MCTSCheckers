@@ -9,7 +9,8 @@ private:
 public:
 	Game(Player* whitePlayer, Player* blackPlayer) : _whitePlayer(whitePlayer), _blackPlayer(blackPlayer) {};
 	void PlayGame();
-	static void GetGameSetup(Player*& whitePlayer, Player*& blackPlayer);
+	void PlayGameAsWhite();
+	static int GetGameSetup(Player*& whitePlayer, Player*& blackPlayer);
 	~Game() {};
 };
 
