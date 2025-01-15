@@ -162,14 +162,23 @@ void Player::GenerateDotFile(const std::string& filename)
 
 	// Helper function to traverse and generate nodes
 	std::function<void(const Node*, int&)> writeNode;
-	writeNode = [&dotFile, &writeNode](const Node* node, int& nodeId) -> void {
+	writeNode = [&dotFile, &writeNode, this](const Node* node, int& nodeId) -> void {
 		if (!node)
 			return;
 
 		int currentNodeId = nodeId++;
 		// Write the current node with gamesPlayed and score
 		dotFile << "    node" << currentNodeId << " [label=\"Games Played: "
-			<< node->gamesPlayed << "\\nScore: " << node->score << "\"];\n";
+			<< node->gamesPlayed << "\\nScore: " << node->score;
+
+		// write the uct score
+		if (node->parent != nullptr)
+			dotFile << "\\nUCT: " << node->calculateUCT(color);
+
+		if (node->prevMove != nullptr)
+			dotFile << "\\nMove: " << node->prevMove->toString();
+
+		dotFile << "\"];\n";
 
 		for (const Node* child : node->children)
 		{
