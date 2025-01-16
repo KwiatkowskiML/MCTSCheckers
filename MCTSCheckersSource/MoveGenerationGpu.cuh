@@ -1,6 +1,9 @@
 #pragma once
 #include "ShiftGpu.cuh"
 
+__device__ __host__ BitShift getNextShift(BitShift shift, int iteration, UINT position);
+__device__ __host__ UINT getMoversInShift(BitBoard pieces, PieceColor playerColor, BitShift shift);
+__device__ __host__ UINT getJumpersInShift(BitBoard pieces, PieceColor playerColor, BitShift shift, UINT captured);
 
 //----------------------------------------------------------------
 // BitBoard functions
@@ -10,6 +13,11 @@ __device__ __host__ UINT getAllPieces(BitBoard bitboard) { return bitboard.white
 __device__ __host__ UINT getEmptyFields(BitBoard bitboard) { return ~getAllPieces(bitboard); }
 __device__ __host__ UINT getEnemyPieces(BitBoard bitboard, PieceColor playerColor) { return playerColor == PieceColor::White ? bitboard.blackPawns : bitboard.whitePawns; }
 __device__ __host__ UINT getPieces(BitBoard bitboard, PieceColor playerColor) { return playerColor == PieceColor::White ? bitboard.whitePawns : bitboard.blackPawns; }
+
+__device__ __host__ PieceColor getEnemyColorGpu(PieceColor playerColor)
+{
+	return playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White;
+}
 
 //----------------------------------------------------------------
 // Generating moves
@@ -62,8 +70,7 @@ MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor playerC
 // Getting moveable pieces
 //----------------------------------------------------------------
 
-/*
-UINT MoveGenerator::getAllMovers(const BitBoard& pieces, PieceColor playerColor)
+__device__ __host__ UINT getAllMovers(const BitBoard& pieces, PieceColor playerColor)
 {
 	UINT movers = 0;
 
@@ -73,29 +80,26 @@ UINT MoveGenerator::getAllMovers(const BitBoard& pieces, PieceColor playerColor)
 	}
 
 	return movers;
-}*/
+}
 
-/*
-UINT MoveGenerator::getAllJumpers(const BitBoard& pieces, PieceColor playerColor)
+__device__ __host__ UINT getAllJumpers(const BitBoard& pieces, PieceColor playerColor)
 {
 	UINT jumpers = 0;
 
 	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
 		BitShift shift = static_cast<BitShift>(i);
-		jumpers |= getJumpersInShift(pieces, playerColor, shift);
+		jumpers |= getJumpersInShift(pieces, playerColor, shift, 0);
 	}
 
 	return jumpers;
 }
-*/
 
-/*
-UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor playerColor, BitShift shift, UINT captured)
+__device__ __host__ UINT getJumpersInShift(BitBoard pieces, PieceColor playerColor, BitShift shift, UINT captured)
 {
-	const UINT emptyFields = pieces.getEmptyFields();
-	const UINT currentPieces = pieces.getPieces(playerColor);
-	const UINT kings = currentPieces & pieces.kings;
-	const UINT enemyPieces = pieces.getPieces(getEnemyColor(playerColor));
+	UINT emptyFields = getEmptyFields(pieces);
+	UINT currentPieces = getPieces(pieces, playerColor);
+	UINT kings = currentPieces & pieces.kings;
+	UINT enemyPieces = getPieces(pieces, getEnemyColorGpu(playerColor));
 
 	UINT jumpers = 0;
 	UINT captPieces = 0;
@@ -103,21 +107,21 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor playerC
 	// Finding capturable pieces
 	if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
 	{
-		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L4) & enemyPieces;
+		captPieces |= applyShift(emptyFields, BitShift::BIT_SHIFT_L4) & enemyPieces;
 	}
 	else if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
 	{
-		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R4) & enemyPieces;
+		captPieces |= applyShift(emptyFields, BitShift::BIT_SHIFT_R4) & enemyPieces;
 	}
 	else if (shift == BitShift::BIT_SHIFT_R4)
 	{
-		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L3) & enemyPieces;
-		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_L5) & enemyPieces;
+		captPieces |= applyShift(emptyFields, BitShift::BIT_SHIFT_L3) & enemyPieces;
+		captPieces |= applyShift(emptyFields, BitShift::BIT_SHIFT_L5) & enemyPieces;
 	}
 	else if (shift == BitShift::BIT_SHIFT_L4)
 	{
-		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R3) & enemyPieces;
-		captPieces |= ShiftMap::shift(emptyFields, BitShift::BIT_SHIFT_R5) & enemyPieces;
+		captPieces |= applyShift(emptyFields, BitShift::BIT_SHIFT_R3) & enemyPieces;
+		captPieces |= applyShift(emptyFields, BitShift::BIT_SHIFT_R5) & enemyPieces;
 	}
 
 	// No pieces to capture
@@ -125,8 +129,8 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor playerC
 		return jumpers;
 
 	// Get the pieces that can capture enemy pieces
-	BitShift reverseShift = ShiftMap::getOpposite(shift);
-	jumpers |= ShiftMap::shift(captPieces, reverseShift) & currentPieces;
+	BitShift reverseShift = getOppositeShift(shift);
+	jumpers |= applyShift(captPieces, reverseShift) & currentPieces;
 
 	// Find the kings that can capture black pawns
 	UINT nonTaggedKings = kings & ~jumpers;
@@ -146,7 +150,7 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor playerC
 				if (nextShift == BitShift::BIT_SHIFT_NONE)
 					break;
 
-				movedCurrentKing = ShiftMap::shift(movedCurrentKing, nextShift);
+				movedCurrentKing = applyShift(movedCurrentKing, nextShift);
 				iteration++;
 
 				// found captured piece on its way, there is nothing to do
@@ -184,8 +188,41 @@ UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor playerC
 
 	return jumpers;
 }
-*/
 
+__device__ __host__ UINT getMoversInShift(BitBoard pieces, PieceColor playerColor, BitShift shift)
+{
+	UINT emptyFields = getEmptyFields(pieces);
+	UINT pawns = getPieces(pieces, playerColor);
+	UINT kings = pawns & pieces.kings;
+
+	UINT movers = 0;
+	BitShift reverseShift = getOppositeShift(shift);
+
+	if (playerColor == PieceColor::White)
+	{
+		if (shift == BitShift::BIT_SHIFT_R4 || shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
+		{
+			movers |= applyShift(emptyFields, reverseShift) & pawns;
+		}
+		else if (kings && (shift == BitShift::BIT_SHIFT_L4 || shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5))
+		{
+			movers |= applyShift(emptyFields, reverseShift) & kings;
+		}
+	}
+	else
+	{
+		if (shift == BitShift::BIT_SHIFT_L4 || shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
+		{
+			movers |= applyShift(emptyFields, reverseShift) & pawns;
+		}
+		else if (kings && (shift == BitShift::BIT_SHIFT_R4 || shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5))
+		{
+			movers |= applyShift(emptyFields, reverseShift) & kings;
+		}
+	}
+
+	return movers;
+}
 
 __device__ __host__ BitShift getNextShift(BitShift shift, int iteration, UINT position)
 {
@@ -229,42 +266,6 @@ __device__ __host__ BitShift getNextShift(BitShift shift, int iteration, UINT po
 	}
 
 	return nextShift;
-}
-
-
-__device__ __host__ UINT getMoversInShift(BitBoard pieces, PieceColor playerColor, BitShift shift)
-{
-	UINT emptyFields = getEmptyFields(pieces);
-	UINT pawns = getPieces(pieces, playerColor);
-	UINT kings = pawns & pieces.kings;
-
-	UINT movers = 0;
-	BitShift reverseShift = getOppositeShift(shift);
-
-	if (playerColor == PieceColor::White)
-	{
-		if (shift == BitShift::BIT_SHIFT_R4 || shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
-		{
-			movers |= applyShift(emptyFields, reverseShift) & pawns;
-		}
-		else if (kings && (shift == BitShift::BIT_SHIFT_L4 || shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5))
-		{
-			movers |= applyShift(emptyFields, reverseShift) & kings;
-		}
-	}
-	else
-	{
-		if (shift == BitShift::BIT_SHIFT_L4 || shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
-		{
-			movers |= applyShift(emptyFields, reverseShift) & pawns;
-		}
-		else if (kings && (shift == BitShift::BIT_SHIFT_R4 || shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5))
-		{
-			movers |= applyShift(emptyFields, reverseShift) & kings;
-		}
-	}
-
-	return movers;
 }
 
 //----------------------------------------------------------------

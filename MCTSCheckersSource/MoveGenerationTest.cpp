@@ -407,7 +407,7 @@ void MoveGenerationTest::assertFailedTest2()
 
 void MoveGenerationTest::runAllTests()
 {
-    /*testBasicPawnMovesCenter();
+    testBasicPawnMovesCenter();
     testBasicPawnMovesLeftEdge();
     testBasicPawnMovesRightEdge();
     testSingleCaptureRightDiagonal();
@@ -422,8 +422,8 @@ void MoveGenerationTest::runAllTests()
     testKingCapturingMoves3();
     testCrowningMove();
 
-	assertFailedTest();*/
-	assertFailedTest2();
+	//assertFailedTest();
+	//assertFailedTest2();
 
     printSummary("Move Generation");
 }

@@ -10,20 +10,18 @@
 
 __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
 {
-	BitBoard s;
-	s.blackPawns = black;
-	s.whitePawns = white;
-	s.kings = kings;
-
-	UINT emptyFields = getAllPieces(s);
+	BitBoard bitboard;
+	bitboard.blackPawns = black;
+	bitboard.whitePawns = white;
+	bitboard.kings = kings;
 
 	PieceColor playerColor = whiteToPlay ? PieceColor::White : PieceColor::Black;
+	PieceColor opponentColor = getEnemyColorGpu(playerColor);
     BitShift shift = BitShift::BIT_SHIFT_L4;
-
-	BitShift oppositeShift = getOppositeShift(shift);
-	UINT shiftedPosition = applyShift(white, shift);
    
-	UINT movers = getMoversInShift(s, playerColor, shift);
+	UINT movers = getMoversInShift(bitboard, playerColor, shift);
+	UINT allmovers = getAllMovers(bitboard, playerColor);
+	UINT jumpers = getJumpersInShift(bitboard, playerColor, shift, 0);
 
 	return 0;
 }
