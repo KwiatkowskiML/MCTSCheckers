@@ -1,11 +1,12 @@
 #pragma once
+#include "cuda_runtime.h"
 
 enum class PieceColor {
     White,
     Black
 };
 
-constexpr PieceColor getEnemyColor(PieceColor playerColor)
+__device__ __host__ constexpr PieceColor getEnemyColor(PieceColor playerColor)
 {
     return playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White;
 }
