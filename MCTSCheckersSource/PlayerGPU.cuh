@@ -3,11 +3,18 @@
 #include <thrust/reduce.h>
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
+#include "ShiftMap.h"
 
 __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
 {
 	BitBoard board(white, black, kings);
 	UINT temp = board.getAllPieces();
+
+
+	BitShift shift = BitShift::BIT_SHIFT_L4;
+	BitShift opposite = ShiftMap::getOpposite(shift);
+
+    UINT shifted = ShiftMap::shift(black, shift);
 	return 0;
 }
 

@@ -16,7 +16,7 @@ public:
 	static UINT getAllJumpers(const BitBoard& pieces, PieceColor playerColor);
 
     // Getting specified moveable pieces
-	static UINT getMoversInShift(const BitBoard& pieces, PieceColor playerColor, BitShift shift);
+	__device__ __host__ static UINT getMoversInShift(const BitBoard& pieces, PieceColor playerColor, BitShift shift);
 	static UINT getJumpersInShift(const BitBoard& pieces, PieceColor playerColor, BitShift shift, UINT captured = 0);
 
     // Generating a list of moves
