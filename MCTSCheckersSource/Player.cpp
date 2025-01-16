@@ -73,18 +73,18 @@ bool Player::ExpandNode(Node* node)
 }
 
 // This function is called when a simulation is done. It backpropagates the score from the simulation node to the root node.
-void Player::BackPropagate(Node* node, int score)
+void Player::BackPropagate(Node* node, int score, int numberOfGamesPlayed)
 {
 	Node* currentNode = node;
 
 	// Update current node score
-	currentNode->gamesPlayed++;
+	currentNode->gamesPlayed += numberOfGamesPlayed;
 	currentNode->score += score;
 	currentNode = currentNode->parent;
 
 	while (currentNode != nullptr)
 	{
-		currentNode->gamesPlayed++;
+		currentNode->gamesPlayed += numberOfGamesPlayed;
 		currentNode->score += score;
 		currentNode = currentNode->parent;
 	}

@@ -22,7 +22,7 @@ public:
 	virtual int Simulate(Node* node) = 0;
 
 	// Backpropagate the result of a simulation up the tree
-	void BackPropagate(Node* node, int score);
+	void BackPropagate(Node* node, int score, int numberOfGamesPlayed = 1);
 
 	// Expand the tree by generating children for the given node
 	bool ExpandNode(Node* node);
