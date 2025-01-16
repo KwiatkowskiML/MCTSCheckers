@@ -61,7 +61,7 @@ void Game::PlayGameAsWhite()
 		return;
 	}
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 100; i++) // TODO: correct
 	{
 		// White player move
 		std::cout << newBoard.toString() << std::endl;

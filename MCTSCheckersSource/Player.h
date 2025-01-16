@@ -1,6 +1,7 @@
 #pragma once
 #include "PieceColor.h"
 #include "node.h"
+#include <utility>
 
 class Player
 {
@@ -18,11 +19,11 @@ public:
 	// Reset the tree with a new board
 	void SetBoard(Board boardAfterMove);
 
-	// This must be implemented by derived classes
-	virtual int Simulate(Node* node) = 0;
+	// This must be implemented by derived classes, first element of the pair is the simulation result and the sceond is the number of simulations
+    virtual std::pair<int, int> Simulate(Node* node) = 0;
 
 	// Backpropagate the result of a simulation up the tree
-	void BackPropagate(Node* node, int score, int numberOfGamesPlayed = 1);
+	void BackPropagate(Node* node, std::pair<int,int> simulationResult);
 
 	// Expand the tree by generating children for the given node
 	bool ExpandNode(Node* node);

@@ -53,8 +53,7 @@ Node* Player::SelectNode()
 // Expansion phase
 bool Player::ExpandNode(Node* node)
 {
-	if (!node->isLeaf())
-		return false;
+	assert(node->isLeaf());
 
 	// Get all available enemy moves
 	MoveList moves = node->boardAfterMove.getAvailableMoves(getEnemyColor(node->moveColor));
@@ -73,19 +72,21 @@ bool Player::ExpandNode(Node* node)
 }
 
 // This function is called when a simulation is done. It backpropagates the score from the simulation node to the root node.
-void Player::BackPropagate(Node* node, int score, int numberOfGamesPlayed)
+void Player::BackPropagate(Node* node, std::pair<int,int> simulationResult)
 {
 	Node* currentNode = node;
+	int simulationScore = simulationResult.first;
+	int numberOfGamesPlayed = simulationResult.second;
 
 	// Update current node score
 	currentNode->gamesPlayed += numberOfGamesPlayed;
-	currentNode->score += score;
+	currentNode->score += simulationScore;
 	currentNode = currentNode->parent;
 
 	while (currentNode != nullptr)
 	{
 		currentNode->gamesPlayed += numberOfGamesPlayed;
-		currentNode->score += score;
+		currentNode->score += simulationScore;
 		currentNode = currentNode->parent;
 	}
 }
@@ -97,16 +98,18 @@ Move* Player::GetBestMove()
 	// ----------------------------------------------
 
 	// Start the timer
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+	/*std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-	while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)*/
+
+	for (int i = 0; i < 1000; i++)
 	{ 
 
 		Node* selectedNode = SelectNode();
 		assert(selectedNode != nullptr);
 		assert(selectedNode->isLeaf());
 
-		int simulationResult = 0;
+		std::pair<int,int> simulationResult;
 
 		// If the selected node is a leaf, simulate the game
 		if (selectedNode->gamesPlayed == 0)
@@ -127,8 +130,13 @@ Move* Player::GetBestMove()
 			}
 			else
 			{
-				// No move possible during the expansion stage, backpropagate the loss
-				BackPropagate(selectedNode, LOOSE);
+				// No move possible during the expansion stage
+				if (selectedNode->moveColor == playerColor)
+					simulationResult = std::make_pair(WIN, 1);
+				else
+					simulationResult = std::make_pair(LOOSE, 1);
+
+				BackPropagate(selectedNode, simulationResult);
 			}
 		}
 

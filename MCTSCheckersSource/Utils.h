@@ -25,6 +25,9 @@
 #define DRAW 0
 #define WIN 1
 
+#define WHITE_WIN 10
+#define BLACK_WIN 11
+
 #define MAX_NO_CAPTURE_MOVES 10
 #define DEFAULT_TIME_LIMIT 3000 // in miliseconds
 

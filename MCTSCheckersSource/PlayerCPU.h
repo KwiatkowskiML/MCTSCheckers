@@ -5,6 +5,6 @@ class PlayerCPU : public Player
 {
 public:
 	PlayerCPU(PieceColor playerColor, int timeLimit) : Player(playerColor, timeLimit) {};
-	int Simulate(Node* node) override;
+	std::pair<int,int> Simulate(Node* node) override;
 };
 
