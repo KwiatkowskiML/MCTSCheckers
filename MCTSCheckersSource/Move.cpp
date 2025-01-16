@@ -40,7 +40,7 @@ Move::Move(const std::string& moveStr, PieceColor col) : playerColor(col) {
 				UINT end_pos = steps[i];
 
 				// Calculate position of captured piece
-				UINT captured_pos = Board::getAllFieldsBetween(start_pos, end_pos);
+				UINT captured_pos = Board::getAllFieldsBetween(start_pos, end_pos); // TODO: fix it
 				captured |= captured_pos;
 			}
 		}

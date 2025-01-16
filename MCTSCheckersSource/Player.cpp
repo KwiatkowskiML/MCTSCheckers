@@ -112,19 +112,7 @@ Move* Player::GetBestMove()
 		if (selectedNode->gamesPlayed == 0)
 		{
 			simulationResult = Simulate(selectedNode);
-
-			int simulationScore;
-
-			if (simulationResult == WHITE_WIN && playerColor == PieceColor::White)
-				simulationScore = WIN;
-			else if (simulationResult == BLACK_WIN && playerColor == PieceColor::Black)
-				simulationScore = WIN;
-			else if (simulationResult == DRAW)
-				simulationScore = DRAW;
-			else
-				simulationScore = LOOSE;
-
-			BackPropagate(selectedNode, simulationScore);
+			BackPropagate(selectedNode, simulationResult);
 		}
 		else
 		{
@@ -135,19 +123,7 @@ Move* Player::GetBestMove()
 			{
 				// Simulation phase
 				simulationResult = Simulate(selectedNode->children[0]);
-
-				int simulationScore;
-
-				if (simulationResult == WHITE_WIN && playerColor == PieceColor::White)
-					simulationScore = WIN;
-				else if (simulationResult == BLACK_WIN && playerColor == PieceColor::Black)
-					simulationScore = WIN;
-				else if (simulationResult == DRAW)
-					simulationScore = DRAW;
-				else
-					simulationScore = LOOSE;
-
-				BackPropagate(selectedNode->children[0], simulationScore);
+				BackPropagate(selectedNode->children[0], simulationResult);
 			}
 			else
 			{
@@ -213,7 +189,7 @@ std::string Player::GenerateTreeString()
 
 	// Start the DOT graph definition
 	treeString << "digraph Tree {\n";
-	treeString << "    node [shape=box, fontname=\"Arial\"];\n";
+	treeString << "    node [shape=box, fontname=\"Arial\", style=filled];\n";
 
 	// Helper function to traverse and generate nodes
 	std::function<void(const Node*, int&)> writeNode;
@@ -222,7 +198,7 @@ std::string Player::GenerateTreeString()
 			return;
 
 		int currentNodeId = nodeId++;
-		// Write the current node with gamesPlayed and score
+		// Start writing the node
 		treeString << "    node" << currentNodeId << " [label=\"Games Played: "
 			<< node->gamesPlayed << "\\nScore: " << node->score;
 
@@ -234,10 +210,19 @@ std::string Player::GenerateTreeString()
 		if (node->prevMove != nullptr)
 			treeString << "\\nMove: " << node->prevMove->toString();
 
-		// color to play
-		treeString << "\nTurn: " << (node->moveColor == PieceColor::White ? "White" : "Black");
+		// Color to play
+		treeString << "\\nTurn: " << (node->moveColor == PieceColor::White ? "White" : "Black");
 
-		treeString << "\"];\n";
+		// Check if the parent is the root and set fill color to red
+		if (node->parent && node->parent == root)
+			treeString << "\", fillcolor=red";
+		else if (node->parent)
+			treeString << "\", fillcolor=white";
+		else if (!node->parent)
+			treeString << "\", fillcolor=green";
+
+		// Close the node definition
+		treeString << "];\n";
 
 		for (const Node* child : node->children)
 		{
@@ -260,3 +245,4 @@ std::string Player::GenerateTreeString()
 
 	return treeString.str();  // Return the generated DOT string
 }
+

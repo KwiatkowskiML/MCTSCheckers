@@ -88,7 +88,7 @@ int Board::simulateGame(PieceColor playerColor) const
 
         // No moves available - game is over
         if (moves.empty()) {
-            return currentMoveColor == PieceColor::White ? BLACK_WIN : WHITE_WIN;
+            return currentMoveColor == playerColor ? LOOSE : WIN;
         }
 
 		// Check if the no capture moves limit has beeen exceeded
