@@ -31,7 +31,7 @@
 #define MAX_NO_CAPTURE_MOVES 10
 #define DEFAULT_TIME_LIMIT 3000 // in miliseconds
 
-#define C 2 // Exploration parameter
+#define C_UCT 2 // Exploration parameter
 
 #define GAME_LOG_FILE "game.log"
 #define SIMULATION_LOG "simulation.log"

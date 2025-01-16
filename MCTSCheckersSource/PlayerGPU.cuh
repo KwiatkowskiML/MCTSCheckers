@@ -1,13 +1,13 @@
 #pragma once
 #include "Player.h"
-//#include <thrust/reduce.h>
-//#include <thrust/functional.h>
-//#include <thrust/execution_policy.h>
+#include <thrust/reduce.h>
+#include <thrust/functional.h>
+#include <thrust/execution_policy.h>
 
 __global__ void simulateKernel(UINT white, UINT black, UINT kings, bool whiteToPlay, char* results)
 {
     int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    results[idx] = -1; // temp
+    results[idx] = 1; // temp
 
 	printf("Hello from block %d, thread %d, idx = %d, results = %d\n", blockIdx.x, threadIdx.x, idx, results[idx]);
 }
@@ -62,10 +62,11 @@ public:
             goto Error;
         }
 
-        // result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun);
+        result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun);
+		printf("Result = %d\n", result);
 
     Error:
 		cudaFree(dev_results);
-		return std::make_pair(0, 0);
+		return std::make_pair(result, simulationToRun);
 	};
 };
