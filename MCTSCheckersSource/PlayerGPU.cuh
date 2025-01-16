@@ -5,22 +5,9 @@
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
 
-struct BitBoard2
-{
-    UINT whitePawns;
-    UINT blackPawns;
-    UINT kings;
-
-    // Getters
-    UINT getAllPieces() const { return whitePawns | blackPawns; }
-    UINT getEmptyFields() const { return ~getAllPieces(); }
-    UINT getEnemyPieces(PieceColor playerColor) const { return playerColor == PieceColor::White ? blackPawns : whitePawns; }
-    UINT getPieces(PieceColor playerColor) const { return playerColor == PieceColor::White ? whitePawns : blackPawns; }
-};
-
 __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
 {
-	BitBoard2 s;
+	BitBoard s;
 	PieceColor playerColor = whiteToPlay ? PieceColor::White : PieceColor::Black;
 
 	return 0;
