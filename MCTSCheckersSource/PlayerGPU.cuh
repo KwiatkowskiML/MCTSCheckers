@@ -6,7 +6,8 @@
 
 __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
 {
-	// BitBoard board(white, black, kings);
+	BitBoard board(white, black, kings);
+	UINT temp = board.getAllPieces();
 	return 0;
 }
 

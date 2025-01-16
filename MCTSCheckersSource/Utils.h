@@ -39,5 +39,5 @@
 #define TREE_VISUALIZATION_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_logs\\tree_iteration_"
 #define TREE_GAME_LOG_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\game_logs\\tree_iteration_"
 
-#define NUMBER_OF_BLOCKS 16
-#define THREADS_PER_BLOCK 256
+#define NUMBER_OF_BLOCKS 1
+#define THREADS_PER_BLOCK 10
