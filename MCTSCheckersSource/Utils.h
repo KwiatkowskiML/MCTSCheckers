@@ -33,9 +33,11 @@
 
 #define C 2 // Exploration parameter
 
-
 #define GAME_LOG_FILE "game.log"
 #define SIMULATION_LOG "simulation.log"
 #define TREE_VISUALIZATION_FILE "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree.dot"
 #define TREE_VISUALIZATION_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_logs\\tree_iteration_"
 #define TREE_GAME_LOG_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\game_logs\\tree_iteration_"
+
+#define NUMBER_OF_BLOCKS 16
+#define THREADS_PER_BLOCK 256
