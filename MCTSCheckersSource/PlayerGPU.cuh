@@ -4,12 +4,20 @@
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
 
-__global__ void simulateKernel(UINT white, UINT black, UINT kings, bool whiteToPlay, char* results)
+__host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
+{
+	// BitBoard board(white, black, kings);
+	return 0;
+}
+
+__global__ void simulateKernel(UINT white, UINT black, UINT kings, bool whiteToPlay, char* dev_results)
 {
     int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    results[idx] = 1; // temp
+    dev_results[idx] = -1; // temp
 
-	printf("Hello from block %d, thread %d, idx = %d, results = %d\n", blockIdx.x, threadIdx.x, idx, results[idx]);
+	simulateGame(white, black, kings, whiteToPlay);
+
+	printf("Hello from block %d, thread %d, idx = %d, results = %d\n", blockIdx.x, threadIdx.x, idx, dev_results[idx]);
 }
 
 class PlayerGPU : public Player
@@ -62,9 +70,11 @@ public:
             goto Error;
         }
 
-        result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun);
-		printf("Result = %d\n", result);
+        // Sum up simulation results
+        result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun, 0, thrust::plus<int>());
+        printf("Result = %d\n", result);
 
+        // TODO: check if the results should be negated
     Error:
 		cudaFree(dev_results);
 		return std::make_pair(result, simulationToRun);
