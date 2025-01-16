@@ -63,7 +63,7 @@ Move Move::getExtendedMove(Move continuation, UINT capt) const
 	return Move(newSteps, newCaptured, playerColor);
 }
 
-BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation) const
+BitBoard Move::getBitboardAfterMove(BitBoard sourceBitboard, bool includeCoronation) const
 {
 	UINT source = getSource();
 	UINT destination = getDestination();

@@ -29,7 +29,7 @@ public:
 	Move(const Move& other) : steps(other.steps), captured(other.captured), playerColor(other.playerColor) {}
 
 	Move getExtendedMove(Move continuation, UINT capt) const;
-	BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation = true) const;
+	BitBoard getBitboardAfterMove(BitBoard sourceBitboard, bool includeCoronation = true) const;
 	const std::vector<UINT>& getSteps() const;
 
 	static bool containsMove(const std::vector<Move>& moveList, const Move& move) {

@@ -5,10 +5,25 @@
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
 
+#include "MoveGenerationGpu.cuh"
+#include "ShiftGpu.cuh"
+
 __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
 {
 	BitBoard s;
+	s.blackPawns = black;
+	s.whitePawns = white;
+	s.kings = kings;
+
+	UINT emptyFields = getAllPieces(s);
+
 	PieceColor playerColor = whiteToPlay ? PieceColor::White : PieceColor::Black;
+    BitShift shift = BitShift::BIT_SHIFT_L4;
+
+	BitShift oppositeShift = getOppositeShift(shift);
+	UINT shiftedPosition = applyShift(white, shift);
+   
+	UINT movers = getMoversInShift(s, playerColor, shift);
 
 	return 0;
 }

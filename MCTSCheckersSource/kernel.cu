@@ -55,7 +55,7 @@ int main()
         }*/
 
        {
-            UINT whitePieces = (1ULL << 28) | (1ULL << 21) | (1ULL << 22) | (1ULL << 23) | (1ULL << 17) | (1ULL << 13);
+            /*UINT whitePieces = (1ULL << 28) | (1ULL << 21) | (1ULL << 22) | (1ULL << 23) | (1ULL << 17) | (1ULL << 13);
             UINT blackPieces = (1ULL << 24) | (1ULL << 16) | (1ULL << 14) | (1ULL << 15) | (1ULL << 8) | (1ULL << 10) | (1ULL << 4) | (1ULL << 6);
             UINT kings = 0;
 
@@ -82,7 +82,7 @@ int main()
             std::cout << "Best move: " << bestMove->toString() << std::endl;
 
             blackPlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);
-            delete blackPlayer;
+            delete blackPlayer;*/
         }
 
         {
