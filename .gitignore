@@ -63,5 +63,6 @@ Makefile
 
 # grphviz
 *.dot
+*.pdf
 game_logs
 tree_logs.pdf
