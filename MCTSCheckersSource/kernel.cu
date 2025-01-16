@@ -27,7 +27,7 @@ int main()
 
     delete player;*/
 
-    /*{
+    {
         Player* whitePlayer = nullptr;
         Player* blackPlayer = nullptr;
         int setup = Game::GetGameSetup(whitePlayer, blackPlayer);
@@ -49,31 +49,31 @@ int main()
 
         if (blackPlayer != nullptr)
             delete blackPlayer;
-    }*/
-
-    {
-        UINT whitePieces = (1ULL << 28) | (1ULL << 21) | (1ULL << 22) | (1ULL << 23) | (1ULL << 17) | (1ULL << 13);
-        UINT blackPieces = (1ULL << 24) | (1ULL << 16) | (1ULL << 14) | (1ULL << 15) | (1ULL << 8) | (1ULL << 10) | (1ULL << 4) | (1ULL << 6);
-
-        UINT whitePieces2 = (1ULL << 24) | (1ULL << 22) | (1ULL << 19);
-        UINT blackPieces2 = (1ULL << 17) | (1ULL << 11) | (1ULL << 4);
-
-        Board boardAfterMove(whitePieces2, blackPieces2, 0);
-        std::cout << boardAfterMove.toString() << std::endl;
-
-        Player* blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
-        blackPlayer->SetBoard(boardAfterMove);
-        Move* bestMove = blackPlayer->GetBestMove();
-        std::cout << "Best move: " << bestMove->toString() << std::endl;
-
-        blackPlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);
-        delete blackPlayer;
-
-        /*for (int i = 0; i < 100; i++)
-        {
-            std::cout << "game simulation: " << board.simulateGame(PieceColor::Black) << std::endl;
-        }*/
     }
+
+    //{
+    //    UINT whitePieces = (1ULL << 28) | (1ULL << 21) | (1ULL << 22) | (1ULL << 23) | (1ULL << 17) | (1ULL << 13);
+    //    UINT blackPieces = (1ULL << 24) | (1ULL << 16) | (1ULL << 14) | (1ULL << 15) | (1ULL << 8) | (1ULL << 10) | (1ULL << 4) | (1ULL << 6);
+
+    //    UINT whitePieces2 = (1ULL << 24) | (1ULL << 22) | (1ULL << 19);
+    //    UINT blackPieces2 = (1ULL << 17) | (1ULL << 11) | (1ULL << 4);
+
+    //    Board boardAfterMove(whitePieces2, blackPieces2, 0);
+    //    std::cout << boardAfterMove.toString() << std::endl;
+
+    //    Player* blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
+    //    blackPlayer->SetBoard(boardAfterMove);
+    //    Move* bestMove = blackPlayer->GetBestMove();
+    //    std::cout << "Best move: " << bestMove->toString() << std::endl;
+
+    //    blackPlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);
+    //    delete blackPlayer;
+
+    //    /*for (int i = 0; i < 100; i++)
+    //    {
+    //        std::cout << "game simulation: " << board.simulateGame(PieceColor::Black) << std::endl;
+    //    }*/
+    //}
   
     /*Board board2(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
 	std::cout << board2.toString() << std::endl;

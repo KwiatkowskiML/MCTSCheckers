@@ -34,7 +34,7 @@ public:
 		float k = moveColor != playerColor ? -1.0f : 1.0f;
 
 		// Calculating the formula
-		result = k * ((float)score) + C * sqrt(log((float)parent->gamesPlayed) / (float)gamesPlayed);
+		result = k * ((float)score) / ((float)gamesPlayed) + C * sqrt(log((float)parent->gamesPlayed) / (float)gamesPlayed);
 
 		return result;
 	}
