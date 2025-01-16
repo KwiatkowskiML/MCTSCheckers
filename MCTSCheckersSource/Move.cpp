@@ -107,7 +107,11 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool include
 	UINT newWhitePawns = playerColor == PieceColor::White ? newCurrentPieces : newEnemyPieces;
 	UINT newBlackPawns = playerColor == PieceColor::Black ? newCurrentPieces : newEnemyPieces;
 
-	BitBoard newbitBoard(newWhitePawns, newBlackPawns, newKings);
+	BitBoard newbitBoard;
+	newbitBoard.whitePawns = newWhitePawns;
+	newbitBoard.blackPawns = newBlackPawns;
+	newbitBoard.kings = newKings;
+	
 	return newbitBoard;
 }
 

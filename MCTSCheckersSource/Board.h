@@ -10,8 +10,19 @@ class Board {
 private:
 	BitBoard _pieces;
 public:
-	Board(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
-	Board() : _pieces(0, 0, 0) {};
+	Board(UINT whitePieces, UINT blackPieces, UINT kings) 
+	{
+		_pieces.whitePawns = whitePieces;
+		_pieces.blackPawns = blackPieces;
+		_pieces.kings = kings;
+	};
+	
+	Board() 
+	{
+		_pieces.whitePawns = INIT_WHITE_PAWNS;
+		_pieces.blackPawns = INIT_BLACK_PAWNS;
+		_pieces.kings = 0;
+	};
 
 	// Getters
 	BitBoard getBitBoard() const { return _pieces; }

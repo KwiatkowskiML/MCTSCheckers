@@ -7,9 +7,9 @@ struct BitBoard {
     UINT blackPawns;
     UINT kings;
 
-    BitBoard(UINT white = 0, UINT black = 0, UINT k = 0)
-        : whitePawns(white), blackPawns(black), kings(k) {
-    }
+    //BitBoard(UINT white = 0, UINT black = 0, UINT k = 0)
+    //    : whitePawns(white), blackPawns(black), kings(k) {
+    //}
 
 	// Getters
     UINT getAllPieces() const { return whitePawns | blackPawns; }
