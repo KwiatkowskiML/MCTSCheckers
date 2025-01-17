@@ -56,29 +56,29 @@ MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor playerC
 // Getting moveable pieces
 //----------------------------------------------------------------
 
-UINT MoveGenerator::getAllMovers(const BitBoard& pieces, PieceColor playerColor)
-{
-	UINT movers = 0;
+//UINT MoveGenerator::getAllMovers(const BitBoard& pieces, PieceColor playerColor)
+//{
+//	UINT movers = 0;
+//
+//	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
+//		BitShift shift = static_cast<BitShift>(i);
+//		movers |= getMoversInShift(pieces, playerColor, shift);
+//	}
+//
+//	return movers;
+//}
 
-	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
-		BitShift shift = static_cast<BitShift>(i);
-		movers |= getMoversInShift(pieces, playerColor, shift);
-	}
-
-	return movers;
-}
-
-UINT MoveGenerator::getAllJumpers(const BitBoard& pieces, PieceColor playerColor)
-{
-	UINT jumpers = 0;
-
-	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
-		BitShift shift = static_cast<BitShift>(i);
-		jumpers |= getJumpersInShift(pieces, playerColor, shift);
-	}
-
-	return jumpers;
-}
+//UINT MoveGenerator::getAllJumpers(const BitBoard& pieces, PieceColor playerColor)
+//{
+//	UINT jumpers = 0;
+//
+//	for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
+//		BitShift shift = static_cast<BitShift>(i);
+//		jumpers |= getJumpersInShift(pieces, playerColor, shift);
+//	}
+//
+//	return jumpers;
+//}
 
 //UINT MoveGenerator::getJumpersInShift(const BitBoard& pieces, PieceColor playerColor, BitShift shift, UINT captured)
 //{

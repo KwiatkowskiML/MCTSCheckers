@@ -5,6 +5,7 @@
 #include <thrust/execution_policy.h>
 #include "ShiftMap.h"
 #include "MoveGenerator.h"
+#include "Queue.h"
 
 __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
 {
@@ -18,7 +19,12 @@ __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool w
 
     MoveGenerator::DoNothing();
 	UINT movers = MoveGenerator::getMoversInShift(board, PieceColor::Black, shift);
+	UINT movers2 = MoveGenerator::getAllMovers(board, PieceColor::Black);
 	UINT jumpers = MoveGenerator::getJumpersInShift(board, PieceColor::Black, shift);
+	UINT jumpers2 = MoveGenerator::getAllJumpers(board, PieceColor::Black);
+
+    uint32_t movesArray[10];
+    Queue<uint32_t> availbleMovesQ = Queue<uint32_t>(movesArray, 10);
     
 	return 0;
 }

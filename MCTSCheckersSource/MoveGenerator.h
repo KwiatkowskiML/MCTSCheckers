@@ -4,6 +4,7 @@
 #include "BitBoard.h"
 #include "BitShift.h"
 #include "ShiftMap.h"
+#include "Queue.h"
 
 class MoveGenerator {
 private:
@@ -13,7 +14,6 @@ public:
 
 
     static MoveList generateMoves(const BitBoard& pieces, PieceColor playerColor);
-	
 	
 	__device__ __host__ static BitShift getNextShift(BitShift shift, int iteration, UINT position)
 	{
@@ -58,12 +58,6 @@ public:
 
 		return nextShift;
 	}
-
-	//---------------------------------------------------------------
-	// Getting moveable pieces
-	//---------------------------------------------------------------
-    static UINT getAllMovers(const BitBoard& pieces, PieceColor playerColor);
-	static UINT getAllJumpers(const BitBoard& pieces, PieceColor playerColor);
 
     //---------------------------------------------------------------
     // Getting specified moveable pieces
@@ -199,6 +193,33 @@ public:
 	}
 
 	//---------------------------------------------------------------
+	// Getting moveable pieces
+	//---------------------------------------------------------------
+	__device__ __host__ static UINT getAllMovers(const BitBoard& pieces, PieceColor playerColor)
+	{
+		UINT movers = 0;
+
+		for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
+			BitShift shift = static_cast<BitShift>(i);
+			movers |= getMoversInShift(pieces, playerColor, shift);
+		}
+
+		return movers;
+	}
+
+	__device__ __host__ static UINT getAllJumpers(const BitBoard& pieces, PieceColor playerColor)
+	{
+		UINT jumpers = 0;
+
+		for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) {
+			BitShift shift = static_cast<BitShift>(i);
+			jumpers |= getJumpersInShift(pieces, playerColor, shift);
+		}
+
+		return jumpers;
+	}
+
+	//---------------------------------------------------------------
     // Generating a list of moves
 	//---------------------------------------------------------------
     static void generateBasicMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, MoveList& moves);
@@ -211,4 +232,13 @@ public:
     static void generatePawnCapturesInShift(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
     static void generateKingMoves(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
     static void generatePawnMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
+
+	//---------------------------------------------------------------
+	// Generating specified move with queue
+	//---------------------------------------------------------------
+	static void generatePawnMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move>* moves)
+	{
+	};
+
+
 };
