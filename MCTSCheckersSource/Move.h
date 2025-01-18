@@ -23,8 +23,7 @@ public:
 	// Constructors
 	//----------------------------------------------------------------
 	Move(UINT src, UINT dst, UINT capt = 0, PieceColor col = PieceColor::White)
-		: captured(capt), playerColor(col)
-	{
+		: captured(capt), playerColor(col) {
 		steps.push_back(src);
 		steps.push_back(dst);
 	}
