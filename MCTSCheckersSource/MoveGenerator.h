@@ -13,9 +13,6 @@ class MoveGenerator {
 private:
 	
 public:
-    __device__ __host__ static void DoNothing() {};
-
-	
 	//----------------------------------------------------------------
 	// Generating moves
 	//----------------------------------------------------------------
@@ -144,6 +141,7 @@ public:
     //---------------------------------------------------------------
     // Getting specified moveable pieces
 	//---------------------------------------------------------------
+
 	__device__ __host__ static UINT getMoversInShift(const BitBoard& pieces, PieceColor playerColor, BitShift shift)
 	{
 		const UINT emptyFields = pieces.getEmptyFields();
@@ -277,6 +275,7 @@ public:
 	//---------------------------------------------------------------
 	// Getting moveable pieces
 	//---------------------------------------------------------------
+
 	__device__ __host__ static UINT getAllMovers(const BitBoard& pieces, PieceColor playerColor)
 	{
 		UINT movers = 0;
@@ -304,6 +303,7 @@ public:
 	//---------------------------------------------------------------
 	// Generating king moves
 	//---------------------------------------------------------------
+
 	__device__ __host__ static void generateKingMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
 	{
 		UINT emptyFields = pieces.getEmptyFields();
@@ -512,7 +512,7 @@ public:
 		assert((captured & enemyPieces) != 0);
 #endif
 
-		BitShift nextShift = getNextShift(shift, 1, position);
+		BitShift nextShift = getNextShift(shift, 1, captured);
 
 		// There must be a next shift
 		if (nextShift == BitShift::BIT_SHIFT_NONE)
@@ -568,6 +568,9 @@ public:
 				moves->push(singleCapture);
 		}
 	}
+
+
+
 
 	//---------------------------------------------------------------
 	// Deprecated

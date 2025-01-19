@@ -110,6 +110,14 @@ void MoveGenerationTest::testBasicPawnMovesCenter()
         Move(1ULL << 9, 1ULL << 12, 0, PieceColor::Black)
     };
     verifyMoveList("Basic pawn moves - center position (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
+
+    std::vector<Move2> expectedBlack2 = {
+        Move2(1ULL << 9, 1ULL << 13, PieceColor::Black),
+        Move2(1ULL << 9, 1ULL << 12, PieceColor::Black)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Basic pawn moves - center position (Black)", expectedBlack2, &moveQueue);
 }
 
 void MoveGenerationTest::testBasicPawnMovesLeftEdge()
@@ -121,12 +129,26 @@ void MoveGenerationTest::testBasicPawnMovesLeftEdge()
     };
     verifyMoveList("Basic pawn moves - left edge (White)", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
+    std::vector<Move2> expected2 = {
+        Move2(1ULL << 7, 1ULL << 3, PieceColor::White)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Basic pawn moves - left edge (White)", expected2, &moveQueue);
+
     setUp();
     boardAfterMove.blackPawns = 1ULL << 7;  // Mirrored position for black
     MoveList expectedBlack = {
         Move(1ULL << 7, 1ULL << 11, 0, PieceColor::Black)
     };
     verifyMoveList("Basic pawn moves - left edge (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
+
+    std::vector<Move2> expectedBlack2 = {
+       Move2(1ULL << 7, 1ULL << 11, PieceColor::Black)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Basic pawn moves - left edge (Black)", expectedBlack2, &moveQueue);
 }
 
 void MoveGenerationTest::testBasicPawnMovesRightEdge()
@@ -138,12 +160,26 @@ void MoveGenerationTest::testBasicPawnMovesRightEdge()
     };
     verifyMoveList("Basic pawn moves - right edge (White)", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
+    std::vector<Move2> expected2 = {
+        Move2(1ULL << 31, 1ULL << 27, PieceColor::White)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Basic pawn moves - right edge (White)", expected2, &moveQueue);
+
     setUp();
     boardAfterMove.blackPawns = 1ULL;  // Mirrored position for black
     MoveList expectedBlack = {
         Move(1ULL, 1ULL << 4, 0, PieceColor::Black)
     };
     verifyMoveList("Basic pawn moves - right edge (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
+
+    std::vector<Move2> expectedBlack2 = {
+       Move2(1ULL, 1ULL << 4, PieceColor::Black)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Basic pawn moves - right edge (Black)", expectedBlack2, &moveQueue);
 }
 
 void MoveGenerationTest::testSingleCaptureRightDiagonal()
@@ -156,6 +192,13 @@ void MoveGenerationTest::testSingleCaptureRightDiagonal()
     };
     verifyMoveList("Single capture - right diagonal", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
+    std::vector<Move2> expected2 = {
+       Move2(1ULL << 25, 1ULL << 18, PieceColor::White, 1ULL << 21)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Single capture - right diagonal", expected2, &moveQueue);
+
     setUp();
     boardAfterMove.blackPawns = 1ULL << 9;
     boardAfterMove.whitePawns = 1ULL << 13;
@@ -163,6 +206,13 @@ void MoveGenerationTest::testSingleCaptureRightDiagonal()
         Move(1ULL << 9, 1ULL << 18, 1ULL << 13, PieceColor::Black)
     };
     verifyMoveList("Single capture - right diagonal (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
+
+    std::vector<Move2> expectedBlack2 = {
+        Move2(1ULL << 9, 1ULL << 18, PieceColor::Black, 1ULL << 13)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Single capture - right diagonal (Black)", expectedBlack2, &moveQueue);
 
 }
 

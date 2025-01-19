@@ -17,7 +17,6 @@ __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool w
 	BitShift opposite = ShiftMap::getOpposite(shift);
     UINT shifted = ShiftMap::shift(black, shift);
 
-    MoveGenerator::DoNothing();
 	UINT movers = MoveGenerator::getMoversInShift(board, PieceColor::Black, shift);
 	UINT movers2 = MoveGenerator::getAllMovers(board, PieceColor::Black);
 	UINT jumpers = MoveGenerator::getJumpersInShift(board, PieceColor::Black, shift);
