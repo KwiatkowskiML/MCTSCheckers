@@ -43,7 +43,7 @@ public:
 	};
 
 	// Returns the bitboard after the move is made
-	__host__ __device__ BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard) const
+	__host__ __device__ BitBoard getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation = true) const
 	{
 		UINT currentPlayerPieces = sourceBitboard.getPieces(playerColor);
 		UINT enemyPlayerPieces = sourceBitboard.getPieces(getEnemyColor(playerColor));
@@ -72,11 +72,14 @@ public:
 		}
 
 		// Handling the case when the pawn is crowned
-		if (playerColor == PieceColor::White && (dst & WHITE_CROWNING))
-			newKings |= dst;
+		if (includeCoronation)
+		{
+			if (playerColor == PieceColor::White && (dst & WHITE_CROWNING))
+				newKings |= dst;
 
-		if (playerColor == PieceColor::Black && (dst & BLACK_CROWNING))
-			newKings |= dst;
+			if (playerColor == PieceColor::Black && (dst & BLACK_CROWNING))
+				newKings |= dst;
+		}
 
 		UINT newWhitePawns = playerColor == PieceColor::White ? newCurrentPlayerPieces : newEnemyPlayerPieces;
 		UINT newBlackPawns = playerColor == PieceColor::Black ? newCurrentPlayerPieces : newEnemyPlayerPieces;
