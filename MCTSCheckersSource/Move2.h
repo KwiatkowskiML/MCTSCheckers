@@ -113,4 +113,8 @@ public:
 
 		return result;
 	}
+
+	bool operator==(const Move2& other) const {
+		return src == other.src && dst == other.dst && captured == other.captured && playerColor == other.playerColor;
+	}
 };

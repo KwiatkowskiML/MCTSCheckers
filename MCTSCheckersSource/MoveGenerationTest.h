@@ -5,7 +5,11 @@
 
 class MoveGenerationTest : public CheckersTest {
 private:
+	Move2 moveArray[QUEUE_SIZE];
+	Queue<Move2> moveQueue = Queue<Move2>(moveArray, QUEUE_SIZE);
+
     bool verifyMoveList(const char* testName, const MoveList& expected, const MoveList& actual);
+    bool verifyMoveList2(const char* testName, const std::vector<Move2>& expected, Queue<Move2>* actual);
 
     void testBasicPawnMovesCenter();
     void testBasicPawnMovesLeftEdge();

@@ -72,7 +72,7 @@ int main()
             UINT blackPieces5 = (1ULL << 13);
 			UINT kings5 = (1ULL << 13);*/
 
-            Board boardAfterMove(whitePieces, blackPieces, kings);
+           /* Board boardAfterMove(whitePieces, blackPieces, kings);
             std::cout << boardAfterMove.toString() << std::endl;
 
             Player* blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
@@ -81,7 +81,7 @@ int main()
             std::cout << "Best move: " << bestMove->toString() << std::endl;
 
             blackPlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);
-            delete blackPlayer;
+            delete blackPlayer;*/
         }
 
         /*Board board2(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
@@ -93,8 +93,11 @@ int main()
         whitePlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);*/
     }
 
-	Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-    whitePlayer->Simulate(whitePlayer->root);
+	/*Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+    whitePlayer->Simulate(whitePlayer->root);*/
+
+
+	CheckersTestSuite::runAll();
 
     return 0;
 }

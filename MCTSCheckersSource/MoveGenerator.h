@@ -13,22 +13,97 @@ private:
 public:
     __device__ __host__ static void DoNothing() {};
 
-
-    static MoveList generateMoves(const BitBoard& pieces, PieceColor playerColor);
 	
+	//----------------------------------------------------------------
+	// Generating moves
+	//----------------------------------------------------------------
+
+	__device__ __host__ static void generateMovesGpu(const BitBoard& pieces, PieceColor playerColor, Queue<Move2>* moves)
+	{
+		UINT jumpersL3 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_L3);
+		UINT jumpersL4 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_L4);
+		UINT jumpersL5 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_L5);
+		UINT jumpersR3 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_R3);
+		UINT jumpersR4 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_R4);
+		UINT jumpersR5 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_R5);
+
+		UINT jumpers2 = jumpersL3 | jumpersL4 | jumpersL5 | jumpersR3 | jumpersR4 | jumpersR5;
+
+		if (jumpers2)
+		{
+			generateCapturingMovesInShiftGpu(pieces, playerColor, jumpersL3, BitShift::BIT_SHIFT_L3, moves);
+			generateCapturingMovesInShiftGpu(pieces, playerColor, jumpersL4, BitShift::BIT_SHIFT_L4, moves);
+			generateCapturingMovesInShiftGpu(pieces, playerColor, jumpersL5, BitShift::BIT_SHIFT_L5, moves);
+			generateCapturingMovesInShiftGpu(pieces, playerColor, jumpersR3, BitShift::BIT_SHIFT_R3, moves);
+			generateCapturingMovesInShiftGpu(pieces, playerColor, jumpersR4, BitShift::BIT_SHIFT_R4, moves);
+			generateCapturingMovesInShiftGpu(pieces, playerColor, jumpersR5, BitShift::BIT_SHIFT_R5, moves);
+			return;
+		}
+
+		UINT moversL3 = getMoversInShift(pieces, playerColor, BitShift::BIT_SHIFT_L3);
+		UINT moversL4 = getMoversInShift(pieces, playerColor, BitShift::BIT_SHIFT_L4);
+		UINT moversL5 = getMoversInShift(pieces, playerColor, BitShift::BIT_SHIFT_L5);
+		UINT moversR3 = getMoversInShift(pieces, playerColor, BitShift::BIT_SHIFT_R3);
+		UINT moversR4 = getMoversInShift(pieces, playerColor, BitShift::BIT_SHIFT_R4);
+		UINT moversR5 = getMoversInShift(pieces, playerColor, BitShift::BIT_SHIFT_R5);
+
+		generateBasicMovesInShiftGpu(pieces, playerColor, moversL3, BitShift::BIT_SHIFT_L3, moves);
+		generateBasicMovesInShiftGpu(pieces, playerColor, moversL4, BitShift::BIT_SHIFT_L4, moves);
+		generateBasicMovesInShiftGpu(pieces, playerColor, moversL5, BitShift::BIT_SHIFT_L5, moves);
+		generateBasicMovesInShiftGpu(pieces, playerColor, moversR3, BitShift::BIT_SHIFT_R3, moves);
+		generateBasicMovesInShiftGpu(pieces, playerColor, moversR4, BitShift::BIT_SHIFT_R4, moves);
+		generateBasicMovesInShiftGpu(pieces, playerColor, moversR5, BitShift::BIT_SHIFT_R5, moves);
+		return;
+	}
+	
+	__device__ __host__ static void generateBasicMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, Queue<Move2>* moves)
+	{
+		while (movers) {
+			UINT mover = movers & -movers; // TODO: reconsider this
+			movers ^= mover;
+
+			if (mover & pieces.kings) {
+				generateKingMovesGpu(pieces, playerColor, mover, shift, moves);
+			}
+			else {
+				generatePawnMovesGpu(pieces, playerColor, mover, shift, moves);
+			}
+		}
+	}
+
+	__device__ __host__ static void generateCapturingMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT jumpers, BitShift shift, Queue<Move2>* moves)
+	{
+		while (jumpers) {
+			UINT jumper = jumpers & -jumpers;
+			jumpers ^= jumper;
+
+			if (jumper & pieces.kings) {
+				generateKingCapturesGpu(pieces, playerColor, jumper, shift, moves);
+			}
+			else {
+				generatePawnCapturesGpu(pieces, playerColor, jumper, shift, moves);
+			}
+		}
+	}
+
 	__device__ __host__ static BitShift getNextShift(BitShift shift, int iteration, UINT position)
 	{
-		BitShift nextShift = shift;
+		BitShift nextShift = BitShift::BIT_SHIFT_NONE;
+
 		if (shift == BitShift::BIT_SHIFT_L3 || shift == BitShift::BIT_SHIFT_L5)
 		{
 			if (iteration & 1)
 				nextShift = BitShift::BIT_SHIFT_L4;
+			else
+				nextShift = shift;
 		}
 
 		if (shift == BitShift::BIT_SHIFT_R3 || shift == BitShift::BIT_SHIFT_R5)
 		{
 			if (iteration & 1)
 				nextShift = BitShift::BIT_SHIFT_R4;
+			else
+				nextShift = shift;
 		}
 
 		if (shift == BitShift::BIT_SHIFT_L4)
@@ -42,6 +117,8 @@ public:
 				else
 					return BitShift::BIT_SHIFT_NONE;
 			}
+			else
+				nextShift = shift;
 		}
 
 		if (shift == BitShift::BIT_SHIFT_R4)
@@ -55,6 +132,8 @@ public:
 				else
 					return BitShift::BIT_SHIFT_NONE;
 			}
+			else
+				nextShift = shift;
 		}
 
 		return nextShift;
@@ -221,51 +300,20 @@ public:
 	}
 
 	//---------------------------------------------------------------
-    // Generating a list of moves
+	// Generating king moves
 	//---------------------------------------------------------------
-    static void generateBasicMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, MoveList& moves);
-    static void generateCapturingMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT jumpers, BitShift shift, MoveList& moves);
-
-	__device__ __host__ void generateBasicMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generateKingMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
 	{
-		while (movers) {
-			UINT mover = movers & -movers; // TODO: reconsider this
-			movers ^= mover;
 
-			if (mover & pieces.kings) {
-				// generateKingMoves(pieces, playerColor, mover, shift, moves);
-			}
-			else {
-				generatePawnMovesGpu(pieces, playerColor, mover, shift, moves);
-			}
-		}
 	}
 
-	__device__ __host__ void generateCapturingMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT jumpers, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generateKingCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves, UINT captured = 0)
 	{
-		while (jumpers) {
-			UINT jumper = jumpers & -jumpers;
-			jumpers ^= jumper;
 
-			if (jumper & pieces.kings) {
-				// generateKingCaptures(pieces, playerColor, jumper, shift, moves);
-			}
-			else {
-				generatePawnCapturesGpu(pieces, playerColor, jumper, shift, moves);
-			}
-		}
 	}
-    
-	//---------------------------------------------------------------
-    // Generating specified move
-	//---------------------------------------------------------------
-    static void generateKingCaptures(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves, UINT captured = 0);
-    static void generatePawnCapturesInShift(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
-    static void generateKingMoves(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
-    static void generatePawnMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
 
 	//---------------------------------------------------------------
-	// Generating specified move with queue
+	// Generating pawn moves
 	//---------------------------------------------------------------
 	__device__ __host__ static void generatePawnMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
 	{
@@ -273,7 +321,6 @@ public:
 		Move2 move(position, newPosition, playerColor);
 		moves->push(move);
 	};
-
 	__device__ __host__ static void generatePawnCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
 	{
 		UINT emptyFields = pieces.getEmptyFields();
@@ -398,4 +445,25 @@ public:
 				moves->push(singleCapture);
 		}
 	}
+
+
+
+
+
+
+
+
+
+	//---------------------------------------------------------------
+	// Deprecated
+	//---------------------------------------------------------------
+	static MoveList generateMoves(const BitBoard& pieces, PieceColor playerColor);
+
+	static void generateBasicMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, MoveList& moves);
+	static void generateCapturingMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT jumpers, BitShift shift, MoveList& moves);
+
+	static void generateKingCaptures(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves, UINT captured = 0);
+	static void generatePawnCapturesInShift(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
+	static void generateKingMoves(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
+	static void generatePawnMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, MoveList& moves);
 };

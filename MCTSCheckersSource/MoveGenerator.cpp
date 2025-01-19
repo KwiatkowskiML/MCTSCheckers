@@ -548,7 +548,7 @@ void MoveGenerator::generateKingMoves(const BitBoard& pieces, PieceColor playerC
 	while (newPosition)
 	{
 		BitShift nextShift = getNextShift(shift, iteration, newPosition);
-		if (shift == BitShift::BIT_SHIFT_NONE)
+		if (nextShift == BitShift::BIT_SHIFT_NONE)
 			break;
 
 		newPosition = ShiftMap::shift(newPosition, nextShift);

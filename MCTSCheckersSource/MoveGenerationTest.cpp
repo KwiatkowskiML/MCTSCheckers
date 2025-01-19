@@ -47,6 +47,44 @@ bool MoveGenerationTest::verifyMoveList(const char* testName, const MoveList& ex
     return passed;
 }
 
+bool MoveGenerationTest::verifyMoveList2(const char* testName, const std::vector<Move2>& expected, Queue<Move2>* actual)
+{
+    bool passed = true;
+
+    if (expected.size() != actual->length()) {
+        printf("Test %s: FAILED\n", testName);
+        printf("Expected %zu moves, got %zu moves\n", expected.size(), actual->length());
+        passed = false;
+    }
+    else {
+		while (!actual->empty()) {
+			Move2 actualMove = actual->front();
+			actual->pop();
+			bool moveFound = false;
+			for (const auto& expectedMove : expected) {
+				if (expectedMove == actualMove) {
+					moveFound = true;
+                    std::cout << "Found move: " << actualMove.toString() << std::endl;
+					break;
+				}
+			}
+			if (!moveFound) {
+				printf("Test %s: FAILED\n", testName);
+				std::cout << "Missing move: " << actualMove.toString() << std::endl;
+				passed = false;
+			}
+		}
+    }
+
+    if (passed) {
+        printf("Test %s: PASSED\n", testName);
+        passedTests++;
+    }
+    totalTests++;
+
+    return passed;
+}
+
 void MoveGenerationTest::testBasicPawnMovesCenter()
 {
     setUp();
@@ -56,6 +94,14 @@ void MoveGenerationTest::testBasicPawnMovesCenter()
         Move(1ULL << 25, 1ULL << 21)
     };
     verifyMoveList("Basic pawn moves - center position (White)", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
+
+    std::vector<Move2> expected2 = {
+        Move2(1ULL << 25, 1ULL << 20, PieceColor::White),
+        Move2(1ULL << 25, 1ULL << 21, PieceColor::White)
+    };
+	moveQueue.clear();
+	moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Basic pawn moves - center position (White)", expected2, &moveQueue);
 
     setUp();
     boardAfterMove.blackPawns = 1ULL << 9;  // Mirrored position for black
@@ -407,7 +453,7 @@ void MoveGenerationTest::assertFailedTest2()
 
 void MoveGenerationTest::runAllTests()
 {
-    /*testBasicPawnMovesCenter();
+    testBasicPawnMovesCenter();
     testBasicPawnMovesLeftEdge();
     testBasicPawnMovesRightEdge();
     testSingleCaptureRightDiagonal();
@@ -422,8 +468,8 @@ void MoveGenerationTest::runAllTests()
     testKingCapturingMoves3();
     testCrowningMove();
 
-	assertFailedTest();*/
-	assertFailedTest2();
+	assertFailedTest();
+	// assertFailedTest2();
 
     printSummary("Move Generation");
 }
