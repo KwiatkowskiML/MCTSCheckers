@@ -7,6 +7,8 @@
 #include "Queue.h"
 #include "Move2.h"
 
+#define ASSERTS_ON
+
 class MoveGenerator {
 private:
 	
@@ -304,12 +306,172 @@ public:
 	//---------------------------------------------------------------
 	__device__ __host__ static void generateKingMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
 	{
+		UINT emptyFields = pieces.getEmptyFields();
+		UINT newPosition = position;
+		int iteration = 0;
 
+		while (newPosition)
+		{
+			BitShift nextShift = getNextShift(shift, iteration, newPosition);
+			if (nextShift == BitShift::BIT_SHIFT_NONE)
+				break;
+
+			newPosition = ShiftMap::shift(newPosition, nextShift);
+
+			if (!(newPosition & emptyFields))
+				break;
+
+			Move2 move(position, newPosition, playerColor);
+			moves->push(move);
+			iteration++;
+		}
 	}
 
-	__device__ __host__ static void generateKingCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves, UINT captured = 0)
+	__device__ __host__ static void generateKingCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
 	{
+		UINT emptyFields = pieces.getEmptyFields();
+		UINT newPosition = position;
+		UINT currentPieces = pieces.getPieces(playerColor);
+		UINT enemyPieces = pieces.getPieces(getEnemyColor(playerColor));
 
+#ifdef ASSERTS_ON
+		assert(position & pieces.kings & currentPieces);
+		assert((currentPieces & enemyPieces) == 0);
+#endif
+
+		int iteration = 0;
+		UINT foundEnemyPiece = 0;
+
+		// Initialize continuation array
+		Move2 localMovesArray[QUEUE_SIZE];
+		Queue<Move2> localMovesQueue(localMovesArray, QUEUE_SIZE);
+
+		while (newPosition)
+		{
+			BitShift nextShift = getNextShift(shift, iteration, newPosition);
+			if (nextShift == BitShift::BIT_SHIFT_NONE)
+				break;
+
+			// Make the shift
+			newPosition = ShiftMap::shift(newPosition, nextShift);
+			iteration++;
+
+			// Shifted out of the board
+			if (newPosition == 0)
+				break;
+
+			// There must not be any piece in the same color on the way if the captured pawn has not been found yet 
+#ifdef ASSERTS_ON
+			assert((newPosition & currentPieces) == 0 || foundEnemyPiece);
+#endif
+			if (newPosition & currentPieces)
+				break;
+
+			// If the newPosition contains empty field continue looking for enemy pieces
+			if ((newPosition & emptyFields) > 0 && !foundEnemyPiece)
+				continue;
+
+			// If the newPosition contains empty field and we have already found enemy piece, add the move
+			if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
+			{
+				Move2 move(position, newPosition, playerColor, foundEnemyPiece);
+				localMovesQueue.push(move);
+				continue;
+			}
+
+			// Being here means the enemy piece is on the new position
+#ifdef ASSERTS_ON
+			assert((newPosition & enemyPieces) > 0);
+#endif
+			if ((newPosition & enemyPieces) == 0)
+				break;
+
+			// If we have already found enemy piece, we must not find another one
+			if (foundEnemyPiece > 0)
+				break;
+
+			foundEnemyPiece = newPosition;
+		}
+
+		while (!localMovesQueue.empty())
+		{
+			Move2 move = localMovesQueue.front();
+			localMovesQueue.pop();
+			
+			// Create new board state after capture
+			BitBoard newBoardState = move.getBitboardAfterMove(pieces);
+			bool foundContinuation = false;
+
+			for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i) 
+			{
+				// Get all jumpers
+				BitShift newShift = static_cast<BitShift>(i);
+				UINT jumpers = getJumpersInShift(newBoardState, playerColor, newShift, move.captured);
+				
+				// Destination jumper
+				UINT jumper = jumpers & move.dst;
+
+				// Destination cannot move any further 
+				if (!jumper)
+					continue;
+
+				foundContinuation = true;
+				UINT newJumperPosition = jumper;
+				UINT newEmptyFields = newBoardState.getEmptyFields();
+				UINT newCurrentPieces = newBoardState.getPieces(playerColor);
+				UINT newEnemyPieces = newBoardState.getPieces(getEnemyColor(playerColor));
+				UINT newFoundEnemyPiece = 0;
+				int newIteration = 0;
+
+				while (newJumperPosition)
+				{
+					BitShift nextShift = getNextShift(newShift, newIteration, newJumperPosition);
+					if (nextShift == BitShift::BIT_SHIFT_NONE)
+						break;
+
+					// Make the shift
+					newJumperPosition = ShiftMap::shift(newJumperPosition, nextShift);
+
+					// Shifted out of the board
+					if (newJumperPosition == 0)
+						break;
+
+					// There must not be any piece in the same color on the way if the captured pawn has not been found yet
+#ifdef ASSERTS_ON
+					assert((newJumperPosition & newCurrentPieces) == 0 || newFoundEnemyPiece);
+#endif
+					if (newJumperPosition & newCurrentPieces)
+						break;
+
+					// If the newPosition contains empty field continue looking for enemy pieces
+					if ((newJumperPosition & newEmptyFields) > 0 && !newFoundEnemyPiece)
+						continue;
+
+					// If the newPosition contains empty field and we have already found enemy piece, add the move
+					if ((newJumperPosition & newEmptyFields) > 0 && newFoundEnemyPiece)
+					{
+						Move2 newMove(move.src, newJumperPosition, playerColor, move.captured | newFoundEnemyPiece);
+						localMovesQueue.push(newMove);
+						continue;
+					}
+
+					// Being here means the enemy piece is on the new position
+#ifdef ASSERTS_ON
+					assert((newJumperPosition & newEnemyPieces) > 0);
+#endif // ASSERTS_ON
+					if ((newJumperPosition & newEnemyPieces) == 0)
+						break;
+
+					if (newFoundEnemyPiece > 0)
+						break;
+
+					newFoundEnemyPiece = newJumperPosition;
+				}
+			}
+
+			if (!foundContinuation)
+				moves->push(move);
+		}
 	}
 
 	//---------------------------------------------------------------
@@ -321,6 +483,7 @@ public:
 		Move2 move(position, newPosition, playerColor);
 		moves->push(move);
 	};
+
 	__device__ __host__ static void generatePawnCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
 	{
 		UINT emptyFields = pieces.getEmptyFields();
@@ -328,66 +491,26 @@ public:
 		UINT currentPieces = pieces.getPieces(playerColor);
 		UINT enemyPieces = pieces.getPieces(getEnemyColor(playerColor));
 		UINT newPosition = 0;
+			
+#ifdef ASSERTS_ON
+		// Make sure the position is right color
+		assert(position & currentPieces);
 
-		// Assertions
-		{
-			// Make sure the position is right color
-			// assert(position & currentPieces);
+		// Make sure the captured piece is enemy piece
+		assert(captured & enemyPieces);
 
-			// Make sure the captured piece is enemy piece
-			// assert(captured & enemyPieces);
+		// Make sure the captured piece is not the same as the position
+		assert((captured & currentPieces) == 0);
 
-			// Make sure the captured piece is not the same as the position
-			// assert((captured & currentPieces) == 0);
+		// Make sure the captured piece is not empty field
+		assert((captured & emptyFields) == 0);
 
-			// Make sure the captured piece is not empty field
-			// assert((captured & emptyFields) == 0);
+		// Make sure the pieces are marked correctly
+		assert((enemyPieces & currentPieces) == 0);
 
-			// Make sure the pieces are marked correctly
-			// assert((enemyPieces & currentPieces) == 0);
-
-			// There must be a captured piece
-			/*if ((captured & enemyPieces) == 0)
-			{
-				printf("position:\n");
-				Board::printBitboard(position);
-				printf("currentPieces:\n");
-				Board::printBitboard(currentPieces);
-				printf("enemyPieces:\n");
-				Board::printBitboard(enemyPieces);
-				printf("kings:\n");
-				Board::printBitboard(pieces.kings);
-				printf("captured:\n");
-				Board::printBitboard(captured);
-				printf("shift:\n");
-				switch (shift)
-				{
-				case BitShift::BIT_SHIFT_L3:
-					printf("L3\n");
-					break;
-				case BitShift::BIT_SHIFT_L4:
-					printf("L4\n");
-					break;
-				case BitShift::BIT_SHIFT_L5:
-					printf("L5\n");
-					break;
-				case BitShift::BIT_SHIFT_R3:
-					printf("R3\n");
-					break;
-				case BitShift::BIT_SHIFT_R4:
-					printf("R4\n");
-					break;
-				case BitShift::BIT_SHIFT_R5:
-					printf("R5\n");
-					break;
-				default:
-					break;
-				}
-
-				printf("gotit\n");
-			}*/
-			// assert((captured & enemyPieces) != 0);
-		}
+		// There must be a captured piece
+		assert((captured & enemyPieces) != 0);
+#endif
 
 		BitShift nextShift = getNextShift(shift, 1, position);
 
@@ -445,14 +568,6 @@ public:
 				moves->push(singleCapture);
 		}
 	}
-
-
-
-
-
-
-
-
 
 	//---------------------------------------------------------------
 	// Deprecated

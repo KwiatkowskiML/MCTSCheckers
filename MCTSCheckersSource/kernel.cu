@@ -93,11 +93,11 @@ int main()
         whitePlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);*/
     }
 
-	/*Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-    whitePlayer->Simulate(whitePlayer->root);*/
+	Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+    whitePlayer->Simulate(whitePlayer->root);
 
 
-	CheckersTestSuite::runAll();
+	//CheckersTestSuite::runAll();
 
     return 0;
 }
