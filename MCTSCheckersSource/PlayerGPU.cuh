@@ -23,8 +23,12 @@ __host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool w
 	UINT jumpers = MoveGenerator::getJumpersInShift(board, PieceColor::Black, shift);
 	UINT jumpers2 = MoveGenerator::getAllJumpers(board, PieceColor::Black);
 
-    uint32_t movesArray[10];
-    Queue<uint32_t> availbleMovesQ = Queue<uint32_t>(movesArray, 10);
+    Move2 movesArray[QUEUE_SIZE];
+    Queue<Move2> availbleMovesQ = Queue<Move2>(movesArray, QUEUE_SIZE);
+	MoveGenerator::generatePawnMovesGpu(board, PieceColor::Black, 1ULL << 9, BitShift::BIT_SHIFT_L4, &availbleMovesQ);
+
+    BitBoard board2(1ULL << 4, 1ULL, 0);
+    MoveGenerator::generatePawnCapturesGpu(board2, PieceColor::Black, 1ULL, BitShift::BIT_SHIFT_L4, &availbleMovesQ);
     
 	return 0;
 }

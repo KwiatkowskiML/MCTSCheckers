@@ -41,3 +41,5 @@
 
 #define NUMBER_OF_BLOCKS 1
 #define THREADS_PER_BLOCK 10
+
+#define QUEUE_SIZE 96

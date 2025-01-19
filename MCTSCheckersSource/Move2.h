@@ -23,6 +23,8 @@ public:
 	// Constructors
 	//----------------------------------------------------------------
 
+	__host__ __device__ Move2() : src(0), dst(0), playerColor(PieceColor::White), captured(0) {}
+
 	__host__ __device__ Move2(UINT src, UINT dst, PieceColor col, UINT capt = 0)
 		: src(src), dst(dst), playerColor(col), captured(capt) {}
 
