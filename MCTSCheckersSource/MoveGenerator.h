@@ -543,11 +543,11 @@ public:
 			// Generate continuations
 			for (int i = 0; i < static_cast<int>(BitShift::COUNT); ++i)
 			{
-				BitShift nextShift = static_cast<BitShift>(i);
-				UINT jumpers = getJumpersInShift(newState, playerColor, nextShift);
+				BitShift newShift = static_cast<BitShift>(i);
+				UINT jumpers = getJumpersInShift(newState, playerColor, newShift);
 
 				// There must be a jumper which is the continuation of the previous move
-				UINT jumper = jumpers & singleCapture.dst;
+				UINT jumper = jumpers & captureMove.dst;
 				if (jumper == 0)
 					continue;
 
@@ -555,8 +555,8 @@ public:
 				foundContinuation = true;
 
 				// Get new moves attributes
-				UINT newCaptured = ShiftMap::shift(jumper, nextShift);
-				BitShift newPosShift = getNextShift(nextShift, 1, jumper);
+				UINT newCaptured = ShiftMap::shift(jumper, newShift);
+				BitShift newPosShift = getNextShift(newShift, 1, newCaptured);
 				UINT newDst = ShiftMap::shift(newCaptured, newPosShift);
 
 				// Create new move
@@ -565,7 +565,7 @@ public:
 			}
 
 			if (!foundContinuation)
-				moves->push(singleCapture);
+				moves->push(captureMove);
 		}
 	}
 

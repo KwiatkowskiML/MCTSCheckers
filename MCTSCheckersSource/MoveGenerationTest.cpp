@@ -226,6 +226,13 @@ void MoveGenerationTest::testSingleCaptureLeftDiagonal()
     };
     verifyMoveList("Single capture - left diagonal", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
+    std::vector<Move2> expected2 = {
+      Move2(1ULL << 26, 1ULL << 17, PieceColor::White, 1ULL << 21)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Single capture - left diagonal", expected2, &moveQueue);
+
     setUp();
     boardAfterMove.blackPawns = 1ULL << 10;
     boardAfterMove.whitePawns = 1ULL << 13;
@@ -233,6 +240,13 @@ void MoveGenerationTest::testSingleCaptureLeftDiagonal()
         Move(1ULL << 10, 1ULL << 17, 1ULL << 13, PieceColor::Black)
     };
     verifyMoveList("Single capture - left diagonal (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
+
+    std::vector<Move2> expectedBlack2 = {
+        Move2(1ULL << 10, 1ULL << 17, PieceColor::Black, 1ULL << 13)
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Single capture - left diagonal (Black)", expectedBlack2, &moveQueue);
 }
 
 void MoveGenerationTest::testChainCaptureDouble()
@@ -245,7 +259,13 @@ void MoveGenerationTest::testChainCaptureDouble()
     };
     verifyMoveList("Chain capture - double", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    
+    std::vector<Move2> expected2 = {
+     Move2(1ULL << 29, 1ULL << 13, PieceColor::White, (1ULL << 25) | (1ULL << 17))
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Chain capture - double", expected2, &moveQueue);
+
     setUp();
     boardAfterMove.blackPawns = 1ULL << 5;
     boardAfterMove.whitePawns = (1ULL << 9) | (1ULL << 17);
@@ -254,6 +274,12 @@ void MoveGenerationTest::testChainCaptureDouble()
     };
     verifyMoveList("Chain capture - double (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
+    std::vector<Move2> expectedBlack2 = {
+        Move2(1ULL << 5 , 1ULL << 21, PieceColor::Black, (1ULL << 9) | (1ULL << 17))
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Chain capture - double (Black)", expectedBlack2, &moveQueue);
 }
 
 void MoveGenerationTest::testChainCaptureTriple()
@@ -266,6 +292,13 @@ void MoveGenerationTest::testChainCaptureTriple()
     };
     verifyMoveList("Chain capture - triple", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
+    std::vector<Move2> expected2 = {
+     Move2(1ULL << 29, 1ULL << 6, PieceColor::White, (1ULL << 25) | (1ULL << 17) | (1ULL << 10))
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Chain capture - triple", expected2, &moveQueue);
+
     setUp();
     boardAfterMove.blackPawns = 1ULL << 5;
     boardAfterMove.whitePawns = (1ULL << 9) | (1ULL << 17) | (1ULL << 26);
@@ -274,6 +307,12 @@ void MoveGenerationTest::testChainCaptureTriple()
     };
     verifyMoveList("Chain capture - triple (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
+    std::vector<Move2> expectedBlack2 = {
+       Move2(1ULL << 5, 1ULL << 30, PieceColor::Black, (1ULL << 9) | (1ULL << 17) | (1ULL << 26))
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Chain capture - triple (Black)", expectedBlack2, &moveQueue);
 }
 
 void MoveGenerationTest::testChainCaptureMultiple()
@@ -289,6 +328,16 @@ void MoveGenerationTest::testChainCaptureMultiple()
     };
     verifyMoveList("Chain capture - multiple", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
+    std::vector<Move2> expected2 = {
+        Move2(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
+        Move2(1ULL << 31, 1ULL << 22, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+        Move2(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
+        Move2(1ULL << 31, 1ULL << 22, PieceColor::White, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
+    verifyMoveList2("Chain capture - multiple", expected2, &moveQueue);
+
     setUp();
     boardAfterMove.blackPawns = 1ULL;  // Mirrored position
     boardAfterMove.whitePawns = (1ULL << 4) | (1ULL << 13) | (1ULL << 12) | (1ULL << 22) | (1ULL << 21) | (1ULL << 20);
@@ -299,6 +348,16 @@ void MoveGenerationTest::testChainCaptureMultiple()
         Move({1ULL, 1ULL << 9, 1ULL << 16, 1ULL << 25, 1ULL << 18, 1ULL << 9}, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 13), PieceColor::Black),
     };
     verifyMoveList("Chain capture - multiple (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
+
+    std::vector<Move2> expectedBlack2 = {
+       Move2(1ULL, 1ULL << 27, PieceColor::Black, (1ULL << 4) | (1ULL << 13) | (1ULL << 22)),
+        Move2(1ULL, 1ULL << 9, PieceColor::Black, (1ULL << 4) | (1ULL << 13) | (1ULL << 21) | (1ULL << 20) | (1ULL << 12)),
+        Move2(1ULL, 1ULL << 27, PieceColor::Black, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 22)),
+        Move2(1ULL, 1ULL << 9, PieceColor::Black, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 13)),
+    };
+    moveQueue.clear();
+    moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
+    verifyMoveList2("Chain capture - multiple (Black)", expectedBlack2, &moveQueue);
 }
 
 void MoveGenerationTest::testKingBasicMoves()
@@ -518,7 +577,7 @@ void MoveGenerationTest::runAllTests()
     testKingCapturingMoves3();
     testCrowningMove();
 
-	assertFailedTest();
+	// assertFailedTest();
 	// assertFailedTest2();
 
     printSummary("Move Generation");
