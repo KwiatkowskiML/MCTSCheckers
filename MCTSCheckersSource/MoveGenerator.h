@@ -431,9 +431,14 @@ public:
 
 					// Make the shift
 					newJumperPosition = ShiftMap::shift(newJumperPosition, nextShift);
+					newIteration++;
 
 					// Shifted out of the board
 					if (newJumperPosition == 0)
+						break;
+
+					// Already captured piece
+					if (newJumperPosition & move.captured)
 						break;
 
 					// There must not be any piece in the same color on the way if the captured pawn has not been found yet

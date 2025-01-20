@@ -4,6 +4,7 @@
 #include "BitBoard.h"
 #include "Utils.h"
 #include "Board.h"
+#include <sstream>
 
 class Move2 {
 public:
@@ -111,7 +112,14 @@ public:
 			result = "Error in Move2::toString()";
 		}
 
+		result += " 0x" + toHex(captured);
 		return result;
+	}
+
+	std::string toHex(int number) const {
+		std::ostringstream oss;
+		oss << std::hex << number;
+		return oss.str();
 	}
 
 	bool operator==(const Move2& other) const {
