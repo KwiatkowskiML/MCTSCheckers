@@ -40,4 +40,8 @@ public:
     {
         first = last = 0;
     }
+	__host__ __device__ T operator[](int i)
+	{
+		return Q[(first + i) % size];
+	}
 };

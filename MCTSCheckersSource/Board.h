@@ -8,8 +8,9 @@
 
 class Board {
 private:
-	BitBoard _pieces;
+	
 public:
+	BitBoard _pieces;
 	Board(UINT whitePieces, UINT blackPieces, UINT kings) : _pieces(whitePieces, blackPieces, kings) {};
 	Board() : _pieces(0, 0, 0) {};
 

@@ -1,6 +1,9 @@
 #include "MoveGenerationTest.h"
 #include "Move.h"
 #include "Board.h"
+#include <fstream>
+#include <sstream>
+#include <random>
 
 bool MoveGenerationTest::verifyMoveList(const char* testName, const MoveList& expected, const MoveList& actual)
 {
@@ -716,6 +719,115 @@ void MoveGenerationTest::assertFailedTest2()
     verifyMoveList2("King capturing moves", expected2, &moveQueue);
 }
 
+void MoveGenerationTest::simulationMoveGenerationTest()
+{
+    PieceColor currentMoveColor = PieceColor::White;
+    Board newBoard = Board(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
+
+    int noCaptureMoves = 0;
+    std::ofstream debugLog(SIMULATION_LOG);
+    if (!debugLog.is_open()) {
+        throw std::runtime_error("Failed to open log file for writing.");
+    }
+
+    int result = DRAW;
+
+    // Queue for gpu generated moves
+	Move2 movesArray[QUEUE_SIZE];
+	Queue<Move2> moveQueue = Queue<Move2>(movesArray, QUEUE_SIZE);
+	bool areMovesTheSame = true;
+
+    while (true)
+    {
+        MoveList moves = newBoard.getAvailableMoves(currentMoveColor);
+		moveQueue.clear();
+		MoveGenerator::generateMovesGpu(newBoard._pieces, currentMoveColor, &moveQueue);
+
+        // Validation
+		int queueLength = moveQueue.length();
+		areMovesTheSame = true;
+        
+
+        if (queueLength != moves.size()) {
+			std::cout << "Error: Move list size mismatch. cpu: " << moves.size() << ", gpu: " << queueLength << std::endl;
+			areMovesTheSame = false;
+        }
+
+        for (int i = 0; i < queueLength; i++) {
+			Move2 gpuMove = moveQueue[i];
+            bool foundMove = false;
+            for(Move cpuMove: moves) {
+                if (cpuMove.getSource() == gpuMove.src &&
+                    cpuMove.getDestination() == gpuMove.dst &&
+                    cpuMove.getCaptured() == gpuMove.captured)
+					foundMove = true;
+            }
+            if (!foundMove) {
+				std::cout << "Error: Move not found in cpu list: " << gpuMove.toString() << std::endl;
+				areMovesTheSame = false;
+            }
+        }
+
+        for (int i = 0; i < queueLength; i++) {
+            Move2 gpuMove = moveQueue[i];
+            debugLog << "gpuMove:" << gpuMove.toString() << std::endl;
+        }
+
+        for (Move cpuMove : moves) {
+            debugLog << "cpuMove:" << cpuMove.toString() << std::endl;
+        }
+
+        if (!areMovesTheSame)
+        {   
+            break;
+        }      
+
+        // No moves available - game is over
+        if (moves.empty()) {
+            result = currentMoveColor == PieceColor::White ? BLACK_WIN : WHITE_WIN;
+            break;
+        }
+
+        // Check if the no capture moves limit has beeen exceeded
+        if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
+            result = DRAW;
+            break;
+        }
+
+        // Random number generation
+        std::random_device rd; // Seed
+        std::mt19937 gen(rd()); // Mersenne Twister engine
+        std::uniform_int_distribution<> dist(0, moves.size() - 1);
+
+        // Select a random move
+        int randomIndex = dist(gen);
+        Move randomMove = moves[randomIndex];
+
+        // Check if the move is a capture
+        if (!randomMove.isCapture() && (randomMove.getSource() & newBoard.getKings()) > 0) {
+            noCaptureMoves++;
+        }
+        else {
+            noCaptureMoves = 0;
+        }
+
+        newBoard = newBoard.getBoardAfterMove(randomMove);
+        currentMoveColor = getEnemyColor(currentMoveColor);
+
+        debugLog << "Chosen move: " << randomMove.toString() << std::endl;
+        debugLog << "Updated board state:\n" << newBoard.toString() << std::endl;
+        debugLog << "Kings: \n" << std::hex << newBoard.getKings() << std::endl;
+    }
+
+	if (areMovesTheSame) {
+        std::cout << "Simulation test: PASSED" << std::endl;
+	}
+    else
+    {
+		std::cout << "Simulation test: FAILED" << std::endl;
+    }
+} 
+
 void MoveGenerationTest::runAllTests()
 {
     testBasicPawnMovesCenter();
@@ -735,6 +847,8 @@ void MoveGenerationTest::runAllTests()
 
 	assertFailedTest();
 	assertFailedTest2();
+
+	simulationMoveGenerationTest();
 
     printSummary("Move Generation");
 }

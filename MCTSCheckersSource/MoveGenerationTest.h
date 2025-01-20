@@ -28,6 +28,8 @@ private:
     void assertFailedTest();
     void assertFailedTest2();
 
+    void simulationMoveGenerationTest();
+
 public:
     void runAllTests() override;
 };
