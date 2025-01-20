@@ -85,10 +85,10 @@ int main()
         whitePlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);*/
     }
 
-	/*Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-    whitePlayer->Simulate(whitePlayer->root);*/
+	Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+    whitePlayer->Simulate(whitePlayer->root);
 
-	simulateGameGpu(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0, PieceColor::White);
+	// simulateGameGpu(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0, PieceColor::White);
 
 
 	// CheckersTestSuite::runAll();
