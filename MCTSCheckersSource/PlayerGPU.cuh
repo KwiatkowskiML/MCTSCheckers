@@ -32,8 +32,6 @@ __host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, Piec
 	Move2 movesArray[QUEUE_SIZE];
 	Queue<Move2> movesQueue(movesArray, QUEUE_SIZE);
 
-
-
 	while (true)
 	{
 		// Clear the moves queue
@@ -77,6 +75,7 @@ __global__ void simulateKernel(UINT white, UINT black, UINT kings, PieceColor pl
 	uint32_t w = dev_random[idx * RANDOM_PER_THREAD + 1];
 	uint32_t jsr = dev_random[idx * RANDOM_PER_THREAD + 2];
 	uint32_t jcong = dev_random[idx * RANDOM_PER_THREAD + 3];
+
 	int simulationResult = simulateGameGpu(white, black, kings, playerColor, z, w, jsr, jcong);
 
 	if (simulationResult == DRAW) {
@@ -88,8 +87,6 @@ __global__ void simulateKernel(UINT white, UINT black, UINT kings, PieceColor pl
 	else {
 		dev_results[idx] = playerColor == PieceColor::Black ? WIN : LOOSE;
 	}
-
-	printf("Hello from block %d, thread %d, idx = %d, results = %d\n", blockIdx.x, threadIdx.x, idx, dev_results[idx]);
 }
 
 class PlayerGPU : public Player
@@ -159,7 +156,7 @@ public:
 		}
 
 		// Launch kernel
-		simulateKernel << <NUMBER_OF_BLOCKS, THREADS_PER_BLOCK >> > (white, black, kings, node->moveColor, dev_results, dev_random);
+		simulateKernel << <NUMBER_OF_BLOCKS, THREADS_PER_BLOCK>> > (white, black, kings, node->moveColor, dev_results, dev_random);
 
 		// Check for any errors launching the kernel
 		cudaStatus = cudaGetLastError();
@@ -176,9 +173,7 @@ public:
 
 		// Sum up simulation results
 		result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun, 0, thrust::plus<int>());
-		printf("Result = %d\n", result);
 
-		// TODO: check if the results should be negated
 	Error:
 		cudaFree(dev_results);
 		cudaFree(dev_random);

@@ -29,17 +29,18 @@
 #define BLACK_WIN 11
 
 #define MAX_NO_CAPTURE_MOVES 10
-#define DEFAULT_TIME_LIMIT 3000 // in miliseconds
+#define DEFAULT_TIME_LIMIT 1000 // in miliseconds
 
 #define C_UCT 2 // Exploration parameter
 
 #define GAME_LOG_FILE "game.log"
 #define SIMULATION_LOG "simulation.log"
-#define TREE_VISUALIZATION_FILE "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree.dot"
+#define TREE_VISUALIZATION_FILE_GPU "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_gpu.dot"
+#define TREE_VISUALIZATION_FILE_CPU "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_cpu.dot"
 #define TREE_VISUALIZATION_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_logs\\tree_iteration_"
 #define TREE_GAME_LOG_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\game_logs\\tree_iteration_"
 
 #define NUMBER_OF_BLOCKS 1
-#define THREADS_PER_BLOCK 100
+#define THREADS_PER_BLOCK 1
 
-#define QUEUE_SIZE 96
+#define QUEUE_SIZE 48

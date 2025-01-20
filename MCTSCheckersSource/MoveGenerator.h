@@ -58,7 +58,7 @@ public:
 	__device__ __host__ static void generateBasicMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, Queue<Move2>* moves)
 	{
 		while (movers) {
-			UINT mover = movers & -movers; // TODO: reconsider this
+			UINT mover = movers & -movers;
 			movers ^= mover;
 
 			if (mover & pieces.kings) {

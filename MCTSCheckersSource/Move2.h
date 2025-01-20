@@ -8,17 +8,18 @@
 
 class Move2 {
 public:
+	// The color of the player making the move
+	PieceColor playerColor;
+
 	// Source of the move
-	UINT src;
+	UINT src;	
 
 	// Destination of the move
 	UINT dst;
 
 	// Captured piece (if any)
 	UINT captured;
-
-	// The color of the player making the move
-	PieceColor playerColor;
+	
 
 	//----------------------------------------------------------------
 	// Constructors

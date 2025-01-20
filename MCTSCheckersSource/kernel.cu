@@ -13,14 +13,6 @@
 int main()
 {
     {
-        /*PlayerCPU* player = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-        Move* bestMove = player->GetBestMove();
-        player->GenerateDotFile(TREE_VISUALIZATION_FILE);
-
-        std::cout << "Best move: " << bestMove->toString() << std::endl;
-
-        delete player;*/
-
         /*{
             Player* whitePlayer = nullptr;
             Player* blackPlayer = nullptr;
@@ -46,11 +38,11 @@ int main()
         }*/
 
         {
-            UINT whitePieces = (1ULL << 28) | (1ULL << 21) | (1ULL << 22) | (1ULL << 23) | (1ULL << 17) | (1ULL << 13);
+            /*UINT whitePieces = (1ULL << 28) | (1ULL << 21) | (1ULL << 22) | (1ULL << 23) | (1ULL << 17) | (1ULL << 13);
             UINT blackPieces = (1ULL << 24) | (1ULL << 16) | (1ULL << 14) | (1ULL << 15) | (1ULL << 8) | (1ULL << 10) | (1ULL << 4) | (1ULL << 6);
             UINT kings = 0;
 
-  /*          UINT whitePieces2 = (1ULL << 24) | (1ULL << 22) | (1ULL << 19);
+            UINT whitePieces2 = (1ULL << 24) | (1ULL << 22) | (1ULL << 19);
             UINT blackPieces2 = (1ULL << 17) | (1ULL << 11) | (1ULL << 4);
 
             UINT whitePieces3 = (1ULL << 28) | (1ULL << 31) | (1ULL << 24) | (1ULL << 25) | (1ULL << 26) | (1ULL << 27) | (1ULL << 22) | (1ULL << 16) | (1ULL << 8);
@@ -64,7 +56,7 @@ int main()
             UINT blackPieces5 = (1ULL << 13);
 			UINT kings5 = (1ULL << 13);*/
 
-           /* Board boardAfterMove(whitePieces, blackPieces, kings);
+           /*Board boardAfterMove(whitePieces, blackPieces, kings);
             std::cout << boardAfterMove.toString() << std::endl;
 
             Player* blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
@@ -76,17 +68,40 @@ int main()
             delete blackPlayer;*/
         }
 
-        /*Board board2(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
+        UINT whitePieces = (1ULL << 24) | (1ULL << 26) | (1ULL << 27) | (1ULL << 20) | (1ULL << 16);
+        UINT blackPieces = (1ULL << 17) | (1ULL << 18) | (1ULL << 12) | (1ULL << 9) | (1ULL << 7) | (1ULL << 1);
+        UINT kings = 0;
+
+        Board board2(whitePieces, blackPieces, kings);
         std::cout << board2.toString() << std::endl;
-        Player* whitePlayer = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-        whitePlayer->SetBoard(board2);
-        Move* bestMove2 = whitePlayer->GetBestMove();
-        std::cout << "Best move: " << bestMove2->toString() << std::endl;
-        whitePlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);*/
+
+        // gpu
+        Player* blackPlayerGPU = new PlayerGPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
+        blackPlayerGPU->SetBoard(board2);
+
+        Move* bestMoveGpu = blackPlayerGPU->GetBestMove();
+		std::cout << "Best move: " << bestMoveGpu->toString() << std::endl;
+		std::cout << "Run simulations: " << blackPlayerGPU->root->gamesPlayed << std::endl;
+
+        blackPlayerGPU->GenerateDotFile(TREE_VISUALIZATION_FILE_GPU);
+
+        // cpu
+        Player* blackPlayerCPU = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
+        blackPlayerCPU->SetBoard(board2);
+
+        Move* bestMoveCpu = blackPlayerCPU->GetBestMove();
+		std::cout << "Best move: " << bestMoveCpu->toString() << std::endl;
+        std::cout << "Run simulations: " << blackPlayerCPU->root->gamesPlayed << std::endl;
+
+        blackPlayerCPU->GenerateDotFile(TREE_VISUALIZATION_FILE_CPU);
+
+		delete blackPlayerGPU;
+		delete blackPlayerCPU;
+
     }
 
-	Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-    whitePlayer->Simulate(whitePlayer->root);
+	/*Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+    whitePlayer->Simulate(whitePlayer->root);*/
 
 	// simulateGameGpu(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0, PieceColor::White);
 
