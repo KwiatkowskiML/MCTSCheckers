@@ -40,6 +40,6 @@
 #define TREE_GAME_LOG_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\game_logs\\tree_iteration_"
 
 #define NUMBER_OF_BLOCKS 1
-#define THREADS_PER_BLOCK 10
+#define THREADS_PER_BLOCK 1
 
 #define QUEUE_SIZE 96

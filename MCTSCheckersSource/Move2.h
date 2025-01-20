@@ -90,6 +90,15 @@ public:
 		return BitBoard(newWhitePawns, newBlackPawns, newKings);
 	}
 
+	// kernel debiging
+	__device__ __host__ void printMove() {
+		printf("Move: 0x%08x%s0x%08x 0x%08x\n",
+			src,
+			captured ? ":" : "-",
+			dst,
+			captured);
+	}
+
 	// Get string representation of the move
 	std::string toString() const
 	{

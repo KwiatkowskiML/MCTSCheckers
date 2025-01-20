@@ -7,37 +7,67 @@
 #include "MoveGenerator.h"
 #include "Queue.h"
 
-__host__ __device__ UINT simulateGame(UINT white, UINT black, UINT kings, bool whiteToPlay)
+__host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, PieceColor playercolor)
 {
-	BitBoard board(white, black, kings);
-	UINT temp = board.getAllPieces();
+    PieceColor currentMoveColor = playercolor;
+    BitBoard currentBitBoard = BitBoard(white, black, kings);
 
+    // Keeping track of the moves with no captures
+    int noCaptureMoves = 0;
 
-	BitShift shift = BitShift::BIT_SHIFT_L4;
-	BitShift opposite = ShiftMap::getOpposite(shift);
-    UINT shifted = ShiftMap::shift(black, shift);
+    // Moves Queue initialization
+	Move2 movesArray[QUEUE_SIZE];
+	Queue<Move2> movesQueue(movesArray, QUEUE_SIZE);
 
-	UINT movers = MoveGenerator::getMoversInShift(board, PieceColor::Black, shift);
-	UINT movers2 = MoveGenerator::getAllMovers(board, PieceColor::Black);
-	UINT jumpers = MoveGenerator::getJumpersInShift(board, PieceColor::Black, shift);
-	UINT jumpers2 = MoveGenerator::getAllJumpers(board, PieceColor::Black);
+    while (true)
+    {
+		// Clear the moves queue
+		movesQueue.clear();
 
-    Move2 movesArray[QUEUE_SIZE];
-    Queue<Move2> availbleMovesQ = Queue<Move2>(movesArray, QUEUE_SIZE);
-	MoveGenerator::generatePawnMovesGpu(board, PieceColor::Black, 1ULL << 9, BitShift::BIT_SHIFT_L4, &availbleMovesQ);
+		// Generate all possible moves
+		MoveGenerator::generateMovesGpu(currentBitBoard, currentMoveColor, &movesQueue);
 
-    BitBoard board2(1ULL << 4, 1ULL, 0);
-    MoveGenerator::generatePawnCapturesGpu(board2, PieceColor::Black, 1ULL, BitShift::BIT_SHIFT_L4, &availbleMovesQ);
-    
-	return 0;
+        // No moves available - game is over
+        if (movesQueue.empty()) {
+            return currentMoveColor == PieceColor::White ? BLACK_WIN : WHITE_WIN;
+        }
+
+        // Check if the no capture moves limit has beeen exceeded
+        if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
+            return DRAW;
+        }
+
+        //// Random number generation
+        //std::random_device rd; // Seed
+        //std::mt19937 gen(rd()); // Mersenne Twister engine
+        //std::uniform_int_distribution<> dist(0, moves.size() - 1);
+
+        //// Select a random move
+        //int randomIndex = dist(gen);
+        //Move randomMove = moves[randomIndex];
+
+		Move2 randomMove = movesQueue.front();
+		randomMove.printMove();
+
+        // Check if the move is a capture
+        if (!randomMove.captured && (randomMove.src & currentBitBoard.kings) > 0) {
+            noCaptureMoves++;
+        }
+        else {
+            noCaptureMoves = 0;
+        }
+
+        currentBitBoard = randomMove.getBitboardAfterMove(currentBitBoard);
+        currentBitBoard.print();
+        currentMoveColor = getEnemyColor(currentMoveColor);     
+    }
 }
 
-__global__ void simulateKernel(UINT white, UINT black, UINT kings, bool whiteToPlay, char* dev_results)
+__global__ void simulateKernel(UINT white, UINT black, UINT kings, PieceColor playerColor, char* dev_results)
 {
     int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    dev_results[idx] = -1; // temp
 
-	simulateGame(white, black, kings, whiteToPlay);
+    dev_results[idx] = simulateGameGpu(white, black, kings, playerColor);
 
 	printf("Hello from block %d, thread %d, idx = %d, results = %d\n", blockIdx.x, threadIdx.x, idx, dev_results[idx]);
 }
@@ -55,7 +85,6 @@ public:
         UINT white = node->boardAfterMove.getWhitePawns();
         UINT black = node->boardAfterMove.getBlackPawns();
         UINT kings = node->boardAfterMove.getKings();
-        bool whiteToPlay = node->moveColor == PieceColor::Black; // if black moved, white is to play
 		int simulationToRun = NUMBER_OF_BLOCKS * THREADS_PER_BLOCK;
         
         // Results array
@@ -77,7 +106,7 @@ public:
         }
 		
         // Launch kernel
-		simulateKernel <<<NUMBER_OF_BLOCKS, THREADS_PER_BLOCK>>> (white, black, kings, whiteToPlay, dev_results);
+		simulateKernel <<<NUMBER_OF_BLOCKS, THREADS_PER_BLOCK>>> (white, black, kings, node->moveColor, dev_results);
 
         // Check for any errors launching the kernel
         cudaStatus = cudaGetLastError();
