@@ -62,54 +62,8 @@ void CompareSimulations(Board board, int times, PieceColor playerColor, PieceCol
 
 int main()
 {
-    UINT whitePieces = (1ULL << 24) | (1ULL << 26) | (1ULL << 27) | (1ULL << 20) | (1ULL << 16);
-    UINT blackPieces = (1ULL << 17) | (1ULL << 18) | (1ULL << 12) | (1ULL << 9) | (1ULL << 7) | (1ULL << 1);
-    UINT kings = 0;
-
-    {     
-
-        Board board2(whitePieces, blackPieces, kings);
-        std::cout << board2.toString() << std::endl;
-
-        // gpu
-        Player* blackPlayerGPU = new PlayerGPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
-        blackPlayerGPU->SetBoard(board2);
-
-        Move* bestMoveGpu = blackPlayerGPU->GetBestMove();
-		std::cout << "Best move: " << bestMoveGpu->toString() << std::endl;
-		std::cout << "Run simulations: " << blackPlayerGPU->root->gamesPlayed << std::endl;
-
-        blackPlayerGPU->GenerateDotFile(TREE_VISUALIZATION_FILE_GPU);
-
-        // cpu
-        Player* blackPlayerCPU = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
-        blackPlayerCPU->SetBoard(board2);
-
-        Move* bestMoveCpu = blackPlayerCPU->GetBestMove();
-		std::cout << "Best move: " << bestMoveCpu->toString() << std::endl;
-        std::cout << "Run simulations: " << blackPlayerCPU->root->gamesPlayed << std::endl;
-
-        blackPlayerCPU->GenerateDotFile(TREE_VISUALIZATION_FILE_CPU);
-
-		delete blackPlayerGPU;
-		delete blackPlayerCPU;
-
-    }
-
-	/*Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-    whitePlayer->Simulate(whitePlayer->root);*/
-
-    UINT whitePiecesAfter = (1ULL << 24) | (1ULL << 26) | (1ULL << 27) | (1ULL << 20) | (1ULL << 16);
-    UINT blackPiecesAfter = (1ULL << 17) | (1ULL << 18) | (1ULL << 12) | (1ULL << 9) | (1ULL << 7) | (1ULL << 4);
-	Board board(whitePiecesAfter, blackPiecesAfter, 0);
-
-	// CompareSimulations(board, 1000, PieceColor::Black, PieceColor::Black);
-
-    /*simulateGameGpu(whitePiecesAfter, blackPiecesAfter, 0, PieceColor::Black, 0, 0, 0, 0);
-	int result = board.simulateGame(PieceColor::Black);
-	printf("Result: %d\n", result);*/
-
-	// CheckersTestSuite::runAll();
+	Game game;
+	game.PlayGame();
 
     return 0;
 }

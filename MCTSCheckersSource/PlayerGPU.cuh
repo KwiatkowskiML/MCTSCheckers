@@ -9,7 +9,7 @@
 #include <curand.h>
 #include <curand_kernel.h>
 
-#include "Player.h"
+#include "PlayerGpu.h"
 #include "ShiftMap.h"
 #include "MoveGenerator.h"
 #include "Queue.h"
@@ -96,96 +96,184 @@ __global__ void simulateKernel(UINT white, UINT black, UINT kings, PieceColor co
 	dev_results[idx] = result;
 }
 
-class PlayerGPU : public Player
+std::pair<int, int> PlayerGPU::Simulate(Node* node)
 {
-public:
-	PlayerGPU(PieceColor color, int timeLimit) : Player(color, timeLimit) {}
+	cudaError_t cudaStatus;
 
-	// Simulation on GPU
-	std::pair<int, int> Simulate(Node* node) override {
-		cudaError_t cudaStatus;
+	// Random number generator initialization
+	curandGenerator_t gen;
 
-		// Random number generator initialization
-		curandGenerator_t gen;
+	// Kernel parameters setup
+	UINT white = node->boardAfterMove.getWhitePawns();
+	UINT black = node->boardAfterMove.getBlackPawns();
+	UINT kings = node->boardAfterMove.getKings();
+	int simulationToRun = NUMBER_OF_BLOCKS * THREADS_PER_BLOCK;
 
-		// Kernel parameters setup
-		UINT white = node->boardAfterMove.getWhitePawns();
-		UINT black = node->boardAfterMove.getBlackPawns();
-		UINT kings = node->boardAfterMove.getKings();
-		int simulationToRun = NUMBER_OF_BLOCKS * THREADS_PER_BLOCK;
+	// Results array
+	char* dev_results = 0;
+	uint32_t* dev_random = 0;
+	int result = 0;
 
-		// Results array
-		char* dev_results = 0;
-		uint32_t* dev_random = 0;
-		int result = 0;
+	// Choose which GPU to run on, change this on a multi-GPU system.
+	cudaStatus = cudaSetDevice(0);
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+		goto Error;
+	}
 
-		// Choose which GPU to run on, change this on a multi-GPU system.
-		cudaStatus = cudaSetDevice(0);
-		if (cudaStatus != cudaSuccess) {
-			fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-			goto Error;
-		}
+	// Allocate results array
+	cudaStatus = cudaMalloc((void**)&dev_results, simulationToRun * sizeof(char));
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMalloc failed!");
+		goto Error;
+	}
 
-		// Allocate results array
-		cudaStatus = cudaMalloc((void**)&dev_results, simulationToRun * sizeof(char));
-		if (cudaStatus != cudaSuccess) {
-			fprintf(stderr, "cudaMalloc failed!");
-			goto Error;
-		}
+	// Allocate random numbers array
+	cudaStatus = cudaMalloc((void**)&dev_random, simulationToRun * RANDOM_PER_THREAD * sizeof(uint32_t));
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaMalloc failed!");
+		goto Error;
+	}
 
-		// Allocate random numbers array
-		cudaStatus = cudaMalloc((void**)&dev_random, simulationToRun * RANDOM_PER_THREAD * sizeof(uint32_t));
-		if (cudaStatus != cudaSuccess) {
-			fprintf(stderr, "cudaMalloc failed!");
-			goto Error;
-		}
+	// Random number generator setup
+	curandStatus_t cuRandStatus;
+	cuRandStatus = curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+	if (cuRandStatus != CURAND_STATUS_SUCCESS) {
+		fprintf(stderr, "curandCreateGenerator failed!");
+		goto Error;
+	}
 
-		// Random number generator setup
-		curandStatus_t cuRandStatus;
-		cuRandStatus = curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
-		if (cuRandStatus != CURAND_STATUS_SUCCESS) {
-			fprintf(stderr, "curandCreateGenerator failed!");
-			goto Error;
-		}
+	// Setting up seed
+	cuRandStatus = curandSetPseudoRandomGeneratorSeed(gen, time(NULL));
+	if (cuRandStatus != CURAND_STATUS_SUCCESS) {
+		fprintf(stderr, "curandSetPseudoRandomGeneratorSeed failed!");
+		goto Error;
+	}
 
-		// Setting up seed
-		cuRandStatus = curandSetPseudoRandomGeneratorSeed(gen, time(NULL));
-		if (cuRandStatus != CURAND_STATUS_SUCCESS) {
-			fprintf(stderr, "curandSetPseudoRandomGeneratorSeed failed!");
-			goto Error;
-		}
+	// Setting up seed
+	cuRandStatus = curandGenerate(gen, dev_random, simulationToRun * RANDOM_PER_THREAD);
+	if (cuRandStatus != CURAND_STATUS_SUCCESS) {
+		fprintf(stderr, "curandGenerate failed!");
+		goto Error;
+	}
 
-		// Setting up seed
-		cuRandStatus = curandGenerate(gen, dev_random, simulationToRun * RANDOM_PER_THREAD);
-		if (cuRandStatus != CURAND_STATUS_SUCCESS) {
-			fprintf(stderr, "curandGenerate failed!");
-			goto Error;
-		}
+	// Launch kernel
+	simulateKernel << <NUMBER_OF_BLOCKS, THREADS_PER_BLOCK >> > (white, black, kings, getEnemyColor(node->moveColor), playerColor, dev_results, dev_random);
 
-		// Launch kernel
-		simulateKernel << <NUMBER_OF_BLOCKS, THREADS_PER_BLOCK>> > (white, black, kings, getEnemyColor(node->moveColor), playerColor, dev_results, dev_random);
+	// Check for any errors launching the kernel
+	cudaStatus = cudaGetLastError();
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "simulateKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
+		goto Error;
+	}
 
-		// Check for any errors launching the kernel
-		cudaStatus = cudaGetLastError();
-		if (cudaStatus != cudaSuccess) {
-			fprintf(stderr, "simulateKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-			goto Error;
-		}
+	cudaStatus = cudaDeviceSynchronize();
+	if (cudaStatus != cudaSuccess) {
+		fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching simulateKernel!\n", cudaStatus);
+		goto Error;
+	}
 
-		cudaStatus = cudaDeviceSynchronize();
-		if (cudaStatus != cudaSuccess) {
-			fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching simulateKernel!\n", cudaStatus);
-			goto Error;
-		}
+	// Sum up simulation results
+	result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun, 0, thrust::plus<int>());
 
-		// Sum up simulation results
-		result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun, 0, thrust::plus<int>());
+Error:
+	cudaFree(dev_results);
+	cudaFree(dev_random);
+	curandDestroyGenerator(gen);
 
-	Error:
-		cudaFree(dev_results);
-		cudaFree(dev_random);
-		curandDestroyGenerator(gen);
+	return std::make_pair(result, simulationToRun);
+}
 
-		return std::make_pair(result, simulationToRun);
-	};
-};
+//class PlayerGPU : public Player
+//{
+//public:
+//	PlayerGPU(PieceColor color, int timeLimit) : Player(color, timeLimit) {}
+//
+//	// Simulation on GPU
+//	std::pair<int, int> Simulate(Node* node) override {
+//		cudaError_t cudaStatus;
+//
+//		// Random number generator initialization
+//		curandGenerator_t gen;
+//
+//		// Kernel parameters setup
+//		UINT white = node->boardAfterMove.getWhitePawns();
+//		UINT black = node->boardAfterMove.getBlackPawns();
+//		UINT kings = node->boardAfterMove.getKings();
+//		int simulationToRun = NUMBER_OF_BLOCKS * THREADS_PER_BLOCK;
+//
+//		// Results array
+//		char* dev_results = 0;
+//		uint32_t* dev_random = 0;
+//		int result = 0;
+//
+//		// Choose which GPU to run on, change this on a multi-GPU system.
+//		cudaStatus = cudaSetDevice(0);
+//		if (cudaStatus != cudaSuccess) {
+//			fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+//			goto Error;
+//		}
+//
+//		// Allocate results array
+//		cudaStatus = cudaMalloc((void**)&dev_results, simulationToRun * sizeof(char));
+//		if (cudaStatus != cudaSuccess) {
+//			fprintf(stderr, "cudaMalloc failed!");
+//			goto Error;
+//		}
+//
+//		// Allocate random numbers array
+//		cudaStatus = cudaMalloc((void**)&dev_random, simulationToRun * RANDOM_PER_THREAD * sizeof(uint32_t));
+//		if (cudaStatus != cudaSuccess) {
+//			fprintf(stderr, "cudaMalloc failed!");
+//			goto Error;
+//		}
+//
+//		// Random number generator setup
+//		curandStatus_t cuRandStatus;
+//		cuRandStatus = curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+//		if (cuRandStatus != CURAND_STATUS_SUCCESS) {
+//			fprintf(stderr, "curandCreateGenerator failed!");
+//			goto Error;
+//		}
+//
+//		// Setting up seed
+//		cuRandStatus = curandSetPseudoRandomGeneratorSeed(gen, time(NULL));
+//		if (cuRandStatus != CURAND_STATUS_SUCCESS) {
+//			fprintf(stderr, "curandSetPseudoRandomGeneratorSeed failed!");
+//			goto Error;
+//		}
+//
+//		// Setting up seed
+//		cuRandStatus = curandGenerate(gen, dev_random, simulationToRun * RANDOM_PER_THREAD);
+//		if (cuRandStatus != CURAND_STATUS_SUCCESS) {
+//			fprintf(stderr, "curandGenerate failed!");
+//			goto Error;
+//		}
+//
+//		// Launch kernel
+//		simulateKernel << <NUMBER_OF_BLOCKS, THREADS_PER_BLOCK>> > (white, black, kings, getEnemyColor(node->moveColor), playerColor, dev_results, dev_random);
+//
+//		// Check for any errors launching the kernel
+//		cudaStatus = cudaGetLastError();
+//		if (cudaStatus != cudaSuccess) {
+//			fprintf(stderr, "simulateKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
+//			goto Error;
+//		}
+//
+//		cudaStatus = cudaDeviceSynchronize();
+//		if (cudaStatus != cudaSuccess) {
+//			fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching simulateKernel!\n", cudaStatus);
+//			goto Error;
+//		}
+//
+//		// Sum up simulation results
+//		result = thrust::reduce(thrust::device, dev_results, dev_results + simulationToRun, 0, thrust::plus<int>());
+//
+//	Error:
+//		cudaFree(dev_results);
+//		cudaFree(dev_random);
+//		curandDestroyGenerator(gen);
+//
+//		return std::make_pair(result, simulationToRun);
+//	};
+//};
