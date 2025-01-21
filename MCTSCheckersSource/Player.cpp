@@ -5,7 +5,7 @@
 #include <chrono>
 #include <sstream>
 
-#define TREE_BUILD_DEBUG
+// #define TREE_BUILD_DEBUG
 
 // Set players board
 void Player::SetBoard(Board board)
@@ -100,8 +100,7 @@ Move* Player::GetBestMove()
 	// Start the timer
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-	//while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
-	for (int i = 0; i < 100; i++)
+	while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count() < timeLimit)
 	{ 
 
 		Node* selectedNode = SelectNode();

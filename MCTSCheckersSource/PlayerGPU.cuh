@@ -54,7 +54,6 @@ __host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, Piec
 		int randomIndex = KISS % movesQueue.length();
 		Move2 randomMove = movesQueue[randomIndex];
 
-
 		// Check if the move is a capture
 		if (!randomMove.captured && (randomMove.src & currentBitBoard.kings) > 0) {
 			noCaptureMoves++;
