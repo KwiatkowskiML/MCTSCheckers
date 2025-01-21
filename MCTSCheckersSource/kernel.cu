@@ -12,6 +12,10 @@
 
 int main()
 {
+    UINT whitePieces = (1ULL << 24) | (1ULL << 26) | (1ULL << 27) | (1ULL << 20) | (1ULL << 16);
+    UINT blackPieces = (1ULL << 17) | (1ULL << 18) | (1ULL << 12) | (1ULL << 9) | (1ULL << 7) | (1ULL << 1);
+    UINT kings = 0;
+
     {
         /*{
             Player* whitePlayer = nullptr;
@@ -68,9 +72,7 @@ int main()
             delete blackPlayer;*/
         }
 
-        UINT whitePieces = (1ULL << 24) | (1ULL << 26) | (1ULL << 27) | (1ULL << 20) | (1ULL << 16);
-        UINT blackPieces = (1ULL << 17) | (1ULL << 18) | (1ULL << 12) | (1ULL << 9) | (1ULL << 7) | (1ULL << 1);
-        UINT kings = 0;
+        
 
         Board board2(whitePieces, blackPieces, kings);
         std::cout << board2.toString() << std::endl;
@@ -103,8 +105,13 @@ int main()
 	/*Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
     whitePlayer->Simulate(whitePlayer->root);*/
 
-	// simulateGameGpu(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0, PieceColor::White);
+    UINT whitePiecesAfter = (1ULL << 24) | (1ULL << 26) | (1ULL << 27) | (1ULL << 20) | (1ULL << 16);
+    UINT blackPiecesAfter = (1ULL << 17) | (1ULL << 18) | (1ULL << 12) | (1ULL << 9) | (1ULL << 7) | (1ULL << 4);
+	//simulateGameGpu(whitePiecesAfter, blackPiecesAfter, 0, PieceColor::Black, 0, 0, 0, 0);
 
+	/*Board board(whitePiecesAfter, blackPiecesAfter, 0);
+	int result = board.simulateGame(PieceColor::Black);
+	printf("Result: %d\n", result);*/
 
 	// CheckersTestSuite::runAll();
 

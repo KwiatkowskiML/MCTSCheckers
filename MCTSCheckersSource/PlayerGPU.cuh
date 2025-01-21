@@ -20,9 +20,9 @@
 
 #define RANDOM_PER_THREAD 4
 
-__host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, PieceColor playercolor, uint32_t z, uint32_t w, uint32_t jsr, uint32_t jcong)
+__host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, PieceColor colorToMove, uint32_t z, uint32_t w, uint32_t jsr, uint32_t jcong)
 {
-	PieceColor currentMoveColor = playercolor;
+	PieceColor currentMoveColor = colorToMove;
 	BitBoard currentBitBoard = BitBoard(white, black, kings);
 
 	// Keeping track of the moves with no captures
@@ -54,6 +54,7 @@ __host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, Piec
 		int randomIndex = KISS % movesQueue.length();
 		Move2 randomMove = movesQueue[randomIndex];
 
+
 		// Check if the move is a capture
 		if (!randomMove.captured && (randomMove.src & currentBitBoard.kings) > 0) {
 			noCaptureMoves++;
@@ -67,7 +68,7 @@ __host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, Piec
 	}
 }
 
-__global__ void simulateKernel(UINT white, UINT black, UINT kings, PieceColor playerColor, char* dev_results, uint32_t* dev_random)
+__global__ void simulateKernel(UINT white, UINT black, UINT kings, PieceColor colorToMove, PieceColor playerColor, char* dev_results, uint32_t* dev_random)
 {
 	int idx = blockDim.x * blockIdx.x + threadIdx.x;
 
@@ -76,17 +77,19 @@ __global__ void simulateKernel(UINT white, UINT black, UINT kings, PieceColor pl
 	uint32_t jsr = dev_random[idx * RANDOM_PER_THREAD + 2];
 	uint32_t jcong = dev_random[idx * RANDOM_PER_THREAD + 3];
 
-	int simulationResult = simulateGameGpu(white, black, kings, playerColor, z, w, jsr, jcong);
+	int winner = simulateGameGpu(white, black, kings, colorToMove, z, w, jsr, jcong);
+	int result = 0;
 
-	if (simulationResult == DRAW) {
-		dev_results[idx] = DRAW;
-	}
-	else if (simulationResult == WHITE_WIN) {
-		dev_results[idx] = playerColor == PieceColor::White ? WIN : LOOSE;
-	}
-	else {
-		dev_results[idx] = playerColor == PieceColor::Black ? WIN : LOOSE;
-	}
+	if (winner == BLACK_WIN && playerColor == PieceColor::Black)
+		result = WIN;
+	else if (winner == WHITE_WIN && playerColor == PieceColor::White)
+		result = WIN;
+	else if (winner == DRAW)
+		result = DRAW;
+	else
+		result = LOOSE;
+
+	dev_results[idx] = result;
 }
 
 class PlayerGPU : public Player
@@ -156,7 +159,7 @@ public:
 		}
 
 		// Launch kernel
-		simulateKernel << <NUMBER_OF_BLOCKS, THREADS_PER_BLOCK>> > (white, black, kings, node->moveColor, dev_results, dev_random);
+		simulateKernel << <NUMBER_OF_BLOCKS, THREADS_PER_BLOCK>> > (white, black, kings, getEnemyColor(node->moveColor), playerColor, dev_results, dev_random);
 
 		// Check for any errors launching the kernel
 		cudaStatus = cudaGetLastError();

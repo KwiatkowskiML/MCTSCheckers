@@ -95,13 +95,12 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool include
 	// Handling the case when the pawn is crowned
 	if (includeCoronation)
 	{
-		for (UINT step : steps)
-		{
-			if (playerColor == PieceColor::White && (step & WHITE_CROWNING))
-				newKings |= destination;
-			if (playerColor == PieceColor::Black && (step & BLACK_CROWNING))
-				newKings |= destination;
-		}
+
+		if (playerColor == PieceColor::White && (getDestination() & WHITE_CROWNING))
+			newKings |= destination;
+		if (playerColor == PieceColor::Black && (getDestination() & BLACK_CROWNING))
+			newKings |= destination;
+	
 	}
 
 	UINT newWhitePawns = playerColor == PieceColor::White ? newCurrentPieces : newEnemyPieces;
