@@ -29,7 +29,7 @@ public:
 	bool ExpandNode(Node* node);
 
 	// Get the best move based on the results of simulations
-	virtual Move* GetBestMove();
+	Move* GetBestMove();
 
 	// Select the most promising node 
 	Node* SelectNode();

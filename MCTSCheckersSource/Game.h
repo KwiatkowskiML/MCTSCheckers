@@ -4,16 +4,13 @@
 class Game
 {
 private:
-	Player* _whitePlayer = nullptr;
-	Player* _blackPlayer = nullptr;
+	Player* _whitePlayer;
+	Player* _blackPlayer;
 public:
-	Game();
+	Game(Player* whitePlayer, Player* blackPlayer) : _whitePlayer(whitePlayer), _blackPlayer(blackPlayer) {};
 	void PlayGame();
 	void PlayGameAsWhite();
-	~Game() 
-	{
-		delete _whitePlayer;
-		delete _blackPlayer;
-	};
+	static int GetGameSetup(Player*& whitePlayer, Player*& blackPlayer);
+	~Game() {};
 };
 
