@@ -19,6 +19,7 @@ struct BitBoard {
     __device__ __host__ UINT getEnemyPieces(PieceColor playerColor) const { return static_cast<UINT>(playerColor)^1; }
     __device__ __host__ UINT getPieces(PieceColor playerColor) const { return playerColor == PieceColor::White ? whitePawns : blackPawns; }
 
+    // Useless
     __device__ __host__ void print() {
         printf("     A   B   C   D   E   F   G   H\n");
         printf("   +---+---+---+---+---+---+---+---+\n");

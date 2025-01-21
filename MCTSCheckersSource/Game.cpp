@@ -1,14 +1,78 @@
 #include "Game.h"
 #include "PlayerCPU.h"
+#include "PlayerGPU.cuh"
+#include "PlayerReal.h"
 #include <fstream>
 
 #define LOG_GAME_TREE
+
+Game::Game()
+{
+	std::string input;
+	bool shouldAskAgain;
+
+	// Get the white player type
+	std::cout << "White:" << std::endl;
+	std::cout << "1. Player" << std::endl;
+	std::cout << "2. CPU" << std::endl;
+	std::cout << "3. GPU" << std::endl;
+	do
+	{
+		shouldAskAgain = false;
+		std::cin >> input;
+		switch (stoi(input))
+		{
+		case 1:
+			_whitePlayer = new PlayerReal(PieceColor::White, DEFAULT_TIME_LIMIT);
+			break;
+		case 2:
+			_whitePlayer = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+			break;
+		case 3:
+			_whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+			break;
+		default:
+			shouldAskAgain = true;
+			std::cout << "Invalid value!" << std::endl;
+			break;
+		}
+	} while (shouldAskAgain);
+
+	// Get the black player type
+	std::cout << "Black:" << std::endl;
+	std::cout << "1. Player" << std::endl;
+	std::cout << "2. CPU" << std::endl;
+	std::cout << "3. GPU" << std::endl;
+	do
+	{
+		shouldAskAgain = false;
+		std::cin >> input;
+		switch (stoi(input))
+		{
+		case 1:
+			_blackPlayer = new PlayerReal(PieceColor::Black, DEFAULT_TIME_LIMIT);
+			break;
+		case 2:
+			_blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
+			break;
+		case 3:
+			_blackPlayer = new PlayerGPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
+			break;
+		default:
+			shouldAskAgain = true;
+			std::cout << "Invalid value!" << std::endl;
+			break;
+		}
+	} while (shouldAskAgain);
+}
 
 void Game::PlayGame()
 {
 	Board newBoard;
 	bool gameEnded = false;
 	std::ofstream logFile(GAME_LOG_FILE);
+	int iteration = 0;
+	int noCaptureMoves;
 
 	if (!logFile) {
 		std::cerr << "Error opening log file!" << std::endl;
@@ -16,19 +80,40 @@ void Game::PlayGame()
 	}
 
 	// Game loop
-	for (int i = 0; i < 100; i++)
+	while (true)
 	{
+		// Keeping count of the iterations done
+		iteration++;
+
 		// White player move
 		Move* whiteMove = _whitePlayer->GetBestMove();
 		if (whiteMove == nullptr)
 		{
 			logFile << "White player has no moves left. Black player wins!" << std::endl;
+			std::cout << "White player has no moves left. Black player wins!" << std::endl;
 			break;
 		}
 		newBoard = _whitePlayer->root->boardAfterMove.getBoardAfterMove(*whiteMove);
 
-		logFile << i << ". White player move: " << whiteMove->toString() << std::endl;
+		logFile << iteration << ". White player move: " << whiteMove->toString() << std::endl;
+		std::cout << iteration << ". White player move: " << whiteMove->toString() << std::endl;
 		logFile << newBoard.toString() << std::endl;
+		std::cout << newBoard.toString() << std::endl;
+
+		// Checking if the move is a capture
+		if (!whiteMove->isCapture() && (whiteMove->getSource() & newBoard.getKings()) > 0) {
+			noCaptureMoves++;
+		}
+		else {
+			noCaptureMoves = 0;
+		}
+
+		// Checking for the draw
+		if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
+			logFile << "DRAW" << std::endl;
+			std::cout << "DRAW" << std::endl;
+			break;
+		}
 
 		// Update black players board
 		_blackPlayer->SetBoard(newBoard);
@@ -38,12 +123,30 @@ void Game::PlayGame()
 		if (blackMove == nullptr)
 		{
 			logFile << "Black player has no moves left. White player wins!" << std::endl;
+			std::cout << "Black player has no moves left. White player wins!" << std::endl;
 			break;
 		}
 		newBoard = _blackPlayer->root->boardAfterMove.getBoardAfterMove(*blackMove);
 
-		logFile << "Black player move: " << blackMove->toString() << std::endl;
+		logFile << iteration << ". Black player move: " << blackMove->toString() << std::endl;
+		std::cout << iteration << ". Black player move: " << blackMove->toString() << std::endl;
 		logFile << newBoard.toString() << std::endl;
+		std::cout << newBoard.toString() << std::endl;
+
+		// Checking if the move is a capture
+		if (!blackMove->isCapture() && (blackMove->getSource() & newBoard.getKings()) > 0) {
+			noCaptureMoves++;
+		}
+		else {
+			noCaptureMoves = 0;
+		}
+
+		// Checking for the draw
+		if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
+			logFile << "DRAW" << std::endl;
+			std::cout << "DRAW" << std::endl;
+			break;
+		}
 
 		// Set up white players board
 		_whitePlayer->SetBoard(newBoard);
@@ -68,7 +171,7 @@ void Game::PlayGameAsWhite()
 
 		// get white player move
 		std::string move;
-		Move whiteMove(0,0);
+		Move whiteMove(0, 0);
 		MoveList possibleWhiteMoves = newBoard.getAvailableMoves(PieceColor::White);
 
 		// Cehck if player input move is correct
@@ -78,7 +181,7 @@ void Game::PlayGameAsWhite()
 			std::cin >> move;
 			try
 			{
-				whiteMove = Move(move, PieceColor::White); 
+				whiteMove = Move(move, PieceColor::White);
 				if (!Move::containsMove(possibleWhiteMoves, whiteMove))
 				{
 					std::cout << "Invalid move!" << std::endl << "Possible moves:" << std::endl;
@@ -131,59 +234,4 @@ void Game::PlayGameAsWhite()
 
 		std::cout << "Black player move: " << blackMove->toString() << std::endl;
 	}
-}
-
-int Game::GetGameSetup(Player*& whitePlayer, Player*& blackPlayer)
-{
-	std::string input;
-	bool shouldAskAgain;
-	int result = 0;
-
-	// Get the white player type
-	std::cout << "White:" << std::endl;
-	std::cout << "1. Player" << std::endl;
-	std::cout << "2. CPU" << std::endl;
-	do
-	{
-		shouldAskAgain = false;
-		std::cin >> input;
-		switch (stoi(input))
-		{
-		case 1:
-			result = 1;
-			break;
-		case 2:
-			whitePlayer = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-			break;
-		default:
-			shouldAskAgain = true;
-			std::cout << "Invalid value!" << std::endl;
-			break;
-		}
-	} while (shouldAskAgain);
-
-	// Get the black player type
-	std::cout << "Black:" << std::endl;
-	std::cout << "1. Player" << std::endl;
-	std::cout << "2. CPU" << std::endl;
-	do
-	{
-		shouldAskAgain = false;
-		std::cin >> input;
-		switch (stoi(input))
-		{
-		case 1:
-			std::cout << "Not implemented yet" << std::endl;
-			break;
-		case 2:
-			blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
-			break;
-		default:
-			shouldAskAgain = true;
-			std::cout << "Invalid value!" << std::endl;
-			break;
-		}
-	} while (shouldAskAgain);
-
-	return result;
 }

@@ -1,10 +1,15 @@
 #pragma once
-#include "Player.h"
+
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 #include <thrust/reduce.h>
 #include <thrust/functional.h>
 #include <thrust/execution_policy.h>
 #include <curand.h>
 #include <curand_kernel.h>
+
+
+#include "Player.h"
 #include "ShiftMap.h"
 #include "MoveGenerator.h"
 #include "Queue.h"
