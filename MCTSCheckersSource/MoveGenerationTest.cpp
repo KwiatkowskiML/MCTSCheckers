@@ -1,9 +1,10 @@
-#include "MoveGenerationTest.h"
-#include "Move.h"
-#include "Board.h"
 #include <fstream>
 #include <sstream>
 #include <random>
+
+#include "MoveGenerationTest.h"
+#include "Move.h"
+#include "Board.h"
 
 bool MoveGenerationTest::verifyMoveList(const char* testName, const MoveList& expected, const MoveList& actual)
 {

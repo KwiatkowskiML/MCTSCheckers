@@ -1,8 +1,9 @@
 #pragma once
-#include "Types.h"
-#include "PieceColor.h"
 #include "cuda_runtime.h"
 #include "stdio.h"
+
+#include "Types.h"
+#include "PieceColor.h"
 
 struct BitBoard {
     UINT whitePawns;

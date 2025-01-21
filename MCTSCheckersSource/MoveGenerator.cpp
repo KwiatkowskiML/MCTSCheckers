@@ -1,11 +1,11 @@
 #include <cassert>
+#include <list>
+#include <tuple>
 
 #include "MoveGenerator.h"
 #include "Utils.h"
 #include "Board.h"
 #include "ShiftMap.h"
-#include <list>
-#include <tuple>
 
 //----------------------------------------------------------------
 // Generating moves

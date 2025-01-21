@@ -1,7 +1,8 @@
 #pragma once
+#include <utility>
+
 #include "PieceColor.h"
 #include "node.h"
-#include <utility>
 
 class Player
 {

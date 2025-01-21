@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
+#include <cassert>
+#include <string>
+
 #include "Types.h"
 #include "PieceColor.h"
-#include <cassert>
 #include "Utils.h"
 #include "BitBoard.h"
-#include <string>
 
 class Move {
 private:

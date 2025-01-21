@@ -1,10 +1,12 @@
 #pragma once
+
+#include <vector>
+#include <unordered_map>
+
 #include "Utils.h"
 #include "PieceColor.h"
 #include "BitBoard.h"
-#include <vector>
 #include "Move.h"
-#include <unordered_map>
 
 class Board {
 private:

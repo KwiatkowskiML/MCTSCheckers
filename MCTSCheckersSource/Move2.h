@@ -1,10 +1,11 @@
 #pragma once
+#include <sstream>
+
 #include "Types.h"
 #include "PieceColor.h"
 #include "BitBoard.h"
 #include "Utils.h"
 #include "Board.h"
-#include <sstream>
 
 class Move2 {
 public:

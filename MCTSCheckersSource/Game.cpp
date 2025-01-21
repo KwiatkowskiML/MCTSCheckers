@@ -1,6 +1,7 @@
+#include <fstream>
+
 #include "Game.h"
 #include "PlayerCPU.h"
-#include <fstream>
 
 #define LOG_GAME_TREE
 

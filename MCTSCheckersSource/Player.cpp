@@ -1,9 +1,10 @@
-#include "Player.h"
 #include <fstream>
 #include <string>
 #include <functional>
 #include <chrono>
 #include <sstream>
+
+#include "Player.h"
 
 // #define TREE_BUILD_DEBUG
 

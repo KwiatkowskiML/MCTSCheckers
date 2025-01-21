@@ -1,9 +1,10 @@
-#include "Board.h"
 #include <cassert>
-#include "MoveGenerator.h"
 #include <random>
 #include <fstream>
 #include <sstream>
+
+#include "Board.h"
+#include "MoveGenerator.h"
 #include "ShiftMap.h"
 
 #define DEBUG
