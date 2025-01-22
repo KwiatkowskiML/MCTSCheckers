@@ -1,7 +1,7 @@
 #pragma once
 #include "cuda_runtime.h"
 
-enum class PieceColor: uint8_t {
+enum class PieceColor{
     White,
     Black
 };

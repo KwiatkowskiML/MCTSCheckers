@@ -1,6 +1,6 @@
 #include "../includes/Game.h"
 #include "../includes/PlayerCPU.h"
-#include "../includes/PlayerGPU.h"
+#include "../includes/PlayerGpu.h"
 #include "../includes/PlayerReal.h"
 #include <fstream>
 
