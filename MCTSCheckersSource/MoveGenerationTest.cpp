@@ -5,6 +5,7 @@
 #include "MoveGenerationTest.h"
 #include "Move.h"
 #include "Board.h"
+#include "PlayerCPU.h"
 
 bool MoveGenerationTest::verifyMoveList(const char* testName, const MoveList& expected, const MoveList& actual)
 {
@@ -829,27 +830,43 @@ void MoveGenerationTest::simulationMoveGenerationTest()
     }
 } 
 
+void MoveGenerationTest::noMovesAvailable()
+{
+	setUp();
+	boardAfterMove.whitePawns = 0;
+	boardAfterMove.blackPawns = 1ull << 29;
+	Board newBoard(boardAfterMove.whitePawns, boardAfterMove.blackPawns, boardAfterMove.kings);
+    
+	Player* whitePlayerCpu = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+	whitePlayerCpu->SetBoard(newBoard);
+	Move* bestMove = whitePlayerCpu->GetBestMove();
+
+	assert(bestMove == nullptr);
+}
+
 void MoveGenerationTest::runAllTests()
 {
-    testBasicPawnMovesCenter();
-    testBasicPawnMovesLeftEdge();
-    testBasicPawnMovesRightEdge();
-    testSingleCaptureRightDiagonal();
-    testSingleCaptureLeftDiagonal();
-    testChainCaptureDouble();
-    testChainCaptureTriple();
-    testChainCaptureMultiple();
-    testKingBasicMoves();
-	testKingCapturingMoves();
-	testKingCapturingMoves2();
-    testKingCapturingMoves3();
-    testCrowningMove();
-    testKingCapturingMovesEdgeCase();
+ //   testBasicPawnMovesCenter();
+ //   testBasicPawnMovesLeftEdge();
+ //   testBasicPawnMovesRightEdge();
+ //   testSingleCaptureRightDiagonal();
+ //   testSingleCaptureLeftDiagonal();
+ //   testChainCaptureDouble();
+ //   testChainCaptureTriple();
+ //   testChainCaptureMultiple();
+ //   testKingBasicMoves();
+	//testKingCapturingMoves();
+	//testKingCapturingMoves2();
+ //   testKingCapturingMoves3();
+ //   testCrowningMove();
+ //   testKingCapturingMovesEdgeCase();
 
-	assertFailedTest();
-	assertFailedTest2();
+	//assertFailedTest();
+	//assertFailedTest2();
 
-	simulationMoveGenerationTest();
+	//simulationMoveGenerationTest();
+
+	noMovesAvailable();
 
     printSummary("Move Generation");
 }

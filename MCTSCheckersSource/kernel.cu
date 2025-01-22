@@ -65,5 +65,7 @@ int main()
 	Game game;
 	game.PlayGame();
 
+	// CheckersTestSuite::runAll();
+
     return 0;
 }

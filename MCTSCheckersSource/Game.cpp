@@ -72,7 +72,7 @@ void Game::PlayGame()
 	bool gameEnded = false;
 	std::ofstream logFile(GAME_LOG_FILE);
 	int iteration = 0;
-	int noCaptureMoves;
+	int noCaptureMoves = 0;
 
 	if (!logFile) {
 		std::cerr << "Error opening log file!" << std::endl;
@@ -91,7 +91,7 @@ void Game::PlayGame()
 		{
 			logFile << "White player has no moves left. Black player wins!" << std::endl;
 			std::cout << "White player has no moves left. Black player wins!" << std::endl;
-			break;
+			return;
 		}
 		newBoard = _whitePlayer->root->boardAfterMove.getBoardAfterMove(*whiteMove);
 
@@ -112,7 +112,7 @@ void Game::PlayGame()
 		if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
 			logFile << "DRAW" << std::endl;
 			std::cout << "DRAW" << std::endl;
-			break;
+			return;
 		}
 
 		// Update black players board
@@ -124,7 +124,7 @@ void Game::PlayGame()
 		{
 			logFile << "Black player has no moves left. White player wins!" << std::endl;
 			std::cout << "Black player has no moves left. White player wins!" << std::endl;
-			break;
+			return;
 		}
 		newBoard = _blackPlayer->root->boardAfterMove.getBoardAfterMove(*blackMove);
 
@@ -145,10 +145,10 @@ void Game::PlayGame()
 		if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
 			logFile << "DRAW" << std::endl;
 			std::cout << "DRAW" << std::endl;
-			break;
+			return;
 		}
 
 		// Set up white players board
 		_whitePlayer->SetBoard(newBoard);
 	}
-}
+ }

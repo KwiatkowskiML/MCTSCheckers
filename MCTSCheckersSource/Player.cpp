@@ -108,6 +108,9 @@ Move* Player::GetBestMove()
 		assert(selectedNode != nullptr);
 		assert(selectedNode->isLeaf());
 
+		if (selectedNode->parent == nullptr)
+			return nullptr;
+
 		std::pair<int,int> simulationResult;
 
 		// If the selected node is a leaf, simulate the game

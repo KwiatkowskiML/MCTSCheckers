@@ -27,6 +27,7 @@ private:
     void testCrowningMove();
     void assertFailedTest();
     void assertFailedTest2();
+    void noMovesAvailable();
 
     void simulationMoveGenerationTest();
 
