@@ -8,6 +8,7 @@ private:
 	Player* _blackPlayer = nullptr;
 public:
 	Game();
+	Game(Player* whitePlayer, Player* blackPlayer) : _whitePlayer(whitePlayer), _blackPlayer(blackPlayer) {};
 	void PlayGame();
 	~Game()
 	{

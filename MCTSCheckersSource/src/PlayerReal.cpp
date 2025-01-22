@@ -13,6 +13,11 @@ Move* PlayerReal::GetBestMove()
 	bool askAgain = false;
 	Move move(0, 0, 0, playerColor);
 
+	if (root->children.empty())
+	{
+		return nullptr;
+	}
+
 	do {
 		std::cout << "Enter your move: ";
 		std::cin >> stringMove;

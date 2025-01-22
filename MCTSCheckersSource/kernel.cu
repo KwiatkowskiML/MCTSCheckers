@@ -6,6 +6,7 @@
 #include "includes/CheckersTestSuite.h"
 #include "includes/PlayerCPU.h"
 #include "includes/PlayerGPU.cuh"
+#include "includes/PlayerReal.h"
 #include "includes/Game.h"
 
 void CompareSimulations(Board board, int times, PieceColor playerColor, PieceColor playerToMove)
@@ -60,21 +61,10 @@ void CompareSimulations(Board board, int times, PieceColor playerColor, PieceCol
     printf("Result gpu: %d\n", resultgpu);
 }
 
-int main()
+void CompareGetBestMove(UINT white, UINT black, UINT kings)
 {
-	Game game;
-	game.PlayGame();
-
-	// CheckersTestSuite::runAll();
-
-	/*UINT white = (1ull << 22) | (1ull << 23) | (1ull << 15);
-	UINT black = (1ull << 2) | (1ull << 4) | (1ull << 6) | (1ull << 14) | (1ull << 17);*/
-
-	//UINT white = (1ull << 23) | (1ull << 7);
-	//UINT black = (1ull << 2) | (1ull << 4) | (1ull << 14) | (1ull << 26) | (1ull << 17);
-
-	/*BitBoard bitboard(white, black, 0);
-	Board board(white, black, 0);
+	BitBoard bitboard(white, black, kings);
+	Board board(white, black, kings);
 	std::cout << board.toString() << std::endl;
 
 	Player* blackPlayerCpu = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
@@ -93,9 +83,37 @@ int main()
 	blackPlayerGpu->GenerateDotFile(TREE_VISUALIZATION_FILE_GPU);
 
 	delete blackPlayerCpu;
-	delete blackPlayerGpu;*/
+	delete blackPlayerGpu;
+}
 
-	// CompareSimulations(board, 1000, PieceColor::Black, PieceColor::Black);
+void PlayGameTest()
+{
+	UINT white = 1ull << 28;
+	UINT black = 0; // 1ull << 3;
+	UINT kings = 0; // 1ull << 28 | 1ull << 3;
 
-    return 0;
+	Player* whitePlayer = new PlayerGPU(PieceColor::White, DEFAULT_TIME_LIMIT);
+	Player* blackPlayer = new PlayerReal(PieceColor::Black, DEFAULT_TIME_LIMIT);
+
+	whitePlayer->SetBoard(Board(white, black, kings));
+
+	Game game(whitePlayer, blackPlayer);
+	game.PlayGame();
+
+	if (!whitePlayer)
+		delete whitePlayer;
+	if (!blackPlayer)
+		delete blackPlayer;
+}
+
+int main()
+{
+	//Game game;
+	//game.PlayGame();
+
+	// CheckersTestSuite::runAll();
+	
+	PlayGameTest();
+
+	return 0;
 }

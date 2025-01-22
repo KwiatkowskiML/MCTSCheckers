@@ -95,13 +95,7 @@ void Game::PlayGame()
 			std::cout << "White player has no moves left. Black player wins!" << std::endl;
 			return;
 		}
-		newBoard = _whitePlayer->root->boardAfterMove.getBoardAfterMove(*whiteMove);
-
-		logFile << iteration << ". White player move: " << whiteMove->toString() << std::endl;
-		std::cout << iteration << ". White player move: " << whiteMove->toString() << std::endl;
-		logFile << newBoard.toString() << std::endl;
-		std::cout << newBoard.toString() << std::endl;
-
+		
 		// Checking if the move is a capture
 		if (!whiteMove->isCapture() && (whiteMove->getSource() & newBoard.getKings()) > 0) {
 			noCaptureMoves++;
@@ -109,6 +103,13 @@ void Game::PlayGame()
 		else {
 			noCaptureMoves = 0;
 		}
+
+		// Updating game board
+		newBoard = _whitePlayer->root->boardAfterMove.getBoardAfterMove(*whiteMove);
+		logFile << iteration << ". White player move: " << whiteMove->toString() << std::endl;
+		std::cout << iteration << ". White player move: " << whiteMove->toString() << std::endl;
+		logFile << newBoard.toString() << std::endl;
+		std::cout << newBoard.toString() << std::endl;
 
 		// Checking for the draw
 		if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
@@ -128,13 +129,7 @@ void Game::PlayGame()
 			std::cout << "Black player has no moves left. White player wins!" << std::endl;
 			return;
 		}
-		newBoard = _blackPlayer->root->boardAfterMove.getBoardAfterMove(*blackMove);
-
-		logFile << iteration << ". Black player move: " << blackMove->toString() << std::endl;
-		std::cout << iteration << ". Black player move: " << blackMove->toString() << std::endl;
-		logFile << newBoard.toString() << std::endl;
-		std::cout << newBoard.toString() << std::endl;
-
+		
 		// Checking if the move is a capture
 		if (!blackMove->isCapture() && (blackMove->getSource() & newBoard.getKings()) > 0) {
 			noCaptureMoves++;
@@ -142,6 +137,13 @@ void Game::PlayGame()
 		else {
 			noCaptureMoves = 0;
 		}
+
+		// Updating game board
+		newBoard = _blackPlayer->root->boardAfterMove.getBoardAfterMove(*blackMove);
+		logFile << iteration << ". Black player move: " << blackMove->toString() << std::endl;
+		std::cout << iteration << ". Black player move: " << blackMove->toString() << std::endl;
+		logFile << newBoard.toString() << std::endl;
+		std::cout << newBoard.toString() << std::endl;
 
 		// Checking for the draw
 		if (noCaptureMoves >= MAX_NO_CAPTURE_MOVES) {
