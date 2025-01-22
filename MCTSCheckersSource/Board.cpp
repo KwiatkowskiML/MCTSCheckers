@@ -98,9 +98,9 @@ int Board::simulateGame(PieceColor playerColor) const
 		}
 
         // Random number generation
-        std::random_device rd; // Seed
-        std::mt19937 gen(rd()); // Mersenne Twister engine
-        std::uniform_int_distribution<> dist(0, moves.size() - 1);
+        std::random_device rd; 
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> dist(0, static_cast<int>(moves.size() - 1));
 
         // Select a random move
         int randomIndex = dist(gen);

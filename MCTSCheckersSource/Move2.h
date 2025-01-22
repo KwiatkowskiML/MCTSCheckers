@@ -116,7 +116,7 @@ public:
 			else
 			{
 				result += ":";
-				result += Board::fieldToStringMapping.at(dst); // TODO: fix
+				result += Board::fieldToStringMapping.at(dst);
 			}
 		}
 		catch (const std::exception& e) {

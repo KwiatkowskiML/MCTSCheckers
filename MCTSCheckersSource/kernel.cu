@@ -62,10 +62,12 @@ void CompareSimulations(Board board, int times, PieceColor playerColor, PieceCol
 
 int main()
 {
-	Game game;
-	game.PlayGame();
+	/*Game game;
+	game.PlayGame();*/
 
 	// CheckersTestSuite::runAll();
+
+	
 
     return 0;
 }

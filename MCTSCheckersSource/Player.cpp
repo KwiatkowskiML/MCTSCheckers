@@ -163,7 +163,7 @@ Move* Player::GetBestMove()
 			bestNode = child;
 		}
 
-		std::cout << "Move: " << child->prevMove->toString() << " Score: " << child->score << " Games Played: " << child->gamesPlayed << " Average: " << average << std::endl;
+		// std::cout << "Move: " << child->prevMove->toString() << " Score: " << child->score << " Games Played: " << child->gamesPlayed << " Average: " << average << std::endl;
 	}
 
 	if (bestNode)

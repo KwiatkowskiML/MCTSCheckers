@@ -58,7 +58,7 @@ bool MoveGenerationTest::verifyMoveList2(const char* testName, const std::vector
 
     if (expected.size() != actual->length()) {
         printf("Test %s: FAILED\n", testName);
-        printf("Expected %zu moves, got %zu moves\n", expected.size(), actual->length());
+        printf("Expected %llu moves, got %u moves\n", static_cast<unsigned long long>(expected.size()), actual->length());
 
         while (!actual->empty())
         {
@@ -799,7 +799,7 @@ void MoveGenerationTest::simulationMoveGenerationTest()
         // Random number generation
         std::random_device rd; // Seed
         std::mt19937 gen(rd()); // Mersenne Twister engine
-        std::uniform_int_distribution<> dist(0, moves.size() - 1);
+        std::uniform_int_distribution<> dist(0, static_cast<int>(moves.size() - 1));
 
         // Select a random move
         int randomIndex = dist(gen);
