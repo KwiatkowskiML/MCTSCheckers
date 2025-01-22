@@ -10,11 +10,11 @@ public:
 
         MoversTest moversTest;
         printf("Running Movers Tests...\n");
-        //moversTest.runAllTests();
+        moversTest.runAllTests();
 
         JumpersTest jumpersTest;
         printf("Running Jumpers Tests...\n");
-        //jumpersTest.runAllTests();
+        jumpersTest.runAllTests();
 
 		MoveGenerationTest moveGenTest;
 		printf("Running Move Generation Tests...\n");

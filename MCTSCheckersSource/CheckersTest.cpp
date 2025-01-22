@@ -3,9 +3,9 @@
 
 void CheckersTest::setUp()
 {
-    board.whitePawns = 0;
-    board.blackPawns = 0;
-    board.kings = 0;
+    boardAfterMove.whitePawns = 0;
+    boardAfterMove.blackPawns = 0;
+    boardAfterMove.kings = 0;
 }
 
 bool CheckersTest::verifyTest(const char* testName, UINT expected, UINT actual)

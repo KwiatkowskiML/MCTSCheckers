@@ -1,11 +1,32 @@
-#include "Player.h"
 #include <fstream>
 #include <string>
 #include <functional>
 #include <chrono>
 #include <sstream>
 
+#include "Player.h"
+
 // #define TREE_BUILD_DEBUG
+
+// Set players board
+void Player::SetBoard(Board board)
+{
+	// Clear the tree
+	if (root)
+		delete root;
+
+	// Initialize the root node
+	root = new Node(board, nullptr, playerColor);
+
+	// Roots children initialization with saving each move
+	MoveList moves = root->boardAfterMove.getAvailableMoves(playerColor);
+	for (Move move : moves)
+	{
+		Board newBoard = root->boardAfterMove.getBoardAfterMove(move);
+		Node* newNode = new Node(newBoard, root, playerColor, new Move(move));
+		root->children.push_back(newNode);
+	}
+}
 
 // Selection phase
 Node* Player::SelectNode()
@@ -18,7 +39,7 @@ Node* Player::SelectNode()
 		Node* bestNode = nullptr;
 		for (Node* child : currentNode->children)
 		{
-			float uct = child->calculateUCT(color);
+			float uct = child->calculateUCT(playerColor);
 			if (uct > maxUCT)
 			{
 				maxUCT = uct;
@@ -33,63 +54,40 @@ Node* Player::SelectNode()
 // Expansion phase
 bool Player::ExpandNode(Node* node)
 {
-	if (!node->isLeaf())
-		return false;
+	assert(node->isLeaf());
 
-	// Get all available moves
-	MoveList moves = node->board.getAvailableMoves(node->simulationColor);
+	// Get all available enemy moves
+	MoveList moves = node->boardAfterMove.getAvailableMoves(getEnemyColor(node->moveColor));
 	if (moves.empty())
 		return false;
 
 	// Create a new node for each move
 	for (Move move : moves)
 	{
-		Board newBoard = node->board.getBoardAfterMove(move);
-		Node* newNode = new Node(newBoard, node, getEnemyColor(node->simulationColor));
+		Board newBoard = node->boardAfterMove.getBoardAfterMove(move);
+		Node* newNode = new Node(newBoard, node, getEnemyColor(node->moveColor), new Move(move));
 		node->children.push_back(newNode);
 	}
 
 	return true;
 }
 
-// Set players board
-void Player::SetBoard(Board board)
-{
-	// Clear the tree
-	if (root)
-		delete root;
-
-	// Initialize the root node
-	root = new Node(board, nullptr, color);
-	
-	// Roots children initialization with saving each move
-	MoveList moves = root->board.getAvailableMoves(color);
-	for (Move move : moves)
-	{
-		Board newBoard = root->board.getBoardAfterMove(move);
-		Node* newNode = new Node(newBoard, root, getEnemyColor(color), new Move(move));
-		root->children.push_back(newNode);
-	}
-}
-
 // This function is called when a simulation is done. It backpropagates the score from the simulation node to the root node.
-void Player::BackPropagate(Node* node, int score)
+void Player::BackPropagate(Node* node, std::pair<int,int> simulationResult)
 {
 	Node* currentNode = node;
-
-	// if the node was simulating the enemy color, invert the score
-	if (currentNode->simulationColor != color)
-		score = -score;
+	int simulationScore = simulationResult.first;
+	int numberOfGamesPlayed = simulationResult.second;
 
 	// Update current node score
-	currentNode->gamesPlayed++;
-	currentNode->score += score;
+	currentNode->gamesPlayed += numberOfGamesPlayed;
+	currentNode->score += simulationScore;
 	currentNode = currentNode->parent;
 
 	while (currentNode != nullptr)
 	{
-		currentNode->gamesPlayed++;
-		currentNode->score += score;
+		currentNode->gamesPlayed += numberOfGamesPlayed;
+		currentNode->score += simulationScore;
 		currentNode = currentNode->parent;
 	}
 }
@@ -110,7 +108,10 @@ Move* Player::GetBestMove()
 		assert(selectedNode != nullptr);
 		assert(selectedNode->isLeaf());
 
-		int simulationResult = 0;
+		if (selectedNode->parent == nullptr)
+			return nullptr;
+
+		std::pair<int,int> simulationResult;
 
 		// If the selected node is a leaf, simulate the game
 		if (selectedNode->gamesPlayed == 0)
@@ -131,8 +132,13 @@ Move* Player::GetBestMove()
 			}
 			else
 			{
-				// No move possible during the expansion stage, backpropagate the loss
-				BackPropagate(selectedNode, LOOSE);
+				// No move possible during the expansion stage
+				if (selectedNode->moveColor == playerColor)
+					simulationResult = std::make_pair(WIN, 1);
+				else
+					simulationResult = std::make_pair(LOOSE, 1);
+
+				BackPropagate(selectedNode, simulationResult);
 			}
 		}
 
@@ -145,17 +151,19 @@ Move* Player::GetBestMove()
 	// ----------------------------------------------
 	// Select the best move
 	// ----------------------------------------------
-	float maxUCT = -FLT_MAX;
+	float bestAverage = -FLT_MAX;
 	Node* bestNode = nullptr;
 	Move* bestMove = nullptr;
 	for (Node* child : root->children)
 	{
-		float uct = child->calculateUCT(color);
-		if (uct > maxUCT)
+		float average = (float)child->score / (float)child->gamesPlayed;
+		if (average > bestAverage)
 		{
-			maxUCT = uct;
+			bestAverage = average;
 			bestNode = child;
 		}
+
+		std::cout << "Move: " << child->prevMove->toString() << " Score: " << child->score << " Games Played: " << child->gamesPlayed << " Average: " << average << std::endl;
 	}
 
 	if (bestNode)
@@ -193,7 +201,7 @@ std::string Player::GenerateTreeString()
 
 	// Start the DOT graph definition
 	treeString << "digraph Tree {\n";
-	treeString << "    node [shape=box, fontname=\"Arial\"];\n";
+	treeString << "    node [shape=box, fontname=\"Arial\", style=filled];\n";
 
 	// Helper function to traverse and generate nodes
 	std::function<void(const Node*, int&)> writeNode;
@@ -202,22 +210,31 @@ std::string Player::GenerateTreeString()
 			return;
 
 		int currentNodeId = nodeId++;
-		// Write the current node with gamesPlayed and score
+		// Start writing the node
 		treeString << "    node" << currentNodeId << " [label=\"Games Played: "
 			<< node->gamesPlayed << "\\nScore: " << node->score;
 
 		// Write the UCT score if parent exists
 		if (node->parent != nullptr)
-			treeString << "\\nUCT: " << node->calculateUCT(color);
+			treeString << "\\nUCT: " << node->calculateUCT(playerColor);
 
 		// Write the previous move if exists
 		if (node->prevMove != nullptr)
 			treeString << "\\nMove: " << node->prevMove->toString();
 
-		// color to play
-		treeString << "\nTurn: " << (node->simulationColor == PieceColor::White ? "White" : "Black");
+		// Color to play
+		treeString << "\\nTurn: " << (node->moveColor == PieceColor::White ? "White" : "Black");
 
-		treeString << "\"];\n";
+		// Check if the parent is the root and set fill color to red
+		if (node->parent && node->parent == root)
+			treeString << "\", fillcolor=red";
+		else if (node->parent)
+			treeString << "\", fillcolor=white";
+		else if (!node->parent)
+			treeString << "\", fillcolor=green";
+
+		// Close the node definition
+		treeString << "];\n";
 
 		for (const Node* child : node->children)
 		{
@@ -240,3 +257,4 @@ std::string Player::GenerateTreeString()
 
 	return treeString.str();  // Return the generated DOT string
 }
+

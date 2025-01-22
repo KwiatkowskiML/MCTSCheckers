@@ -2,7 +2,7 @@
 #include "Board.h"
 #include "MoveGenerator.h"
 
-Move::Move(const std::string& moveStr, PieceColor col) : color(col) {
+Move::Move(const std::string& moveStr, PieceColor col) : playerColor(col) {
 	try {
 		// Initialize captured to 0
 		captured = 0;
@@ -40,7 +40,7 @@ Move::Move(const std::string& moveStr, PieceColor col) : color(col) {
 				UINT end_pos = steps[i];
 
 				// Calculate position of captured piece
-				UINT captured_pos = Board::getAllFieldsBetween(start_pos, end_pos);
+				UINT captured_pos = Board::getAllFieldsBetween(start_pos, end_pos); // TODO: fix it
 				captured |= captured_pos;
 			}
 		}
@@ -60,15 +60,15 @@ Move Move::getExtendedMove(Move continuation, UINT capt) const
 	}
 
 	UINT newCaptured = captured | capt;
-	return Move(newSteps, newCaptured, color);
+	return Move(newSteps, newCaptured, playerColor);
 }
 
 BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool includeCoronation) const
 {
 	UINT source = getSource();
 	UINT destination = getDestination();
-	UINT currentPieces = sourceBitboard.getPieces(color);
-	UINT enemyPieces = sourceBitboard.getPieces(getEnemyColor(color));
+	UINT currentPieces = sourceBitboard.getPieces(playerColor);
+	UINT enemyPieces = sourceBitboard.getPieces(getEnemyColor(playerColor));
 
 	// Deleting the initial position of the moved piece
 	UINT newCurrentPieces = currentPieces & ~source;
@@ -95,17 +95,16 @@ BitBoard Move::getBitboardAfterMove(const BitBoard& sourceBitboard, bool include
 	// Handling the case when the pawn is crowned
 	if (includeCoronation)
 	{
-		for (UINT step : steps)
-		{
-			if (color == PieceColor::White && (step & WHITE_CROWNING))
-				newKings |= destination;
-			if (color == PieceColor::Black && (step & BLACK_CROWNING))
-				newKings |= destination;
-		}
+
+		if (playerColor == PieceColor::White && (getDestination() & WHITE_CROWNING))
+			newKings |= destination;
+		if (playerColor == PieceColor::Black && (getDestination() & BLACK_CROWNING))
+			newKings |= destination;
+	
 	}
 
-	UINT newWhitePawns = color == PieceColor::White ? newCurrentPieces : newEnemyPieces;
-	UINT newBlackPawns = color == PieceColor::Black ? newCurrentPieces : newEnemyPieces;
+	UINT newWhitePawns = playerColor == PieceColor::White ? newCurrentPieces : newEnemyPieces;
+	UINT newBlackPawns = playerColor == PieceColor::Black ? newCurrentPieces : newEnemyPieces;
 
 	BitBoard newbitBoard(newWhitePawns, newBlackPawns, newKings);
 	return newbitBoard;

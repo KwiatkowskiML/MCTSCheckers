@@ -1,167 +1,71 @@
-﻿
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
+﻿#include <stdio.h>
+#include <random>
 
-#include <stdio.h>
 #include "Board.h"
 #include "MoveGenerator.h"
 #include "CheckersTestSuite.h"
 #include "PlayerCPU.h"
+#include "PlayerGPU.cuh"
 #include "Game.h"
 
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
-
-__global__ void addKernel(int *c, const int *a, const int *b)
+void CompareSimulations(Board board, int times, PieceColor playerColor, PieceColor playerToMove)
 {
-    int i = threadIdx.x;
-    c[i] = a[i] + b[i];
+	int resultcpu = 0;
+	int resultgpu = 0;
+
+    for (int i = 0; i < times; i++)
+    {
+		int winner = board.simulateGame(playerToMove);
+        int result = 0;
+
+        if (winner == BLACK_WIN && playerColor == PieceColor::Black)
+            result = WIN;
+        else if (winner == WHITE_WIN && playerColor == PieceColor::White)
+            result = WIN;
+        else if (winner == DRAW)
+            result = DRAW;
+        else
+            result = LOOSE;
+
+		resultcpu += result;
+    }
+
+    for (int i = 0; i < times; i++)
+    {
+        std::random_device rd; // Seed
+        std::mt19937 gen(rd()); // Mersenne Twister engine
+        std::uniform_int_distribution<> dist(-999999, 999999);
+
+		int z = dist(gen);
+		int w = dist(gen);
+		int jsr = dist(gen);
+		int jcong = dist(gen);
+
+		int winner = simulateGameGpu(board.getWhitePawns(), board.getBlackPawns(), board.getKings(), playerToMove, z, w, jsr, jcong);
+
+		int result = 0;
+		if (winner == BLACK_WIN && playerColor == PieceColor::Black)
+			result = WIN;
+		else if (winner == WHITE_WIN && playerColor == PieceColor::White)
+			result = WIN;
+		else if (winner == DRAW)
+			result = DRAW;
+		else
+			result = LOOSE;
+
+		resultgpu += result;
+    }
+
+    printf("Result cpu: %d\n", resultcpu);
+    printf("Result gpu: %d\n", resultgpu);
 }
 
 int main()
 {
-    /*PlayerCPU* player = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-    Move* bestMove = player->GetBestMove();
-    player->GenerateDotFile(TREE_VISUALIZATION_FILE);
+	Game game;
+	game.PlayGame();
 
-    std::cout << "Best move: " << bestMove->toString() << std::endl;
-
-    delete player;*/
-
-    /*{
-        Player* whitePlayer = nullptr;
-        Player* blackPlayer = nullptr;
-        int setup = Game::GetGameSetup(whitePlayer, blackPlayer);
-
-        Game game(whitePlayer, blackPlayer);
-
-        switch (setup)
-        {
-        case 1:
-            game.PlayGameAsWhite();
-            break;
-        default:
-            game.PlayGame();
-            break;
-        }
-
-        if (whitePlayer != nullptr)
-            delete whitePlayer;
-
-        if (blackPlayer != nullptr)
-            delete blackPlayer;
-    }*/
-
-    {
-        UINT whitePieces = (1ULL << 28) | (1ULL << 21) | (1ULL << 22) | (1ULL << 23) | (1ULL << 17) | (1ULL << 13);
-        UINT blackPieces = (1ULL << 24) | (1ULL << 16) | (1ULL << 14) | (1ULL << 15) | (1ULL << 8) | (1ULL << 10) | (1ULL << 4) | (1ULL << 6);
-
-        UINT whitePieces2 = (1ULL << 24) | (1ULL << 22) | (1ULL << 19);
-        UINT blackPieces2 = (1ULL << 17) | (1ULL << 11) | (1ULL << 4);
-
-        Board board(whitePieces2, blackPieces2, 0);
-        std::cout << board.toString() << std::endl;
-
-        Player* blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
-        blackPlayer->SetBoard(board);
-        Move* bestMove = blackPlayer->GetBestMove();
-        std::cout << "Best move: " << bestMove->toString() << std::endl;
-
-        blackPlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);
-        delete blackPlayer;
-
-        /*for (int i = 0; i < 100; i++)
-        {
-            std::cout << "game simulation: " << board.simulateGame(PieceColor::Black) << std::endl;
-        }*/
-    }
-  
-    /*Board board2(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
-	std::cout << board2.toString() << std::endl;
-	Player* whitePlayer = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
-	whitePlayer->SetBoard(board2);
-	Move* bestMove2 = whitePlayer->GetBestMove();
-	std::cout << "Best move: " << bestMove2->toString() << std::endl;
-	whitePlayer->GenerateDotFile(TREE_VISUALIZATION_FILE);*/
+	// CheckersTestSuite::runAll();
 
     return 0;
-}
-
-// Helper function for using CUDA to add vectors in parallel.
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size)
-{
-    int *dev_a = 0;
-    int *dev_b = 0;
-    int *dev_c = 0;
-    cudaError_t cudaStatus;
-
-    // Choose which GPU to run on, change this on a multi-GPU system.
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-        goto Error;
-    }
-
-    // Allocate GPU buffers for three vectors (two input, one output)    .
-    cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    // Copy input vectors from host memory to GPU buffers.
-    cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-
-    // Launch a kernel on the GPU with one thread for each element.
-    addKernel<<<1, size>>>(dev_c, dev_a, dev_b);
-
-    // Check for any errors launching the kernel
-    cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-        goto Error;
-    }
-    
-    // cudaDeviceSynchronize waits for the kernel to finish, and returns
-    // any errors encountered during the launch.
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
-        goto Error;
-    }
-
-    // Copy output vector from GPU buffer to host memory.
-    cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-
-Error:
-    cudaFree(dev_c);
-    cudaFree(dev_a);
-    cudaFree(dev_b);
-    
-    return cudaStatus;
 }
