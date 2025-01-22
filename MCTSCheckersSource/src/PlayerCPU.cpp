@@ -1,4 +1,4 @@
-#include "PlayerCPU.h"
+#include "../includes/PlayerCPU.h"
 
 std::pair<int,int> PlayerCPU::Simulate(Node* node)
 {

@@ -1,4 +1,4 @@
-#include "MoversTest.h"
+#include "../includes/MoversTest.h"
 
 bool MoversTest::testWhiteMover(const char* testName, UINT expectedMovers)
 {

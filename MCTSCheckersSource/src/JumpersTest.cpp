@@ -1,4 +1,4 @@
-#include "JumpersTest.h"
+#include "../includes/JumpersTest.h"
 
 bool JumpersTest::testJumper(const char* testName, UINT expectedJumpers, PieceColor playerColor)
 {

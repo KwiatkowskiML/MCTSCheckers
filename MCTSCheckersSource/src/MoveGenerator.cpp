@@ -2,10 +2,10 @@
 #include <list>
 #include <tuple>
 
-#include "MoveGenerator.h"
-#include "Utils.h"
-#include "Board.h"
-#include "ShiftMap.h"
+#include "../includes/MoveGenerator.h"
+#include "../includes/Utils.h"
+#include "../includes/Board.h"
+#include "../includes/ShiftMap.h"
 
 //----------------------------------------------------------------
 // Generating moves

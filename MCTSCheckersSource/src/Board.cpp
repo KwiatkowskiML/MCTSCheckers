@@ -3,9 +3,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "Board.h"
-#include "MoveGenerator.h"
-#include "ShiftMap.h"
+#include "../includes/Board.h"
+#include "../includes/MoveGenerator.h"
+#include "../includes/ShiftMap.h"
 
 #define DEBUG
 

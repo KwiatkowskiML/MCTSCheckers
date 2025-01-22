@@ -1,7 +1,7 @@
-#include "Game.h"
-#include "PlayerCPU.h"
-#include "PlayerGPU.h"
-#include "PlayerReal.h"
+#include "../includes/Game.h"
+#include "../includes/PlayerCPU.h"
+#include "../includes/PlayerGPU.h"
+#include "../includes/PlayerReal.h"
 #include <fstream>
 
 #define LOG_GAME_TREE

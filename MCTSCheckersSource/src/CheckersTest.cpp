@@ -1,5 +1,5 @@
-#include "CheckersTest.h"
-#include "TestUtils.h"
+#include "../includes/CheckersTest.h"
+#include "../includes/TestUtils.h"
 
 void CheckersTest::setUp()
 {

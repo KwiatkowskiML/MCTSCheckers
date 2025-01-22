@@ -1,6 +1,6 @@
-#include "Move.h"
-#include "Board.h"
-#include "MoveGenerator.h"
+#include "../includes/Move.h"
+#include "../includes/Board.h"
+#include "../includes/MoveGenerator.h"
 
 Move::Move(const std::string& moveStr, PieceColor col) : playerColor(col) {
 	try {
