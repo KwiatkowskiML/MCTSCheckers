@@ -58,8 +58,6 @@ Makefile
 # Other
 *.tlog
 *.lastbuildstate
-*.vcxproj
-*.vcxproj.filters
 
 # grphviz
 *.dot
