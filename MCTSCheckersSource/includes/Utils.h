@@ -35,10 +35,8 @@
 
 #define GAME_LOG_FILE "game.log"
 #define SIMULATION_LOG "simulation.log"
-#define TREE_VISUALIZATION_FILE_GPU "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_gpu.dot"
-#define TREE_VISUALIZATION_FILE_CPU "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_cpu.dot"
-#define TREE_VISUALIZATION_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\tree_logs\\tree_iteration_"
-#define TREE_GAME_LOG_PREFIX "C:\\Users\\Kmicha\\studia\\sem5\\gpu\\p2\\MCTSCheckers\\game_logs\\tree_iteration_"
+#define TREE_VISUALIZATION_FILE_GPU "tree_gpu.dot"
+#define TREE_VISUALIZATION_FILE_CPU "tree_cpu.dot"
 
 #define NUMBER_OF_BLOCKS 32
 #define THREADS_PER_BLOCK 512

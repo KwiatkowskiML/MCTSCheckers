@@ -6,8 +6,6 @@
 
 #include "../includes/Player.h"
 
-// #define TREE_BUILD_DEBUG
-
 // Set players board
 void Player::SetBoard(Board board)
 {
@@ -140,12 +138,7 @@ Move* Player::GetBestMove()
 
 				BackPropagate(selectedNode, simulationResult);
 			}
-		}
-
-#ifdef TREE_BUILD_DEBUG
-		std::string filename = TREE_VISUALIZATION_PREFIX + std::to_string(i) + ".dot";
-		GenerateDotFile(filename);
-#endif // TREE_BUILD_DEBUG		
+		}	
 	}
 
 	// ----------------------------------------------
