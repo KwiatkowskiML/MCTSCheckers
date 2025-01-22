@@ -72,15 +72,6 @@ public:
 	PieceColor getColor() const { return playerColor; }
 
 	//----------------------------------------------------------------
-	// Utilities
-	//----------------------------------------------------------------
-
-	// Checks if a move exists in a given move list
-	static bool containsMove(const std::vector<Move>& moveList, const Move& move) {
-		return std::find(moveList.begin(), moveList.end(), move) != moveList.end();
-	}
-
-	//----------------------------------------------------------------
 	// Operators
 	//----------------------------------------------------------------
 

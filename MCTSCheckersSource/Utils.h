@@ -29,7 +29,7 @@
 #define BLACK_WIN 11
 
 #define MAX_NO_CAPTURE_MOVES 10
-#define DEFAULT_TIME_LIMIT 1000 // in miliseconds
+#define DEFAULT_TIME_LIMIT 3000 // in miliseconds
 
 #define C_UCT 2 // Exploration parameter
 

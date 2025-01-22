@@ -7,7 +7,7 @@
 #include "Utils.h"
 #include "Board.h"
 
-class Move2 {
+class MoveGpu {
 public:
 	// The color of the player making the move
 	PieceColor playerColor;
@@ -26,25 +26,25 @@ public:
 	// Constructors
 	//----------------------------------------------------------------
 
-	__host__ __device__ Move2() : src(0), dst(0), playerColor(PieceColor::White), captured(0) {}
+	__host__ __device__ MoveGpu() : src(0), dst(0), playerColor(PieceColor::White), captured(0) {}
 
-	__host__ __device__ Move2(UINT src, UINT dst, PieceColor col, UINT capt = 0)
+	__host__ __device__ MoveGpu(UINT src, UINT dst, PieceColor col, UINT capt = 0)
 		: src(src), dst(dst), playerColor(col), captured(capt) {}
 
-	__host__ __device__ Move2(const Move2& other) : src(other.src), dst(other.dst), playerColor(other.playerColor), captured(other.captured) {}
+	__host__ __device__ MoveGpu(const MoveGpu& other) : src(other.src), dst(other.dst), playerColor(other.playerColor), captured(other.captured) {}
 
 	//----------------------------------------------------------------
 	// Move transformations
 	//----------------------------------------------------------------
 
 	// Creates a new extended move by appending a continuation move to the current move and updating the capture status
-	__host__ __device__ Move2 getExtendedMove(Move2 continuation) const
+	__host__ __device__ MoveGpu getExtendedMove(MoveGpu continuation) const
 	{
 		UINT newSrc = src;
 		UINT newDst = continuation.dst;
 		UINT newCaptured = captured | continuation.captured;
 
-		return Move2(newSrc, newDst, playerColor, newCaptured);
+		return MoveGpu(newSrc, newDst, playerColor, newCaptured);
 	};
 
 	// Returns the bitboard after the move is made
@@ -133,7 +133,7 @@ public:
 		return oss.str();
 	}
 
-	bool operator==(const Move2& other) const {
+	bool operator==(const MoveGpu& other) const {
 		return src == other.src && dst == other.dst && captured == other.captured && playerColor == other.playerColor;
 	}
 };

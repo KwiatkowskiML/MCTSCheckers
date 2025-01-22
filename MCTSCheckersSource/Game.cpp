@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "PlayerCPU.h"
 #include "PlayerGPU.h"
-// #include "PlayerReal.h"
+#include "PlayerReal.h"
 #include <fstream>
 
 #define LOG_GAME_TREE
@@ -23,7 +23,7 @@ Game::Game()
 		switch (stoi(input))
 		{
 		case 1:
-			// _whitePlayer = new PlayerReal(PieceColor::White, DEFAULT_TIME_LIMIT);
+			_whitePlayer = new PlayerReal(PieceColor::White, DEFAULT_TIME_LIMIT);
 			break;
 		case 2:
 			_whitePlayer = new PlayerCPU(PieceColor::White, DEFAULT_TIME_LIMIT);
@@ -50,7 +50,7 @@ Game::Game()
 		switch (stoi(input))
 		{
 		case 1:
-			// _blackPlayer = new PlayerReal(PieceColor::Black, DEFAULT_TIME_LIMIT);
+			_blackPlayer = new PlayerReal(PieceColor::Black, DEFAULT_TIME_LIMIT);
 			break;
 		case 2:
 			_blackPlayer = new PlayerCPU(PieceColor::Black, DEFAULT_TIME_LIMIT);
@@ -68,7 +68,7 @@ Game::Game()
 
 void Game::PlayGame()
 {
-	Board newBoard;
+	Board newBoard = _whitePlayer->root->boardAfterMove;
 	bool gameEnded = false;
 	std::ofstream logFile(GAME_LOG_FILE);
 	int iteration = 0;
@@ -78,6 +78,8 @@ void Game::PlayGame()
 		std::cerr << "Error opening log file!" << std::endl;
 		return;
 	}
+
+	std::cout << newBoard.toString() << std::endl;
 
 	// Game loop
 	while (true)

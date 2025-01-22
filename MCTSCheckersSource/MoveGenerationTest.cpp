@@ -52,7 +52,7 @@ bool MoveGenerationTest::verifyMoveList(const char* testName, const MoveList& ex
     return passed;
 }
 
-bool MoveGenerationTest::verifyMoveList2(const char* testName, const std::vector<Move2>& expected, Queue<Move2>* actual)
+bool MoveGenerationTest::verifyMoveList2(const char* testName, const std::vector<MoveGpu>& expected, Queue<MoveGpu>* actual)
 {
     bool passed = true;
 
@@ -62,7 +62,7 @@ bool MoveGenerationTest::verifyMoveList2(const char* testName, const std::vector
 
         while (!actual->empty())
         {
-            Move2 actualMove = actual->front();
+            MoveGpu actualMove = actual->front();
             actual->pop();
             std::cout << "Actual move: " << actualMove.toString() << std::endl;
         }
@@ -75,7 +75,7 @@ bool MoveGenerationTest::verifyMoveList2(const char* testName, const std::vector
     }
     else {
 		while (!actual->empty()) {
-			Move2 actualMove = actual->front();
+			MoveGpu actualMove = actual->front();
 			actual->pop();
 			bool moveFound = false;
 			for (const auto& expectedMove : expected) {
@@ -112,9 +112,9 @@ void MoveGenerationTest::testBasicPawnMovesCenter()
     };
     verifyMoveList("Basic pawn moves - center position (White)", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 25, 1ULL << 20, PieceColor::White),
-        Move2(1ULL << 25, 1ULL << 21, PieceColor::White)
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 25, 1ULL << 20, PieceColor::White),
+        MoveGpu(1ULL << 25, 1ULL << 21, PieceColor::White)
     };
 	moveQueue.clear();
 	moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -128,9 +128,9 @@ void MoveGenerationTest::testBasicPawnMovesCenter()
     };
     verifyMoveList("Basic pawn moves - center position (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-        Move2(1ULL << 9, 1ULL << 13, PieceColor::Black),
-        Move2(1ULL << 9, 1ULL << 12, PieceColor::Black)
+    std::vector<MoveGpu> expectedBlack2 = {
+        MoveGpu(1ULL << 9, 1ULL << 13, PieceColor::Black),
+        MoveGpu(1ULL << 9, 1ULL << 12, PieceColor::Black)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -146,8 +146,8 @@ void MoveGenerationTest::testBasicPawnMovesLeftEdge()
     };
     verifyMoveList("Basic pawn moves - left edge (White)", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 7, 1ULL << 3, PieceColor::White)
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 7, 1ULL << 3, PieceColor::White)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -160,8 +160,8 @@ void MoveGenerationTest::testBasicPawnMovesLeftEdge()
     };
     verifyMoveList("Basic pawn moves - left edge (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-       Move2(1ULL << 7, 1ULL << 11, PieceColor::Black)
+    std::vector<MoveGpu> expectedBlack2 = {
+       MoveGpu(1ULL << 7, 1ULL << 11, PieceColor::Black)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -177,8 +177,8 @@ void MoveGenerationTest::testBasicPawnMovesRightEdge()
     };
     verifyMoveList("Basic pawn moves - right edge (White)", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 31, 1ULL << 27, PieceColor::White)
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 31, 1ULL << 27, PieceColor::White)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -191,8 +191,8 @@ void MoveGenerationTest::testBasicPawnMovesRightEdge()
     };
     verifyMoveList("Basic pawn moves - right edge (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-       Move2(1ULL, 1ULL << 4, PieceColor::Black)
+    std::vector<MoveGpu> expectedBlack2 = {
+       MoveGpu(1ULL, 1ULL << 4, PieceColor::Black)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -209,8 +209,8 @@ void MoveGenerationTest::testSingleCaptureRightDiagonal()
     };
     verifyMoveList("Single capture - right diagonal", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-       Move2(1ULL << 25, 1ULL << 18, PieceColor::White, 1ULL << 21)
+    std::vector<MoveGpu> expected2 = {
+       MoveGpu(1ULL << 25, 1ULL << 18, PieceColor::White, 1ULL << 21)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -224,8 +224,8 @@ void MoveGenerationTest::testSingleCaptureRightDiagonal()
     };
     verifyMoveList("Single capture - right diagonal (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-        Move2(1ULL << 9, 1ULL << 18, PieceColor::Black, 1ULL << 13)
+    std::vector<MoveGpu> expectedBlack2 = {
+        MoveGpu(1ULL << 9, 1ULL << 18, PieceColor::Black, 1ULL << 13)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -243,8 +243,8 @@ void MoveGenerationTest::testSingleCaptureLeftDiagonal()
     };
     verifyMoveList("Single capture - left diagonal", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-      Move2(1ULL << 26, 1ULL << 17, PieceColor::White, 1ULL << 21)
+    std::vector<MoveGpu> expected2 = {
+      MoveGpu(1ULL << 26, 1ULL << 17, PieceColor::White, 1ULL << 21)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -258,8 +258,8 @@ void MoveGenerationTest::testSingleCaptureLeftDiagonal()
     };
     verifyMoveList("Single capture - left diagonal (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-        Move2(1ULL << 10, 1ULL << 17, PieceColor::Black, 1ULL << 13)
+    std::vector<MoveGpu> expectedBlack2 = {
+        MoveGpu(1ULL << 10, 1ULL << 17, PieceColor::Black, 1ULL << 13)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -276,8 +276,8 @@ void MoveGenerationTest::testChainCaptureDouble()
     };
     verifyMoveList("Chain capture - double", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-     Move2(1ULL << 29, 1ULL << 13, PieceColor::White, (1ULL << 25) | (1ULL << 17))
+    std::vector<MoveGpu> expected2 = {
+     MoveGpu(1ULL << 29, 1ULL << 13, PieceColor::White, (1ULL << 25) | (1ULL << 17))
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -291,8 +291,8 @@ void MoveGenerationTest::testChainCaptureDouble()
     };
     verifyMoveList("Chain capture - double (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-        Move2(1ULL << 5 , 1ULL << 21, PieceColor::Black, (1ULL << 9) | (1ULL << 17))
+    std::vector<MoveGpu> expectedBlack2 = {
+        MoveGpu(1ULL << 5 , 1ULL << 21, PieceColor::Black, (1ULL << 9) | (1ULL << 17))
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -309,8 +309,8 @@ void MoveGenerationTest::testChainCaptureTriple()
     };
     verifyMoveList("Chain capture - triple", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-     Move2(1ULL << 29, 1ULL << 6, PieceColor::White, (1ULL << 25) | (1ULL << 17) | (1ULL << 10))
+    std::vector<MoveGpu> expected2 = {
+     MoveGpu(1ULL << 29, 1ULL << 6, PieceColor::White, (1ULL << 25) | (1ULL << 17) | (1ULL << 10))
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -324,8 +324,8 @@ void MoveGenerationTest::testChainCaptureTriple()
     };
     verifyMoveList("Chain capture - triple (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-       Move2(1ULL << 5, 1ULL << 30, PieceColor::Black, (1ULL << 9) | (1ULL << 17) | (1ULL << 26))
+    std::vector<MoveGpu> expectedBlack2 = {
+       MoveGpu(1ULL << 5, 1ULL << 30, PieceColor::Black, (1ULL << 9) | (1ULL << 17) | (1ULL << 26))
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -345,11 +345,11 @@ void MoveGenerationTest::testChainCaptureMultiple()
     };
     verifyMoveList("Chain capture - multiple", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 22, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
-        Move2(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 22, PieceColor::White, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 22, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+        MoveGpu(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 22, PieceColor::White, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -366,11 +366,11 @@ void MoveGenerationTest::testChainCaptureMultiple()
     };
     verifyMoveList("Chain capture - multiple (Black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-       Move2(1ULL, 1ULL << 27, PieceColor::Black, (1ULL << 4) | (1ULL << 13) | (1ULL << 22)),
-        Move2(1ULL, 1ULL << 9, PieceColor::Black, (1ULL << 4) | (1ULL << 13) | (1ULL << 21) | (1ULL << 20) | (1ULL << 12)),
-        Move2(1ULL, 1ULL << 27, PieceColor::Black, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 22)),
-        Move2(1ULL, 1ULL << 9, PieceColor::Black, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 13)),
+    std::vector<MoveGpu> expectedBlack2 = {
+       MoveGpu(1ULL, 1ULL << 27, PieceColor::Black, (1ULL << 4) | (1ULL << 13) | (1ULL << 22)),
+        MoveGpu(1ULL, 1ULL << 9, PieceColor::Black, (1ULL << 4) | (1ULL << 13) | (1ULL << 21) | (1ULL << 20) | (1ULL << 12)),
+        MoveGpu(1ULL, 1ULL << 27, PieceColor::Black, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 22)),
+        MoveGpu(1ULL, 1ULL << 9, PieceColor::Black, (1ULL << 4) | (1ULL << 12) | (1ULL << 20) | (1ULL << 21) | (1ULL << 13)),
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -397,18 +397,18 @@ void MoveGenerationTest::testKingBasicMoves()
     };
     verifyMoveList("King basic moves", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-       Move2(1ULL << 21, 1ULL << 25, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 28, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 26, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 30, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 17, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 12, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 8, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 18, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 14, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 11, PieceColor::White),
-        Move2(1ULL << 21, 1ULL << 7, PieceColor::White)
+    std::vector<MoveGpu> expected2 = {
+       MoveGpu(1ULL << 21, 1ULL << 25, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 28, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 26, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 30, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 17, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 12, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 8, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 18, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 14, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 11, PieceColor::White),
+        MoveGpu(1ULL << 21, 1ULL << 7, PieceColor::White)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -432,18 +432,18 @@ void MoveGenerationTest::testKingBasicMoves()
     };
     verifyMoveList("King basic moves (black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-       Move2(1ULL << 21, 1ULL << 25, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 28, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 26, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 30, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 17, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 12, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 8, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 18, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 14, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 11, PieceColor::Black),
-        Move2(1ULL << 21, 1ULL << 7, PieceColor::Black)
+    std::vector<MoveGpu> expectedBlack2 = {
+       MoveGpu(1ULL << 21, 1ULL << 25, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 28, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 26, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 30, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 17, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 12, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 8, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 18, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 14, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 11, PieceColor::Black),
+        MoveGpu(1ULL << 21, 1ULL << 7, PieceColor::Black)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -463,10 +463,10 @@ void MoveGenerationTest::testKingCapturingMoves()
     };
     verifyMoveList("King capturing moves", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-         Move2(1ULL << 25, 1ULL << 14, PieceColor::White, 1ULL << 18),
-        Move2(1ULL << 25, 1ULL << 11, PieceColor::White, 1ULL << 18),
-        Move2(1ULL << 25, 1ULL << 7, PieceColor::White, 1ULL << 18)
+    std::vector<MoveGpu> expected2 = {
+         MoveGpu(1ULL << 25, 1ULL << 14, PieceColor::White, 1ULL << 18),
+        MoveGpu(1ULL << 25, 1ULL << 11, PieceColor::White, 1ULL << 18),
+        MoveGpu(1ULL << 25, 1ULL << 7, PieceColor::White, 1ULL << 18)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -483,10 +483,10 @@ void MoveGenerationTest::testKingCapturingMoves()
     };
     verifyMoveList("King capturing moves (black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-        Move2(1ULL << 25, 1ULL << 14, PieceColor::Black, 1ULL << 18),
-        Move2(1ULL << 25, 1ULL << 11, PieceColor::Black, 1ULL << 18),
-        Move2(1ULL << 25, 1ULL << 7, PieceColor::Black, 1ULL << 18)
+    std::vector<MoveGpu> expectedBlack2 = {
+        MoveGpu(1ULL << 25, 1ULL << 14, PieceColor::Black, 1ULL << 18),
+        MoveGpu(1ULL << 25, 1ULL << 11, PieceColor::Black, 1ULL << 18),
+        MoveGpu(1ULL << 25, 1ULL << 7, PieceColor::Black, 1ULL << 18)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -510,14 +510,14 @@ void MoveGenerationTest::testKingCapturingMoves2()
     };
     verifyMoveList("King capturing moves", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 28, 1ULL << 9, PieceColor::White, (1ULL << 21) | (1ULL << 13)),
-        Move2(1ULL << 28, 1ULL << 4, PieceColor::White, (1ULL << 21) | (1ULL << 13)),
-        Move2(1ULL << 28, 1ULL, PieceColor::White, (1ULL << 21) | (1ULL << 13)),
-        Move2(1ULL << 28, 1ULL << 5, PieceColor::White, (1ULL << 21) | (1ULL << 10)),
-        Move2(1ULL << 28, 1ULL << 1, PieceColor::White, (1ULL << 21) | (1ULL << 10)),
-        Move2(1ULL << 28, 1ULL << 11, PieceColor::White, 1ULL << 21),
-        Move2(1ULL << 28, 1ULL << 7, PieceColor::White, 1ULL << 21)
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 28, 1ULL << 9, PieceColor::White, (1ULL << 21) | (1ULL << 13)),
+        MoveGpu(1ULL << 28, 1ULL << 4, PieceColor::White, (1ULL << 21) | (1ULL << 13)),
+        MoveGpu(1ULL << 28, 1ULL, PieceColor::White, (1ULL << 21) | (1ULL << 13)),
+        MoveGpu(1ULL << 28, 1ULL << 5, PieceColor::White, (1ULL << 21) | (1ULL << 10)),
+        MoveGpu(1ULL << 28, 1ULL << 1, PieceColor::White, (1ULL << 21) | (1ULL << 10)),
+        MoveGpu(1ULL << 28, 1ULL << 11, PieceColor::White, 1ULL << 21),
+        MoveGpu(1ULL << 28, 1ULL << 7, PieceColor::White, 1ULL << 21)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -538,14 +538,14 @@ void MoveGenerationTest::testKingCapturingMoves2()
     };
     verifyMoveList("King capturing moves (black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-        Move2(1ULL << 28, 1ULL << 9, PieceColor::Black, (1ULL << 21) | (1ULL << 13)),
-        Move2(1ULL << 28, 1ULL << 4, PieceColor::Black, (1ULL << 21) | (1ULL << 13)),
-        Move2(1ULL << 28, 1ULL, PieceColor::Black, (1ULL << 21) | (1ULL << 13)),
-        Move2(1ULL << 28, 1ULL << 5, PieceColor::Black, (1ULL << 21) | (1ULL << 10)),
-        Move2(1ULL << 28, 1ULL << 1, PieceColor::Black, (1ULL << 21) | (1ULL << 10)),
-        Move2(1ULL << 28, 1ULL << 11, PieceColor::Black, 1ULL << 21),
-        Move2(1ULL << 28, 1ULL << 7, PieceColor::Black, 1ULL << 21)
+    std::vector<MoveGpu> expectedBlack2 = {
+        MoveGpu(1ULL << 28, 1ULL << 9, PieceColor::Black, (1ULL << 21) | (1ULL << 13)),
+        MoveGpu(1ULL << 28, 1ULL << 4, PieceColor::Black, (1ULL << 21) | (1ULL << 13)),
+        MoveGpu(1ULL << 28, 1ULL, PieceColor::Black, (1ULL << 21) | (1ULL << 13)),
+        MoveGpu(1ULL << 28, 1ULL << 5, PieceColor::Black, (1ULL << 21) | (1ULL << 10)),
+        MoveGpu(1ULL << 28, 1ULL << 1, PieceColor::Black, (1ULL << 21) | (1ULL << 10)),
+        MoveGpu(1ULL << 28, 1ULL << 11, PieceColor::Black, 1ULL << 21),
+        MoveGpu(1ULL << 28, 1ULL << 7, PieceColor::Black, 1ULL << 21)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -577,21 +577,21 @@ void MoveGenerationTest::testKingCapturingMoves3()
     };
     verifyMoveList("Chain capture - multiple", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 3, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 17, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 20, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 24, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 12, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 16, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 22, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
-        Move2(1ULL << 31, 1ULL << 4, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 22, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
-        Move2(1ULL << 31, 1ULL << 26, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
-        Move2(1ULL << 31, 1ULL << 29, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 31, 1ULL << 4, PieceColor::White, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 3, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 17, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 20, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 24, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 12, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 16, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 22, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
+        MoveGpu(1ULL << 31, 1ULL << 4, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL, PieceColor::White,(1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 22, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+        MoveGpu(1ULL << 31, 1ULL << 26, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+        MoveGpu(1ULL << 31, 1ULL << 29, PieceColor::White,(1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -620,21 +620,21 @@ void MoveGenerationTest::testKingCapturingMoves3()
     };
     verifyMoveList("Chain capture - multiple (black)", expectedBlack, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expectedBlack2 = {
-       Move2(1ULL << 31, 1ULL << 4, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 3, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 17, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 20, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 24, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
-        Move2(1ULL << 31, 1ULL << 12, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 16, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 22, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
-        Move2(1ULL << 31, 1ULL << 4, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
-        Move2(1ULL << 31, 1ULL << 22, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
-        Move2(1ULL << 31, 1ULL << 26, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
-        Move2(1ULL << 31, 1ULL << 29, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+    std::vector<MoveGpu> expectedBlack2 = {
+       MoveGpu(1ULL << 31, 1ULL << 4, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 3, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 17, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 20, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 24, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10)),
+        MoveGpu(1ULL << 31, 1ULL << 12, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 16, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 22, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 18)),
+        MoveGpu(1ULL << 31, 1ULL << 4, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL, PieceColor::Black, (1ULL << 27) | (1ULL << 19) | (1ULL << 11) | (1ULL << 10) | (1ULL << 9)),
+        MoveGpu(1ULL << 31, 1ULL << 22, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+        MoveGpu(1ULL << 31, 1ULL << 26, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
+        MoveGpu(1ULL << 31, 1ULL << 29, PieceColor::Black, (1ULL << 27) | (1ULL << 18) | (1ULL << 10) | (1ULL << 11) | (1ULL << 19)),
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -654,10 +654,10 @@ void MoveGenerationTest::testKingCapturingMovesEdgeCase()
     };
     verifyMoveList("King capturing moves", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 21, 1ULL << 12, PieceColor::White, 1ULL << 17),
-        Move2(1ULL << 21, 1ULL << 8, PieceColor::White, 1ULL << 17),
-        Move2(1ULL << 21, 1ULL << 30, PieceColor::White, 1ULL << 26)
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 21, 1ULL << 12, PieceColor::White, 1ULL << 17),
+        MoveGpu(1ULL << 21, 1ULL << 8, PieceColor::White, 1ULL << 17),
+        MoveGpu(1ULL << 21, 1ULL << 30, PieceColor::White, 1ULL << 26)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -688,10 +688,10 @@ void MoveGenerationTest::assertFailedTest()
     };
     verifyMoveList("King capturing moves", expected, moveGen.generateMoves(boardAfterMove, PieceColor::Black));
 
-    std::vector<Move2> expected2 = {
-        Move2(1ULL << 14, 1ULL << 12, PieceColor::Black, 1ULL << 17 | 1ULL << 18),
-        Move2(1ULL << 13, 1ULL << 29, PieceColor::Black, 1ULL << 18 | 1ULL << 26),
-        Move2(1ULL << 13, 1ULL << 15, PieceColor::Black, 1ULL << 18 | 1ULL << 19)
+    std::vector<MoveGpu> expected2 = {
+        MoveGpu(1ULL << 14, 1ULL << 12, PieceColor::Black, 1ULL << 17 | 1ULL << 18),
+        MoveGpu(1ULL << 13, 1ULL << 29, PieceColor::Black, 1ULL << 18 | 1ULL << 26),
+        MoveGpu(1ULL << 13, 1ULL << 15, PieceColor::Black, 1ULL << 18 | 1ULL << 19)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::Black, &moveQueue);
@@ -711,10 +711,10 @@ void MoveGenerationTest::assertFailedTest2()
 	};
 	verifyMoveList("assertion failed scenario", expected, moveGen.generateMoves(boardAfterMove, PieceColor::White));
 
-    std::vector<Move2> expected2 = {
-       Move2(1ULL << 3, 1ULL << 17, PieceColor::White, 1ULL << 13),
-        Move2(1ULL << 3, 1ULL << 20, PieceColor::White, 1ULL << 13),
-        Move2(1ULL << 3, 1ULL << 24, PieceColor::White, 1ULL << 13)
+    std::vector<MoveGpu> expected2 = {
+       MoveGpu(1ULL << 3, 1ULL << 17, PieceColor::White, 1ULL << 13),
+        MoveGpu(1ULL << 3, 1ULL << 20, PieceColor::White, 1ULL << 13),
+        MoveGpu(1ULL << 3, 1ULL << 24, PieceColor::White, 1ULL << 13)
     };
     moveQueue.clear();
     moveGen.generateMovesGpu(boardAfterMove, PieceColor::White, &moveQueue);
@@ -735,8 +735,8 @@ void MoveGenerationTest::simulationMoveGenerationTest()
     int result = DRAW;
 
     // Queue for gpu generated moves
-	Move2 movesArray[QUEUE_SIZE];
-	Queue<Move2> moveQueue = Queue<Move2>(movesArray, QUEUE_SIZE);
+	MoveGpu movesArray[QUEUE_SIZE];
+	Queue<MoveGpu> moveQueue = Queue<MoveGpu>(movesArray, QUEUE_SIZE);
 	bool areMovesTheSame = true;
 
     while (true)
@@ -756,7 +756,7 @@ void MoveGenerationTest::simulationMoveGenerationTest()
         }
 
         for (int i = 0; i < queueLength; i++) {
-			Move2 gpuMove = moveQueue[i];
+			MoveGpu gpuMove = moveQueue[i];
             bool foundMove = false;
             for(Move cpuMove: moves) {
                 if (cpuMove.getSource() == gpuMove.src &&
@@ -771,7 +771,7 @@ void MoveGenerationTest::simulationMoveGenerationTest()
         }
 
         for (int i = 0; i < queueLength; i++) {
-            Move2 gpuMove = moveQueue[i];
+            MoveGpu gpuMove = moveQueue[i];
             debugLog << "gpuMove:" << gpuMove.toString() << std::endl;
         }
 
