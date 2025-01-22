@@ -34,8 +34,8 @@ __host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, Piec
 	int noCaptureMoves = 0;
 
 	// Moves Queue initialization
-	Move2 movesArray[QUEUE_SIZE];
-	Queue<Move2> movesQueue(movesArray, QUEUE_SIZE);
+	MoveGpu movesArray[QUEUE_SIZE];
+	Queue<MoveGpu> movesQueue(movesArray, QUEUE_SIZE);
 
 	while (true)
 	{
@@ -57,7 +57,7 @@ __host__ __device__ int simulateGameGpu(UINT white, UINT black, UINT kings, Piec
 
 		// Random number generation
 		int randomIndex = KISS % movesQueue.length();
-		Move2 randomMove = movesQueue[randomIndex];
+		MoveGpu randomMove = movesQueue[randomIndex];
 
 		// Check if the move is a capture
 		if (!randomMove.captured && (randomMove.src & currentBitBoard.kings) > 0) {

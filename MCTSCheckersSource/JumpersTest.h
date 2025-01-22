@@ -1,6 +1,5 @@
 #pragma once
 #include "BitBoard.h"
-#include "MoveGenerator.h"
 #include "CheckersTest.h"
 
 class JumpersTest : public CheckersTest {

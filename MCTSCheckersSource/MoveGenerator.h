@@ -5,7 +5,7 @@
 #include "BitShift.h"
 #include "ShiftMap.h"
 #include "Queue.h"
-#include "Move2.h"
+#include "MoveGpu.h"
 
 #define ASSERTS_ON
 
@@ -13,11 +13,11 @@ class MoveGenerator {
 private:
 	
 public:
-	//----------------------------------------------------------------
+	//---------------------------------------------------------------l-
 	// Generating moves
 	//----------------------------------------------------------------
 
-	__device__ __host__ static void generateMovesGpu(const BitBoard& pieces, PieceColor playerColor, Queue<Move2>* moves)
+	__device__ __host__ static void generateMovesGpu(const BitBoard& pieces, PieceColor playerColor, Queue<MoveGpu>* moves)
 	{
 		UINT jumpersL3 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_L3);
 		UINT jumpersL4 = getJumpersInShift(pieces, playerColor, BitShift::BIT_SHIFT_L4);
@@ -55,7 +55,7 @@ public:
 		return;
 	}
 	
-	__device__ __host__ static void generateBasicMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generateBasicMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, Queue<MoveGpu>* moves)
 	{
 		while (movers) {
 			UINT mover = movers & -movers;
@@ -70,7 +70,7 @@ public:
 		}
 	}
 
-	__device__ __host__ static void generateCapturingMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT jumpers, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generateCapturingMovesInShiftGpu(const BitBoard& pieces, PieceColor playerColor, UINT jumpers, BitShift shift, Queue<MoveGpu>* moves)
 	{
 		while (jumpers) {
 			UINT jumper = jumpers & -jumpers;
@@ -304,7 +304,7 @@ public:
 	// Generating king moves
 	//---------------------------------------------------------------
 
-	__device__ __host__ static void generateKingMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generateKingMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<MoveGpu>* moves)
 	{
 		UINT emptyFields = pieces.getEmptyFields();
 		UINT newPosition = position;
@@ -321,13 +321,13 @@ public:
 			if (!(newPosition & emptyFields))
 				break;
 
-			Move2 move(position, newPosition, playerColor);
+			MoveGpu move(position, newPosition, playerColor);
 			moves->push(move);
 			iteration++;
 		}
 	}
 
-	__device__ __host__ static void generateKingCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generateKingCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<MoveGpu>* moves)
 	{
 		UINT emptyFields = pieces.getEmptyFields();
 		UINT newPosition = position;
@@ -343,8 +343,8 @@ public:
 		UINT foundEnemyPiece = 0;
 
 		// Initialize continuation array
-		Move2 localMovesArray[QUEUE_SIZE];
-		Queue<Move2> localMovesQueue(localMovesArray, QUEUE_SIZE);
+		MoveGpu localMovesArray[QUEUE_SIZE];
+		Queue<MoveGpu> localMovesQueue(localMovesArray, QUEUE_SIZE);
 
 		while (newPosition)
 		{
@@ -374,7 +374,7 @@ public:
 			// If the newPosition contains empty field and we have already found enemy piece, add the move
 			if ((newPosition & emptyFields) > 0 && foundEnemyPiece)
 			{
-				Move2 move(position, newPosition, playerColor, foundEnemyPiece);
+				MoveGpu move(position, newPosition, playerColor, foundEnemyPiece);
 				localMovesQueue.push(move);
 				continue;
 			}
@@ -395,7 +395,7 @@ public:
 
 		while (!localMovesQueue.empty())
 		{
-			Move2 move = localMovesQueue.front();
+			MoveGpu move = localMovesQueue.front();
 			localMovesQueue.pop();
 			
 			// Create new board state after capture
@@ -455,7 +455,7 @@ public:
 					// If the newPosition contains empty field and we have already found enemy piece, add the move
 					if ((newJumperPosition & newEmptyFields) > 0 && newFoundEnemyPiece)
 					{
-						Move2 newMove(move.src, newJumperPosition, playerColor, move.captured | newFoundEnemyPiece);
+						MoveGpu newMove(move.src, newJumperPosition, playerColor, move.captured | newFoundEnemyPiece);
 						localMovesQueue.push(newMove);
 						continue;
 					}
@@ -482,14 +482,14 @@ public:
 	//---------------------------------------------------------------
 	// Generating pawn moves
 	//---------------------------------------------------------------
-	__device__ __host__ static void generatePawnMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generatePawnMovesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<MoveGpu>* moves)
 	{
 		UINT newPosition = ShiftMap::shift(position, shift);
-		Move2 move(position, newPosition, playerColor);
+		MoveGpu move(position, newPosition, playerColor);
 		moves->push(move);
 	};
 
-	__device__ __host__ static void generatePawnCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<Move2>* moves)
+	__device__ __host__ static void generatePawnCapturesGpu(const BitBoard& pieces, PieceColor playerColor, UINT position, BitShift shift, Queue<MoveGpu>* moves)
 	{
 		UINT emptyFields = pieces.getEmptyFields();
 		UINT captured = ShiftMap::shift(position, shift);
@@ -527,18 +527,18 @@ public:
 		newPosition = ShiftMap::shift(captured, nextShift);
 
 		// Create the move
-		Move2 singleCapture = Move2(position, newPosition, playerColor, captured);
+		MoveGpu singleCapture = MoveGpu(position, newPosition, playerColor, captured);
 
 		// Initialize continuation array
-		Move2 localMovesArray[QUEUE_SIZE];
-		Queue<Move2> localMovesQueue(localMovesArray, QUEUE_SIZE);
+		MoveGpu localMovesArray[QUEUE_SIZE];
+		Queue<MoveGpu> localMovesQueue(localMovesArray, QUEUE_SIZE);
 		localMovesQueue.push(singleCapture);
 
 		// Generate all possible continuations
 		while (!localMovesQueue.empty())
 		{
 			// Get move
-			Move2 captureMove = localMovesQueue.front();
+			MoveGpu captureMove = localMovesQueue.front();
 			localMovesQueue.pop();
 
 			// Create new board state after capture
@@ -565,7 +565,7 @@ public:
 				UINT newDst = ShiftMap::shift(newCaptured, newPosShift);
 
 				// Create new move
-				Move2 newMove = Move2(captureMove.src, newDst, playerColor, newCaptured | captureMove.captured);
+				MoveGpu newMove = MoveGpu(captureMove.src, newDst, playerColor, newCaptured | captureMove.captured);
 				localMovesQueue.push(newMove);
 			}
 

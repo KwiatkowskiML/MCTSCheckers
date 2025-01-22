@@ -59,7 +59,7 @@ MoveList MoveGenerator::generateMoves(const BitBoard& pieces, PieceColor playerC
 void MoveGenerator::generateBasicMovesInShift(const BitBoard& pieces, PieceColor playerColor, UINT movers, BitShift shift, MoveList& moves)
 {
 	while (movers) {
-		UINT mover = movers & -movers; // TODO: reconsider this
+		UINT mover = movers & -movers; 
 		movers ^= mover;
 
 		if (mover & pieces.kings) {

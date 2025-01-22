@@ -32,19 +32,6 @@ Move::Move(const std::string& moveStr, PieceColor col) : playerColor(col) {
 			}
 			steps.push_back(it->second);
 		}
-
-		// For capture moves, calculate the captured pieces
-		if (isCapture && steps.size() > 1) {
-			for (size_t i = 1; i < steps.size(); i++) {
-				UINT start_pos = steps[i - 1];
-				UINT end_pos = steps[i];
-
-				// Calculate position of captured piece
-				UINT captured_pos = Board::getAllFieldsBetween(start_pos, end_pos); // TODO: fix it
-				captured |= captured_pos;
-			}
-		}
-
 	}
 	catch (const std::exception& e) {
 		throw std::invalid_argument("Invalid move string format: " + moveStr);
