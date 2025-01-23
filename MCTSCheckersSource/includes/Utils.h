@@ -39,6 +39,6 @@
 #define TREE_VISUALIZATION_FILE_CPU "tree_cpu.dot"
 
 #define NUMBER_OF_BLOCKS 32
-#define THREADS_PER_BLOCK 512
+#define THREADS_PER_BLOCK 64
 
 #define QUEUE_SIZE 48

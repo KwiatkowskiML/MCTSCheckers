@@ -5,7 +5,7 @@
 #include "includes/MoveGenerator.h"
 #include "includes/CheckersTestSuite.h"
 #include "includes/PlayerCPU.h"
-#include "includes/PlayerGPU.cuh"
+#include "includes/PlayerGPU.h"
 #include "includes/PlayerReal.h"
 #include "includes/Game.h"
 
@@ -77,7 +77,10 @@ void CompareGetBestMove(UINT white, UINT black, UINT kings)
 	Move* bestMoveGpu = blackPlayerGpu->GetBestMove();
 
 	std::cout << "Best move CPU: " << bestMoveCpu->toString() << std::endl;
+	std::cout << "Games Played: " << blackPlayerCpu->root->gamesPlayed << std::endl;
+	
 	std::cout << "Best move GPU: " << bestMoveGpu->toString() << std::endl;
+	std::cout << "Games Played: " << blackPlayerGpu->root->gamesPlayed << std::endl;
 
 	blackPlayerCpu->GenerateDotFile(TREE_VISUALIZATION_FILE_CPU);
 	blackPlayerGpu->GenerateDotFile(TREE_VISUALIZATION_FILE_GPU);
@@ -108,12 +111,14 @@ void PlayGameTest()
 
 int main()
 {
-	//Game game;
-	//game.PlayGame();
+	// Game game;
+	// game.PlayGame();
 
 	// CheckersTestSuite::runAll();
 	
-	PlayGameTest();
+	// PlayGameTest();
+
+	CompareGetBestMove(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
 
 	return 0;
 }

@@ -96,7 +96,9 @@
     <ClInclude Include="includes\PieceColor.h" />
     <ClInclude Include="includes\Player.h" />
     <ClInclude Include="includes\PlayerCPU.h" />
-    <ClInclude Include="includes\PlayerGPU.cuh" />
+    <CudaCompile Include="src\PlayerGPU.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <ClInclude Include="includes\PlayerGpu.h" />
     <ClInclude Include="includes\PlayerReal.h" />
     <ClInclude Include="includes\Queue.h" />
