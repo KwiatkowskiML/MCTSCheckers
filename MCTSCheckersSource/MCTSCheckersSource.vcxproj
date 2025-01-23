@@ -120,7 +120,6 @@
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\PlayerCPU.cpp" />
     <ClCompile Include="src\PlayerReal.cpp" />
-    <ClCompile Include="src\TestUtils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

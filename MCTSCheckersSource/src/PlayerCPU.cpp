@@ -6,15 +6,15 @@ std::pair<int,int> PlayerCPU::Simulate(Node* node)
 {
 	// simulate game after the move
 	//int winner = node->boardAfterMove.simulateGame(getEnemyColor(node->moveColor));
-	
-	std::random_device rd; // Seed
-	std::mt19937 gen(rd()); // Mersenne Twister engine
-	std::uniform_int_distribution<> dist(-999999, 999999);
 
-	int z = dist(gen);
-	int w = dist(gen);
-	int jsr = dist(gen);
-	int jcong = dist(gen);
+	std::random_device rd; // Random device for seeding
+	std::mt19937 gen(rd()); // Mersenne Twister RNG
+	std::uniform_int_distribution<uint32_t> dist(1, UINT32_MAX);
+
+	uint32_t z = dist(gen);
+	uint32_t w = dist(gen);
+	uint32_t jsr = dist(gen);
+	uint32_t jcong = dist(gen);
 
 	int winner = simulateGameGpu(node->boardAfterMove.getWhitePawns(), node->boardAfterMove.getBlackPawns(), node->boardAfterMove.getKings(),
 		getEnemyColor(node->moveColor), z, w, jsr, jcong);
