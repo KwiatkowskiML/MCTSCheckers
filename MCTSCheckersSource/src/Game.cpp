@@ -64,6 +64,11 @@ Game::Game()
 			break;
 		}
 	} while (shouldAskAgain);
+
+	std::cout << "Enter logfile path: ";
+	std::cin >> _logFileName;
+
+	std::cout << "Game started!" << std::endl << std::endl;
 }
 
 void Game::PlayGame()

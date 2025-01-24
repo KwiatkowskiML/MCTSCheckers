@@ -87,7 +87,7 @@ void CompareGetBestMove(UINT white, UINT black, UINT kings)
 
 	delete blackPlayerCpu;
 	delete blackPlayerGpu;
-}
+} 
 
 void PlayGameTest()
 {
@@ -111,14 +111,23 @@ void PlayGameTest()
 
 int main()
 {
-	// Game game;
-	// game.PlayGame();
+	//cudaDeviceProp prop; 
+	//cudaGetDeviceProperties(&prop, 0);  // 0 = first GPU 
+
+	//int num_sms = prop.multiProcessorCount;
+	//int max_threads_per_sm = prop.maxThreadsPerMultiProcessor;
+
+	//printf("Number of SMs: %d\n", num_sms);
+	//printf("Max threads per SM: %d\n", max_threads_per_sm);
+
+	Game game;
+	game.PlayGame();
 
 	// CheckersTestSuite::runAll();
 	
 	// PlayGameTest();
 
-	CompareGetBestMove(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
+	// CompareGetBestMove(INIT_WHITE_PAWNS, INIT_BLACK_PAWNS, 0);
 
 	return 0;
 }

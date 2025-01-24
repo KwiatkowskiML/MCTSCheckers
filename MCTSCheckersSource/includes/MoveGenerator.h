@@ -578,7 +578,7 @@ public:
 
 
 	//---------------------------------------------------------------
-	// Deprecated
+	// Generating moves in a tree
 	//---------------------------------------------------------------
 	static MoveList generateMoves(const BitBoard& pieces, PieceColor playerColor);
 
