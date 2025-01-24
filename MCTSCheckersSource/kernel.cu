@@ -87,7 +87,7 @@ void CompareGetBestMove(UINT white, UINT black, UINT kings)
 
 	delete blackPlayerCpu;
 	delete blackPlayerGpu;
-}
+} 
 
 void PlayGameTest()
 {
