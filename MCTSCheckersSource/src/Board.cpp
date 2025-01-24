@@ -145,9 +145,9 @@ std::string Board::toString() const
                 boardString << "   |";  // Light square - always empty with no vertical line
             }
             else {
-                // Calculate bit position for dark squares (bottom to top, left to right)
-                int darkSquareNumber = (7 - row) * 4 + (col / 2);
-                UINT mask = 1U << darkSquareNumber;
+                // Calculate bit position for dark squares (bottom to top, right to left within each row)
+                int position = row * 4 + (3 - col / 2);
+                UINT mask = 1U << position;
 
                 // Check if square has a piece
                 if (_pieces.whitePawns & mask) {
@@ -168,6 +168,7 @@ std::string Board::toString() const
 
     return boardString.str();
 }
+
 
 void Board::printBitboard(UINT bitboard)
 {
@@ -207,14 +208,14 @@ void Board::printBitboard(UINT bitboard)
 //----------------------------------------------------------------
 
 const std::unordered_map<UINT, std::string> Board::fieldToStringMapping = {
-    {1u, "a1"}, {1u << 1, "c1"}, {1u << 2, "e1"}, {1u << 3, "g1"},
-    {1u << 4, "b2"}, {1u << 5, "d2"}, {1u << 6, "f2"}, {1u << 7, "h2"},
-    {1u << 8, "a3"}, {1u << 9, "c3"}, {1u << 10, "e3"}, {1u << 11, "g3"},
-    {1u << 12, "b4"}, {1u << 13, "d4"}, {1u << 14, "f4"}, {1u << 15, "h4"},
-    {1u << 16, "a5"}, {1u << 17, "c5"}, {1u << 18, "e5"}, {1u << 19, "g5"},
-    {1u << 20, "b6"}, {1u << 21, "d6"}, {1u << 22, "f6"}, {1u << 23, "h6"},
-    {1u << 24, "a7"}, {1u << 25, "c7"}, {1u << 26, "e7"}, {1u << 27, "g7"},
-    {1u << 28, "b8"}, {1u << 29, "d8"}, {1u << 30, "f8"}, {1u << 31, "h8"}
+    {1u, "h8"}, {1u << 1, "f8"}, {1u << 2, "d8"}, {1u << 3, "b8"},
+    {1u << 4, "g7"}, {1u << 5, "e7"}, {1u << 6, "c7"}, {1u << 7, "a7"},
+    {1u << 8, "h6"}, {1u << 9, "f6"}, {1u << 10, "d6"}, {1u << 11, "b6"},
+    {1u << 12, "g5"}, {1u << 13, "e5"}, {1u << 14, "c5"}, {1u << 15, "a5"},
+    {1u << 16, "h4"}, {1u << 17, "f4"}, {1u << 18, "d4"}, {1u << 19, "b4"},
+    {1u << 20, "g3"}, {1u << 21, "e3"}, {1u << 22, "c3"}, {1u << 23, "a3"},
+    {1u << 24, "h2"}, {1u << 25, "f2"}, {1u << 26, "d2"}, {1u << 27, "b2"},
+    {1u << 28, "g1"}, {1u << 29, "e1"}, {1u << 30, "c1"}, {1u << 31, "a1"}
 };
 
 const std::unordered_map<std::string, UINT> Board::stringToFieldMapping = [] {
