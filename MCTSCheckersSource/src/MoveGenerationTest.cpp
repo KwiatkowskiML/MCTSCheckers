@@ -81,7 +81,6 @@ bool MoveGenerationTest::verifyMoveList2(const char* testName, const std::vector
 			for (const auto& expectedMove : expected) {
 				if (expectedMove == actualMove) {
 					moveFound = true;
-                    std::cout << "Found move: " << actualMove.toString() << std::endl;
 					break;
 				}
 			}
@@ -846,25 +845,25 @@ void MoveGenerationTest::noMovesAvailable()
 
 void MoveGenerationTest::runAllTests()
 {
- //   testBasicPawnMovesCenter();
- //   testBasicPawnMovesLeftEdge();
- //   testBasicPawnMovesRightEdge();
- //   testSingleCaptureRightDiagonal();
- //   testSingleCaptureLeftDiagonal();
- //   testChainCaptureDouble();
- //   testChainCaptureTriple();
- //   testChainCaptureMultiple();
- //   testKingBasicMoves();
-	//testKingCapturingMoves();
-	//testKingCapturingMoves2();
- //   testKingCapturingMoves3();
- //   testCrowningMove();
- //   testKingCapturingMovesEdgeCase();
+    testBasicPawnMovesCenter();
+    testBasicPawnMovesLeftEdge();
+    testBasicPawnMovesRightEdge();
+    testSingleCaptureRightDiagonal();
+    testSingleCaptureLeftDiagonal();
+    testChainCaptureDouble();
+    testChainCaptureTriple();
+    testChainCaptureMultiple();
+    testKingBasicMoves();
+	testKingCapturingMoves();
+	testKingCapturingMoves2();
+    testKingCapturingMoves3();
+    testCrowningMove();
+    testKingCapturingMovesEdgeCase();
 
-	//assertFailedTest();
-	//assertFailedTest2();
+	assertFailedTest();
+	assertFailedTest2();
 
-	//simulationMoveGenerationTest();
+	simulationMoveGenerationTest();
 
 	noMovesAvailable();
 

@@ -111,14 +111,14 @@ void PlayGameTest()
 
 int main()
 {
-	cudaDeviceProp prop; 
-	cudaGetDeviceProperties(&prop, 0);  // 0 = first GPU 
+	//cudaDeviceProp prop; 
+	//cudaGetDeviceProperties(&prop, 0);  // 0 = first GPU 
 
-	int num_sms = prop.multiProcessorCount;
-	int max_threads_per_sm = prop.maxThreadsPerMultiProcessor;
+	//int num_sms = prop.multiProcessorCount;
+	//int max_threads_per_sm = prop.maxThreadsPerMultiProcessor;
 
-	printf("Number of SMs: %d\n", num_sms);
-	printf("Max threads per SM: %d\n", max_threads_per_sm);
+	//printf("Number of SMs: %d\n", num_sms);
+	//printf("Max threads per SM: %d\n", max_threads_per_sm);
 
 	Game game;
 	game.PlayGame();
