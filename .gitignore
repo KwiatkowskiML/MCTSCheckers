@@ -63,3 +63,4 @@ Makefile
 *.dot
 game_logs
 tree_logs.pdf
+*.zip
